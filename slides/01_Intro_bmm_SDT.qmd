@@ -1,0 +1,45 @@
+---
+title: "Fitting Cognitive Measurement Models with bmm"
+subtitle: "Part 1: The bmm Workflow & Signal Detection Theory"
+author: "Gidon T. Frischkorn"
+institute: "University of Zurich"
+date: "November 2026"
+format: live-revealjs
+---
+
+{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
+
+## Why cognitive measurement models? {.section-divider}
+
+TODO: Hook — same behavioral data, process-level questions; the translation
+barrier (JAGS/Stan) and how bmm removes it.
+
+## The bmm workflow {.section-divider}
+
+TODO: The shared workflow that runs through all three segments:
+specify formula → choose model → fit → evaluate. This is the thread the
+M3 and DDM segments pick up.
+
+## Signal Detection Theory for recognition memory {.section-divider}
+
+TODO: Binary SDT — d' and criterion; mapping recognition data to the model.
+Candidate webR demo: ROC/criterion slider (see `00_template.qmd`).
+
+## Fitting hierarchical SDT in bmm {.section-divider}
+
+TODO: The bmm call, cached fit from `models/sdt_binary.rds`, stepping through
+output with `code-line-numbers`.
+
+## Evaluating and testing parameters {.section-divider}
+
+TODO: Posterior summaries, hypothesis tests, visualization
+(tidybayes/bayesplot patterns from the template).
+
+## Extension: rating-scale SDT {.section-divider}
+
+TODO: Same workflow, richer data — cached fit from `models/sdt_rating.rds`.
+
+## Take-home {.section-divider}
+
+TODO: Pointer to `examples/01_sdt.qmd`, `resources/01_sdt/`, and the segue
+to Part 2 (M3).

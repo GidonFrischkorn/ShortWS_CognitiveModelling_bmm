@@ -1,0 +1,169 @@
+---
+title: "Deck Template — Pattern Reference"
+subtitle: "Copy these patterns into your own deck"
+author: "Gidon T. Frischkorn, Chenyu Li & Adriana F. Chávez De la Peña"
+institute: "Psychonomic Society Annual Meeting 2026, San Diego"
+date: "November 2026"
+format: live-revealjs
+---
+
+{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
+
+## How to use this deck {.smaller}
+
+This deck is a pattern reference, not workshop content. Each slide shows one
+idiom used across our decks — copy the source, keep the class names.
+
+- Shared options live in `_metadata.yml`; your deck YAML stays minimal
+- Shared theme: `custom.scss`; slide classes: `.section-divider`, `.question-slide`, `.formula-box`
+- Render your own deck while iterating: `quarto render slides/0X_yourdeck.qmd`
+- Before handing off: run `quarto render` at the repo root once and commit the
+  updated `_freeze/` folder — then nobody else re-executes your chunks
+
+::: {.notes}
+Speaker notes go in a `.notes` div — press `s` in the browser for speaker view.
+:::
+
+## Section dividers {.section-divider}
+
+A `{.section-divider}` slide starts each major part of your talk.
+
+## Incremental list
+
+::: {.incremental}
+1. First point appears on click
+2. Second point follows
+3. Third point closes the argument
+:::
+
+## Two-column layout
+
+:::: {.columns}
+
+::: {.column width="50%"}
+Text or bullets on the left:
+
+- explain the figure
+- keep it short
+:::
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| fig-height: 4.5
+#| fig-alt: "Histogram of 500 standard normal draws with vertical line at zero."
+library(ggplot2)
+set.seed(1)
+ggplot(data.frame(x = rnorm(500)), aes(x)) +
+  geom_histogram(bins = 30, fill = "#0028a5") +
+  geom_vline(xintercept = 0, color = "#dc6800", linewidth = 1) +
+  theme_minimal(base_size = 18)
+```
+:::
+
+::::
+
+## Code with line stepping
+
+Use `code-line-numbers` to walk the audience through a call — each `|` group
+highlights on click:
+
+```{r}
+#| eval: false
+#| code-line-numbers: "1-2|4-5|7"
+library(bmm)
+library(here)
+
+model <- sdt(resp ~ 1 + (1 | id),
+             data = dat)
+
+fit <- bmm(model, data = dat, cores = 4)
+```
+
+Illustrative syntax only (`eval: false`) — real fits are cached, see next slide.
+
+## Loading a cached fit {.smaller}
+
+The load-bearing pattern: **never fit live**. Fit once locally, `saveRDS()`
+into `models/`, load the cached object on the slide:
+
+```{r}
+#| code-line-numbers: "1|3"
+fit_file <- here::here("models", "template_fit.rds")
+
+if (file.exists(fit_file)) fit <- readRDS(fit_file)
+```
+
+```{r}
+#| echo: false
+#| output: asis
+if (!file.exists(here::here("models", "template_fit.rds"))) {
+  cat("> `models/template_fit.rds` not found — this guard lets the template",
+      "render on a fresh clone. Your deck should `summary(fit)` here.")
+}
+```
+
+::: {.notes}
+Workflow: fit in your examples/ notebook or a scratch script, saveRDS() to
+models/, commit the .rds together with your deck and _freeze/ update.
+:::
+
+## Posterior visualization
+
+With a cached fit loaded, plot posteriors with `tidybayes` / `bayesplot`:
+
+```{r}
+#| eval: false
+library(tidybayes)
+fit |>
+  gather_draws(b_dprime_Intercept, b_c_Intercept) |>
+  ggplot(aes(x = .value, y = .variable)) +
+  stat_halfeye()
+```
+
+(Chunk shown with `eval: false` here because the template ships no fit —
+in your deck, drop that option so the plot renders from your cached model.)
+
+## Interactive webR cell {.smaller .scrollable}
+
+An editable cell running R **in the audience's browser** (quarto-live).
+Use only for closed-form demos — Stan/bmm cannot run in webR.
+Drag the slider; the cell re-runs reactively:
+
+```{ojs}
+//| echo: false
+d = Inputs.range([0, 4], {value: 1.5, step: 0.1, label: "Sensitivity d'"})
+```
+
+```{webr}
+#| input:
+#|   - d
+#| autorun: true
+#| fig-height: 4
+far <- seq(0.001, 0.999, length.out = 200)
+hr  <- pnorm(qnorm(far) + d)
+plot(far, hr, type = "l", lwd = 3, col = "#0028a5",
+     xlab = "False-alarm rate", ylab = "Hit rate",
+     main = sprintf("ROC curve for d' = %.1f", d), asp = 1)
+abline(0, 1, lty = 2, col = "grey50")
+```
+
+::: {.notes}
+webR needs internet (CDN) — every webr slide MUST have a static pre-rendered
+fallback figure elsewhere in the deck in case the venue network dies.
+:::
+
+## Formulas
+
+Wrap display equations in a `.formula-box` for emphasis:
+
+::: {.formula-box}
+$$d' = z(\text{HR}) - z(\text{FAR}) \qquad c = -\tfrac{1}{2}\left[z(\text{HR}) + z(\text{FAR})\right]$$
+:::
+
+Inline math works as usual: the criterion $c$ shifts the response bias.
+
+## What would you conclude? {.question-slide}
+
+Use a `{.question-slide}` to pose a prompt to the audience before revealing
+the answer on the next slide.

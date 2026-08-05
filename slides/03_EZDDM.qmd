@@ -1,0 +1,42 @@
+---
+title: "Fitting Cognitive Measurement Models with bmm"
+subtitle: "Part 3: The EZ-Drift Diffusion Model"
+author: "Adriana F. Chávez De la Peña"
+institute: "University of California, Irvine"
+date: "November 2026"
+format: live-revealjs
+---
+
+{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
+
+## Choice and RT as evidence accumulation {.section-divider}
+
+TODO: Diffusion models — describing choice and response time data as the
+outcome of a latent evidence-accumulation process.
+
+## The EZ-DDM {.section-divider}
+
+TODO: A computationally accessible reformulation of the three-parameter DDM;
+drift rate, boundary separation, non-decision time from accuracy and RT
+summary statistics.
+Candidate webR demo: forward equations — parameter sliders → predicted
+accuracy/RT summaries (closed form, see `00_template.qmd`).
+
+## Fitting the EZ-DDM in bmm {.section-divider}
+
+TODO: Worked example with perceptual decision-making data; cached fit from
+`models/ezddm_summary.rds`.
+
+## Interpreting the parameters {.section-divider}
+
+TODO: Parameter interpretation and reusable analysis workflows.
+
+## Scaling up: trial-level DDM {.section-divider}
+
+TODO: The same workflow for studies that require trial-level estimation;
+cached fit from `models/ddm_trial.rds`.
+
+## Take-home {.section-divider}
+
+TODO: Pointer to `examples/03_ezddm.qmd`, `resources/03_ezddm/`, and the
+workshop wrap-up.

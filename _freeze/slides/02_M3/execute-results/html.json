@@ -1,0 +1,19 @@
+{
+  "hash": "1faef2fad38e98f71c2a32ef5947c9a0",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Fitting Cognitive Measurement Models with bmm\"\nsubtitle: \"Part 2: The Memory Measurement Model (M3)\"\nauthor: \"Chenyu Li\"\ninstitute: \"University of Zurich\"\ndate: \"November 2026\"\nformat: live-revealjs\n---\n\n\n::: {.cell}\n\n:::\n\n\n\n## The Memory Measurement Model {.section-divider}\n\nTODO: Decomposing categorical working memory performance into activation\nsources (and additional processes such as removal).\n\n## From activation to response probabilities {.section-divider}\n\nTODO: How activation sources map onto response categories.\nCandidate webR demo: activation-parameter sliders → predicted category\nprobabilities (closed form, see `00_template.qmd`).\n\n## Fitting M3 to simple span data {.section-divider}\n\nTODO: Same bmm workflow as Part 1 — formula, model, fit; cached fit from\n`models/m3_simple.rds`.\n\n## Interpreting M3 parameters {.section-divider}\n\nTODO: Posterior summaries and what the parameters mean psychologically.\n\n## Extending to complex span {.section-divider}\n\nTODO: Additional cognitive demands, additional processes; cached fit from\n`models/m3_complex.rds`.\n\n## Take-home {.section-divider}\n\nTODO: Pointer to `examples/02_m3.qmd`, `resources/02_m3/`, and the segue\nto Part 3 (DDM).\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {
+      "include-after-body": [
+        "\n<script>\n  // htmlwidgets need to know to resize themselves when slides are shown/hidden.\n  // Fire the \"slideenter\" event (handled by htmlwidgets.js) when the current\n  // slide changes (different for each slide format).\n  (function () {\n    // dispatch for htmlwidgets\n    function fireSlideEnter() {\n      const event = window.document.createEvent(\"Event\");\n      event.initEvent(\"slideenter\", true, true);\n      window.document.dispatchEvent(event);\n    }\n\n    function fireSlideChanged(previousSlide, currentSlide) {\n      fireSlideEnter();\n\n      // dispatch for shiny\n      if (window.jQuery) {\n        if (previousSlide) {\n          window.jQuery(previousSlide).trigger(\"hidden\");\n        }\n        if (currentSlide) {\n          window.jQuery(currentSlide).trigger(\"shown\");\n        }\n      }\n    }\n\n    // hookup for slidy\n    if (window.w3c_slidy) {\n      window.w3c_slidy.add_observer(function (slide_num) {\n        // slide_num starts at position 1\n        fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);\n      });\n    }\n\n  })();\n</script>\n\n"
+      ]
+    },
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
