@@ -1,0 +1,15 @@
+{
+  "hash": "557eeaa2940e57f860681c99de40d180",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Signal Detection Theory with bmm\"\nsubtitle: \"Take-home notebook — Psychonomics 2026 bmm workshop, Part 1\"\nauthor: \"Gidon T. Frischkorn\"\nformat:\n  html:\n    embed-resources: true\n    toc: true\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n## Setup\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(bmm)\nlibrary(brms)\nlibrary(tidyverse)\nlibrary(tidybayes)\nlibrary(here)\n```\n:::\n\n\n## Data\n\n<!-- TODO (Gidon): replace with the real recognition-memory dataset and\n     document the columns in data/README.md. Expected shape: -->\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Codebook (fill in real column names):\n#   id      participant identifier\n#   stim    old / new\n#   resp    \"old\" / \"new\" response\ndat <- read.csv(here(\"data\", \"sdt_recognition.csv\"))\nglimpse(dat)\n```\n:::\n\n\n## Fit the hierarchical SDT model\n\nAll workshop models ship pre-fitted in `models/`, so this chunk loads the\ncached fit if present and only re-fits when it is missing (re-fitting\nrequires cmdstanr — see `Install_Packages.R`, Part 2).\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file <- here(\"models\", \"sdt_binary.rds\")\n\nif (file.exists(fit_file)) {\n  fit_sdt <- readRDS(fit_file)\n} else {\n  # TODO (Gidon): real model specification\n  # model <- sdt(...)\n  # fit_sdt <- bmm(model, data = dat, cores = 4)\n  # saveRDS(fit_sdt, fit_file)\n}\n```\n:::\n\n\n## Summarize and visualize the posterior\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsummary(fit_sdt)\n\n# TODO (Gidon): tidybayes posterior plots for d' and criterion\n```\n:::\n\n\n## Test hypotheses\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# TODO (Gidon): brms::hypothesis() examples on the SDT parameters\n```\n:::\n\n\n## Extension: rating-scale SDT\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file_rating <- here(\"models\", \"sdt_rating.rds\")\n\nif (file.exists(fit_file_rating)) {\n  fit_rating <- readRDS(fit_file_rating)\n} else {\n  # TODO (Gidon): rating-scale SDT specification + saveRDS()\n}\n```\n:::\n\n\n## Further reading\n\nSee `resources/01_sdt/` for PDFs and `resources/README.md` for the full\nreading list with DOIs.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

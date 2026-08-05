@@ -1,0 +1,15 @@
+{
+  "hash": "83b5f16a3c11868413600c56a769c6b3",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"The EZ-Drift Diffusion Model with bmm\"\nsubtitle: \"Take-home notebook — Psychonomics 2026 bmm workshop, Part 3\"\nauthor: \"Adriana F. Chávez De la Peña\"\nformat:\n  html:\n    embed-resources: true\n    toc: true\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n## Setup\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(bmm)\nlibrary(brms)\nlibrary(tidyverse)\nlibrary(tidybayes)\nlibrary(here)\n```\n:::\n\n\n## Data\n\n<!-- TODO (Adriana): add the perceptual decision-making dataset and document\n     the columns in data/README.md. Expected shape: -->\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Codebook (fill in real column names):\n#   id      participant identifier\n#   rt      response time in seconds\n#   acc     accuracy (0/1)\ndat <- read.csv(here(\"data\", \"ezddm_perceptual.csv\"))\nglimpse(dat)\n```\n:::\n\n\n## Fit the EZ-DDM from summary statistics\n\nAll workshop models ship pre-fitted in `models/`, so this chunk loads the\ncached fit if present and only re-fits when it is missing (re-fitting\nrequires cmdstanr — see `Install_Packages.R`, Part 2).\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file <- here(\"models\", \"ezddm_summary.rds\")\n\nif (file.exists(fit_file)) {\n  fit_ez <- readRDS(fit_file)\n} else {\n  # TODO (Adriana): real model specification\n  # model <- ...\n  # fit_ez <- bmm(model, data = dat, cores = 4)\n  # saveRDS(fit_ez, fit_file)\n}\n```\n:::\n\n\n## Interpret drift rate, boundary separation, non-decision time\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsummary(fit_ez)\n\n# TODO (Adriana): posterior plots + parameter interpretation\n```\n:::\n\n\n## Scaling up: trial-level DDM\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file_trial <- here(\"models\", \"ddm_trial.rds\")\n\nif (file.exists(fit_file_trial)) {\n  fit_trial <- readRDS(fit_file_trial)\n} else {\n  # TODO (Adriana): trial-level DDM (Wiener likelihood) + saveRDS()\n}\n```\n:::\n\n\n## Further reading\n\nSee `resources/03_ezddm/` for PDFs and `resources/README.md` for the full\nreading list with DOIs.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

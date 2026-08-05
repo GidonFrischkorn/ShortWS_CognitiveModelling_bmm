@@ -1,0 +1,19 @@
+{
+  "hash": "0056e5cc2c90211cc42f2e2232d14105",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Fitting Cognitive Measurement Models with bmm\"\nsubtitle: \"Part 1: The bmm Workflow & Signal Detection Theory\"\nauthor: \"Gidon T. Frischkorn\"\ninstitute: \"University of Zurich\"\ndate: \"November 2026\"\nformat: live-revealjs\n---\n\n\n::: {.cell}\n\n:::\n\n\n\n## Why cognitive measurement models? {.section-divider}\n\nTODO: Hook — same behavioral data, process-level questions; the translation\nbarrier (JAGS/Stan) and how bmm removes it.\n\n## The bmm workflow {.section-divider}\n\nTODO: The shared workflow that runs through all three segments:\nspecify formula → choose model → fit → evaluate. This is the thread the\nM3 and DDM segments pick up.\n\n## Signal Detection Theory for recognition memory {.section-divider}\n\nTODO: Binary SDT — d' and criterion; mapping recognition data to the model.\nCandidate webR demo: ROC/criterion slider (see `00_template.qmd`).\n\n## Fitting hierarchical SDT in bmm {.section-divider}\n\nTODO: The bmm call, cached fit from `models/sdt_binary.rds`, stepping through\noutput with `code-line-numbers`.\n\n## Evaluating and testing parameters {.section-divider}\n\nTODO: Posterior summaries, hypothesis tests, visualization\n(tidybayes/bayesplot patterns from the template).\n\n## Extension: rating-scale SDT {.section-divider}\n\nTODO: Same workflow, richer data — cached fit from `models/sdt_rating.rds`.\n\n## Take-home {.section-divider}\n\nTODO: Pointer to `examples/01_sdt.qmd`, `resources/01_sdt/`, and the segue\nto Part 2 (M3).\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {
+      "include-after-body": [
+        "\n<script>\n  // htmlwidgets need to know to resize themselves when slides are shown/hidden.\n  // Fire the \"slideenter\" event (handled by htmlwidgets.js) when the current\n  // slide changes (different for each slide format).\n  (function () {\n    // dispatch for htmlwidgets\n    function fireSlideEnter() {\n      const event = window.document.createEvent(\"Event\");\n      event.initEvent(\"slideenter\", true, true);\n      window.document.dispatchEvent(event);\n    }\n\n    function fireSlideChanged(previousSlide, currentSlide) {\n      fireSlideEnter();\n\n      // dispatch for shiny\n      if (window.jQuery) {\n        if (previousSlide) {\n          window.jQuery(previousSlide).trigger(\"hidden\");\n        }\n        if (currentSlide) {\n          window.jQuery(currentSlide).trigger(\"shown\");\n        }\n      }\n    }\n\n    // hookup for slidy\n    if (window.w3c_slidy) {\n      window.w3c_slidy.add_observer(function (slide_num) {\n        // slide_num starts at position 1\n        fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);\n      });\n    }\n\n  })();\n</script>\n\n"
+      ]
+    },
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

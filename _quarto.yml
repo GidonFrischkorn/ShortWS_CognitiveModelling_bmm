@@ -1,0 +1,9 @@
+project:
+  type: default
+  output-dir: _output
+  render:
+    - "slides/*.qmd"
+    - "examples/*.qmd"
+
+execute:
+  freeze: auto

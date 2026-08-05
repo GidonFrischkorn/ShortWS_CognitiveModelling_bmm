@@ -1,0 +1,29 @@
+# Shared configuration for all workshop decks in slides/.
+# Individual decks only declare title/subtitle/author/date + `format: live-revealjs`.
+# Do NOT add a `revealjs:` key here — that would render every deck twice.
+
+engine: knitr
+
+format:
+  live-revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    transition: fade
+    code-fold: false
+    highlight-style: github
+    fig-align: center
+    width: 1280
+    height: 720
+    logo: images/bmm_logo.png
+    navigation-mode: linear
+    controls: true
+    progress: true
+
+webr:
+  packages:
+    - ggplot2
+
+execute:
+  echo: true
+  warning: false
+  message: false

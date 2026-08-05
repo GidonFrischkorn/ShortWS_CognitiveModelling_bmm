@@ -1,0 +1,294 @@
+/*
+  Shared reveal.js theme for the Psychonomics 2026 bmm lunchtime workshop.
+  Adapted from Workshop_SEM/slides_quarto/custom.scss (UZH palette).
+  Variable names keep the $uzh-* prefix; re-tint here if the decks should
+  match the bmm hex logo instead of UZH blue.
+*/
+
+/*-- scss:defaults --*/
+
+// UZH Color Palette
+$uzh-blue: #0028a5;
+$uzh-blue-light: #3353b7;
+$uzh-blue-lighter: #a8b8e0;
+$uzh-blue-bg: #e8ecf5;
+$uzh-gray: #a3adb7;
+$uzh-gray-dark: #4a5568;
+$uzh-gray-light: #f0f2f5;
+$uzh-white: #ffffff;
+$uzh-accent-green: #28a745;
+$uzh-accent-orange: #dc6800;
+$uzh-accent-red: #c53030;
+
+// Typography
+$font-family-sans-serif: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-monospace: "Fira Code", "Source Code Pro", "Consolas", monospace;
+$presentation-font-size-root: 36px;
+$presentation-h1-font-size: 1.6em;
+$presentation-h2-font-size: 1.3em;
+$presentation-h3-font-size: 1.1em;
+
+// Colors
+$body-bg: $uzh-white;
+$body-color: #2d3748;
+$link-color: $uzh-blue;
+$selection-bg: $uzh-blue-lighter;
+
+// Code
+$code-color: $uzh-blue;
+$code-bg: $uzh-gray-light;
+$code-block-bg: #f8f9fa;
+$code-block-font-size: 0.65em;
+
+/*-- scss:rules --*/
+
+// Slide titles
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  color: $uzh-blue;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+
+.reveal h2 {
+  border-bottom: 3px solid $uzh-blue;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.6em;
+}
+
+// Title slide
+#title-slide {
+  text-align: left;
+
+  h1.title {
+    color: $uzh-blue;
+    font-size: 1.8em;
+    font-weight: 700;
+    margin-bottom: 0.3em;
+  }
+
+  .subtitle {
+    color: $uzh-blue-light;
+    font-size: 1.0em;
+    font-weight: 400;
+  }
+
+  .author, .date, .institute {
+    color: $uzh-gray-dark;
+    font-size: 0.7em;
+  }
+}
+
+// Section divider slides
+.reveal .slide.section-divider {
+  background-color: $uzh-blue;
+
+  h2 {
+    color: $uzh-white;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+    font-size: 1.6em;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Question slides
+.reveal .slide.question-slide {
+  background-color: $uzh-blue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h2 {
+    color: $uzh-white;
+    border-bottom: none;
+    font-size: 1.5em;
+    text-align: center;
+  }
+}
+
+// Exercise slides
+.reveal .slide.exercise-slide {
+  background-color: $uzh-blue-bg;
+
+  h2 {
+    color: $uzh-blue;
+  }
+}
+
+// Two-column layout
+.columns {
+  display: flex;
+  gap: 2em;
+}
+
+.column {
+  flex: 1;
+}
+
+// Code blocks
+.reveal pre {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 0.65em;
+}
+
+.reveal pre code {
+  padding: 1em;
+  line-height: 1.5;
+}
+
+// lavaan syntax highlighting
+.reveal code.sourceCode.r {
+  font-family: $font-family-monospace;
+}
+
+// Callout boxes for key concepts
+.callout-note {
+  border-left: 4px solid $uzh-blue;
+  background-color: $uzh-blue-bg;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+.callout-important {
+  border-left: 4px solid $uzh-accent-orange;
+  background-color: #fff8f0;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+.callout-exercise {
+  border-left: 4px solid $uzh-accent-green;
+  background-color: #f0fff4;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+// Tables
+.reveal table {
+  border-collapse: collapse;
+  font-size: 0.7em;
+  margin: 0.5em auto;
+}
+
+.reveal table th {
+  background-color: $uzh-blue;
+  color: $uzh-white;
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+}
+
+.reveal table td {
+  padding: 0.4em 0.8em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.reveal table tr:nth-child(even) {
+  background-color: $uzh-gray-light;
+}
+
+// Path diagram container
+.path-diagram {
+  text-align: center;
+  margin: 0.5em 0;
+
+  img {
+    max-height: 450px;
+    border-radius: 4px;
+  }
+}
+
+// Speaker notes
+.reveal .speaker-notes {
+  font-family: $font-family-sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+// Footer with slide context
+.reveal .slide-number {
+  color: $uzh-blue;
+  font-size: 14px;
+}
+
+// Fragments with subtle animation
+.reveal .fragment.fade-in-then-semi-out.visible:not(.current-fragment) {
+  opacity: 0.4;
+}
+
+// Smaller text utility
+.small {
+  font-size: 0.7em;
+}
+
+.smaller {
+  font-size: 0.55em;
+}
+
+// Interactive slide OJS elements
+.reveal .slide .ojs-cell {
+  margin: 0.5em 0;
+}
+
+.reveal .slide input[type="range"] {
+  width: 100%;
+  accent-color: $uzh-blue;
+}
+
+.reveal .slide .observablehq {
+  font-family: $font-family-sans-serif;
+  font-size: 0.7em;
+}
+
+// Fit index verdict colors
+.fit-good {
+  color: $uzh-accent-green;
+  font-weight: 600;
+}
+
+.fit-acceptable {
+  color: $uzh-accent-orange;
+  font-weight: 600;
+}
+
+.fit-poor {
+  color: $uzh-accent-red;
+  font-weight: 600;
+}
+
+// Scrollable slides for interactive content
+.reveal .slide.scrollable {
+  overflow-y: auto;
+}
+
+// Full-width diagram slide (centered, no columns)
+.reveal .slide.diagram-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Comparison slide: exactly 2 items side by side
+.reveal .slide.comparison-slide .columns {
+  gap: 3em;
+  align-items: flex-start;
+}
+
+// Formula display
+.formula-box {
+  background-color: $uzh-gray-light;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.8em 1.2em;
+  margin: 0.5em 0;
+  text-align: center;
+}

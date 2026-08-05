@@ -1,0 +1,20 @@
+# RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Rprofile
+
+# OS
+.DS_Store
+
+# Quarto rendered output and caches (NOT _freeze/ — that is committed on purpose)
+/_output/
+/.quarto/
+*_files/
+*.quarto_ipynb
+
+# Never track: workshop proposal, private notes, AI context
+local/
+CLAUDE.md
+
+**/*.quarto_ipynb

@@ -1,0 +1,40 @@
+---
+title: "Fitting Cognitive Measurement Models with bmm"
+subtitle: "Part 2: The Memory Measurement Model (M3)"
+author: "Chenyu Li"
+institute: "University of Zurich"
+date: "November 2026"
+format: live-revealjs
+---
+
+{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
+
+## The Memory Measurement Model {.section-divider}
+
+TODO: Decomposing categorical working memory performance into activation
+sources (and additional processes such as removal).
+
+## From activation to response probabilities {.section-divider}
+
+TODO: How activation sources map onto response categories.
+Candidate webR demo: activation-parameter sliders → predicted category
+probabilities (closed form, see `00_template.qmd`).
+
+## Fitting M3 to simple span data {.section-divider}
+
+TODO: Same bmm workflow as Part 1 — formula, model, fit; cached fit from
+`models/m3_simple.rds`.
+
+## Interpreting M3 parameters {.section-divider}
+
+TODO: Posterior summaries and what the parameters mean psychologically.
+
+## Extending to complex span {.section-divider}
+
+TODO: Additional cognitive demands, additional processes; cached fit from
+`models/m3_complex.rds`.
+
+## Take-home {.section-divider}
+
+TODO: Pointer to `examples/02_m3.qmd`, `resources/02_m3/`, and the segue
+to Part 3 (DDM).

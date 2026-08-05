@@ -1,0 +1,15 @@
+{
+  "hash": "b5c60af2d40231203b29bdee7be918fa",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"The Memory Measurement Model (M3) with bmm\"\nsubtitle: \"Take-home notebook — Psychonomics 2026 bmm workshop, Part 2\"\nauthor: \"Chenyu Li\"\nformat:\n  html:\n    embed-resources: true\n    toc: true\nexecute:\n  echo: true\n  warning: false\n  message: false\n---\n\n## Setup\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(bmm)\nlibrary(brms)\nlibrary(tidyverse)\nlibrary(tidybayes)\nlibrary(here)\n```\n:::\n\n\n## Data\n\n<!-- TODO (Chenyu): add the simple span dataset and document the columns in\n     data/README.md. Expected shape: -->\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Codebook (fill in real column names):\n#   id        participant identifier\n#   corr      count of correct-in-position responses\n#   other     counts for other response categories (item/list/other intrusions)\ndat <- read.csv(here(\"data\", \"m3_simple_span.csv\"))\nglimpse(dat)\n```\n:::\n\n\n## Fit the M3 to simple span data\n\nAll workshop models ship pre-fitted in `models/`, so this chunk loads the\ncached fit if present and only re-fits when it is missing (re-fitting\nrequires cmdstanr — see `Install_Packages.R`, Part 2).\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file <- here(\"models\", \"m3_simple.rds\")\n\nif (file.exists(fit_file)) {\n  fit_m3 <- readRDS(fit_file)\n} else {\n  # TODO (Chenyu): real model specification\n  # model <- m3(...)\n  # fit_m3 <- bmm(model, data = dat, cores = 4)\n  # saveRDS(fit_m3, fit_file)\n}\n```\n:::\n\n\n## Interpret the parameters\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsummary(fit_m3)\n\n# TODO (Chenyu): posterior plots for the activation parameters\n```\n:::\n\n\n## Extension: complex span\n\n\n::: {.cell}\n\n```{.r .cell-code}\nfit_file_complex <- here(\"models\", \"m3_complex.rds\")\n\nif (file.exists(fit_file_complex)) {\n  fit_complex <- readRDS(fit_file_complex)\n} else {\n  # TODO (Chenyu): complex span specification (e.g., removal) + saveRDS()\n}\n```\n:::\n\n\n## Further reading\n\nSee `resources/02_m3/` for PDFs and `resources/README.md` for the full\nreading list with DOIs.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
