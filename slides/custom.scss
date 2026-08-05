@@ -42,6 +42,18 @@ $code-block-font-size: 0.65em;
 
 /*-- scss:rules --*/
 
+// bmm logo: top-right corner, larger than Quarto's default (bottom-right, ~2.2rem)
+.reveal .slide-logo {
+  position: fixed;
+  top: 14px !important;
+  right: 18px !important;
+  bottom: auto !important;
+  left: auto !important;
+  height: 100px !important;
+  max-height: 100px !important;
+  width: auto !important;
+}
+
 // Slide titles
 .reveal h1,
 .reveal h2,

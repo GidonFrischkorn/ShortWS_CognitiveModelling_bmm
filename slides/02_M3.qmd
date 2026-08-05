@@ -33,6 +33,8 @@ TODO: Posterior summaries and what the parameters mean psychologically.
 
 TODO: Additional cognitive demands, additional processes; cached fit from
 `models/m3_complex.rds`.
+FLEX MATERIAL: this section is the designated cut if the segment runs long —
+draft it so dropping it live does not break the storyline.
 
 ## Take-home {.section-divider}
 

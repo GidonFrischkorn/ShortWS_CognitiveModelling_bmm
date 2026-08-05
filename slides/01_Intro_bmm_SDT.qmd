@@ -38,6 +38,8 @@ TODO: Posterior summaries, hypothesis tests, visualization
 ## Extension: rating-scale SDT {.section-divider}
 
 TODO: Same workflow, richer data — cached fit from `models/sdt_rating.rds`.
+FLEX MATERIAL: this section is the designated cut if the segment runs long —
+draft it so dropping it live does not break the storyline.
 
 ## Take-home {.section-divider}
 

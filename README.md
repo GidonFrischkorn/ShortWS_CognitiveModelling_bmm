@@ -36,12 +36,15 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
 
 | Path | Contents |
 | --- | --- |
+| `index.qmd` | Landing page for the published site (schedule + links to all materials) |
 | `slides/` | Quarto reveal.js decks (`00_template.qmd` = shared pattern reference) |
 | `examples/` | Take-home Quarto notebooks, one per segment |
-| `data/` | Datasets used in slides and notebooks (see its README for codebooks) |
+| `data/` | Datasets used in slides and notebooks (its README is the single source for codebooks) |
 | `models/` | Pre-fitted bmm models (`.rds`) — no Stan toolchain needed to follow along |
 | `resources/` | Tutorial papers and background reading per segment |
+| `_common.R` | Shared plot colors and ggplot theme, sourced by all decks and notebooks |
 | `Install_Packages.R` | One-time package installation script |
+| `Check_Setup.R` | Verifies packages and pre-fitted models load — "you're ready" check |
 
 ## Setup for participants
 
@@ -49,12 +52,17 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
    ([RStudio](https://posit.co/download/rstudio-desktop/) or
    [Positron](https://positron.posit.co/)).
 2. Clone or download this repository.
-3. Run `source("Install_Packages.R")` once. Part 1 of the script is all you
+3. Open `ShortWS_CognitiveModelling_bmm.Rproj` and run
+   `source("Install_Packages.R")` once. Part 1 of the script is all you
    need: every model shown in the workshop ships pre-fitted in `models/`, so
    the Stan toolchain (Part 2) is **optional** and only required to re-fit
    models yourself.
-4. Open `ShortWS_CognitiveModelling_bmm.Rproj` and start with the notebooks
-   in `examples/`.
+4. Run `source("Check_Setup.R")` — it verifies that the packages and the
+   pre-fitted models load and tells you that you're ready.
+5. Start with the notebooks in `examples/`.
+
+No time for setup? All materials are also published as a website (slides and
+fully rendered notebooks) — nothing to install, readable on any device.
 
 ## Notes for presenters
 
@@ -62,14 +70,25 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
   slide and code pattern (section dividers, line-stepped code, cached-fit
   loading, interactive webR cells, speaker notes). Shared deck options live
   in `slides/_metadata.yml`; your deck YAML stays minimal.
+- **Follow the shared skeleton.** Every segment uses the same section order —
+  model intuition → see the data → specify → fit → evaluate → extension →
+  take-home — so attendees see the identical workflow three times. The
+  *extension* section is the designated flex material: the schedule has no
+  buffer, so draft it to be cuttable live without breaking the storyline.
+- **Use the shared plot style.** `source(here::here("_common.R"))` in a
+  hidden setup chunk gives you `wk_colors` and `theme_workshop()` — use them
+  in every figure so the three decks look like one workshop.
 - **Never fit live.** Fit models locally, `saveRDS()` into `models/` using
   the file names contracted in `models/README.md`, and load the cached fit
-  on the slide. Commit the `.rds` with your deck.
+  on the slide with a plain `readRDS()`. Fit with **CRAN** versions of
+  bmm/brms and record them in the `models/README.md` table — participants
+  install from CRAN, and dev-version fits can break for them. Commit the
+  `.rds` with your deck.
 - **webR cells need internet.** Interactive cells (quarto-live) load webR
-  from a CDN at presentation time. Every webR demo must have a static
-  pre-rendered fallback figure in the deck in case the venue network fails.
-  Stan/bmm cannot run in webR — interactive cells are for closed-form demos
-  and posterior exploration only.
+  from a CDN at presentation time. Every webR slide needs a static *twin*
+  slide with the same figure rendered at render time (pattern in the
+  template) in case the venue network fails. Stan/bmm cannot run in webR —
+  interactive cells are for closed-form demos and posterior exploration only.
 - **Rendering.** While iterating: `quarto render slides/02_M3.qmd` (executes
   only your deck). Before handing off: run `quarto render` at the repo root
   once and commit the updated `_freeze/` folder — the freeze cache is what
@@ -85,6 +104,21 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
 quarto render              # everything → _output/
 quarto render slides/01_Intro_bmm_SDT.qmd   # a single deck
 ```
+
+## Publishing (GitHub Pages)
+
+The rendered site — `index.qmd` landing page, all decks, all notebooks — is
+published to GitHub Pages so attendees can follow along and revisit the
+materials without installing anything:
+
+```bash
+quarto publish gh-pages    # render + push to the gh-pages branch
+```
+
+Run from the repo root after your changes are committed. Once the site is
+live, put its URL (and a QR code) on every deck's title and take-home slides
+— for many attendees at a lunchtime session, the published site *is* the
+workshop takeaway.
 
 ## License
 

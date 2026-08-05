@@ -1,0 +1,67 @@
+---
+title: "Fitting Cognitive Measurement Models with bmm"
+subtitle: "Lunchtime workshop — Psychonomic Society Annual Meeting 2026, San Diego"
+format:
+  html:
+    toc: true
+    embed-resources: true
+---
+
+Welcome! This page collects everything from the workshop: the slides, the
+take-home notebooks, and the reading list. Nothing here requires an R
+installation — you can read all materials right in your browser and set up R
+whenever you like.
+
+The [bmm](https://cran.r-project.org/package=bmm) (Bayesian Measurement
+Models) R package lets you fit cognitive measurement models — signal
+detection, working-memory measurement, drift diffusion — with a model-first
+interface: you specify the cognitive model, bmm handles the translation to
+Bayesian hierarchical estimation in Stan.
+
+## Schedule
+
+| Time | Segment | Presenter |
+| --- | --- | --- |
+| ~10 min | Welcome & the bmm workflow | Gidon T. Frischkorn |
+| ~20 min | Part 1: Signal Detection Theory | Gidon T. Frischkorn |
+| ~25 min | Part 2: The Memory Measurement Model (M3) | Chenyu Li |
+| ~25 min | Part 3: The EZ-Drift Diffusion Model | Adriana F. Chávez De la Peña |
+| ~10 min | Q&A and wrap-up | all |
+
+## Materials
+
+| Segment | Slides | Take-home notebook |
+| --- | --- | --- |
+| Part 1: bmm workflow & Signal Detection Theory | [slides](slides/01_Intro_bmm_SDT.html) | [notebook](examples/01_sdt.html) |
+| Part 2: The Memory Measurement Model (M3) | [slides](slides/02_M3.html) | [notebook](examples/02_m3.html) |
+| Part 3: The EZ-Drift Diffusion Model | [slides](slides/03_EZDDM.html) | [notebook](examples/03_ezddm.html) |
+
+The notebooks show each complete analysis with output — read them like a
+tutorial, or run them yourself after the setup below.
+
+## Run the materials yourself (optional)
+
+1. Install [R](https://cran.r-project.org/) (≥ 4.3) and
+   [RStudio](https://posit.co/download/rstudio-desktop/) or
+   [Positron](https://positron.posit.co/).
+2. Download the workshop repository:
+   <https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm>
+3. Open `ShortWS_CognitiveModelling_bmm.Rproj`, then run
+   `source("Install_Packages.R")` once and `source("Check_Setup.R")` to
+   verify everything works.
+
+Every model shown in the workshop ships pre-fitted in `models/`, so **you do
+not need the Stan toolchain** — the notebooks load cached fits and run in
+seconds.
+
+## Reading list
+
+Tutorial papers and background reading for each segment are listed in the
+repository's [resources folder](https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm/tree/main/resources)
+with DOIs; open-access PDFs are included there.
+
+## Contact
+
+- Gidon T. Frischkorn (University of Zurich) — bmm intro & SDT
+- Chenyu Li (University of Zurich) — Memory Measurement Model
+- Adriana F. Chávez De la Peña (University of California, Irvine) — EZ-DDM

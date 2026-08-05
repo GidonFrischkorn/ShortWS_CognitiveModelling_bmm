@@ -21,43 +21,52 @@ library(brms)
 library(tidyverse)
 library(tidybayes)
 library(here)
+
+source(here("_common.R"))  # shared workshop colors + ggplot theme
 ```
 
 ## Data
 
-<!-- TODO (Gidon): replace with the real recognition-memory dataset and
-     document the columns in data/README.md. Expected shape: -->
+<!-- TODO (Gidon): add the real recognition-memory dataset. Document every
+     column in data/README.md — that file is the single source for all
+     codebooks; do not duplicate column descriptions here. -->
+
+All columns are documented in the codebook: `data/README.md`.
 
 ```{r}
 #| label: data
 #| eval: false
-# Codebook (fill in real column names):
-#   id      participant identifier
-#   stim    old / new
-#   resp    "old" / "new" response
 dat <- read.csv(here("data", "sdt_recognition.csv"))
 glimpse(dat)
 ```
 
-## Fit the hierarchical SDT model
+## Load the fitted model
 
-All workshop models ship pre-fitted in `models/`, so this chunk loads the
-cached fit if present and only re-fits when it is missing (re-fitting
-requires cmdstanr — see `Install_Packages.R`, Part 2).
+All workshop models ship pre-fitted in `models/` — nothing to compile,
+nothing to wait for:
+
+<!-- TODO (Gidon): once sdt_binary.rds is committed, remove `eval: false`
+     here and in the chunks below so the rendered notebook shows the full
+     worked analysis. -->
 
 ```{r}
-#| label: fit-binary
+#| label: load-fit
 #| eval: false
-fit_file <- here("models", "sdt_binary.rds")
+fit_sdt <- readRDS(here("models", "sdt_binary.rds"))
+```
 
-if (file.exists(fit_file)) {
-  fit_sdt <- readRDS(fit_file)
-} else {
-  # TODO (Gidon): real model specification
-  # model <- sdt(...)
-  # fit_sdt <- bmm(model, data = dat, cores = 4)
-  # saveRDS(fit_sdt, fit_file)
-}
+### Optional: re-fit the model yourself
+
+You do **not** need this to follow the workshop. Re-fitting requires the
+Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes.
+
+```{r}
+#| label: refit
+#| eval: false
+# TODO (Gidon): real model specification
+# model <- sdt(...)
+# fit_sdt <- bmm(model, data = dat, cores = 4)
+# saveRDS(fit_sdt, here("models", "sdt_binary.rds"))
 ```
 
 ## Summarize and visualize the posterior
@@ -80,16 +89,19 @@ summary(fit_sdt)
 
 ## Extension: rating-scale SDT
 
-```{r}
-#| label: fit-rating
-#| eval: false
-fit_file_rating <- here("models", "sdt_rating.rds")
+Same workflow, richer data — the fitted model again ships in `models/`:
 
-if (file.exists(fit_file_rating)) {
-  fit_rating <- readRDS(fit_file_rating)
-} else {
-  # TODO (Gidon): rating-scale SDT specification + saveRDS()
-}
+```{r}
+#| label: load-fit-rating
+#| eval: false
+fit_rating <- readRDS(here("models", "sdt_rating.rds"))
+```
+
+```{r}
+#| label: refit-rating
+#| eval: false
+# Optional re-fit (Stan toolchain required):
+# TODO (Gidon): rating-scale SDT specification + saveRDS()
 ```
 
 ## Further reading

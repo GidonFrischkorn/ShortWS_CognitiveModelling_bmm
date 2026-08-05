@@ -15,7 +15,9 @@ by participants.
 
 ## Codebooks
 
-Document every column of your dataset here when you add it:
+**This file is the single source for all codebooks.** Document every column
+of your dataset here when you add it; slides and notebooks reference this
+file instead of duplicating column descriptions (duplicates drift apart).
 
 ### sdt_recognition.csv
 

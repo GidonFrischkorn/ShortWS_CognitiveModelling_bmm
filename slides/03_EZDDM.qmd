@@ -35,6 +35,8 @@ TODO: Parameter interpretation and reusable analysis workflows.
 
 TODO: The same workflow for studies that require trial-level estimation;
 cached fit from `models/ddm_trial.rds`.
+FLEX MATERIAL: this section is the designated cut if the segment runs long —
+draft it so dropping it live does not break the storyline.
 
 ## Take-home {.section-divider}
 
