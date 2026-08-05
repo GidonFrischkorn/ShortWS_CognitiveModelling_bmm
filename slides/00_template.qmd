@@ -9,6 +9,11 @@ format: live-revealjs
 
 {{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
 
+```{r}
+#| include: false
+source(here::here("_common.R"))  # wk_colors + theme_workshop()
+```
+
 ## How to use this deck {.smaller}
 
 This deck is a pattern reference, not workshop content. Each slide shows one
@@ -16,6 +21,8 @@ idiom used across our decks — copy the source, keep the class names.
 
 - Shared options live in `_metadata.yml`; your deck YAML stays minimal
 - Shared theme: `custom.scss`; slide classes: `.section-divider`, `.question-slide`, `.formula-box`
+- Shared figure style: `source(here::here("_common.R"))` in a hidden setup
+  chunk → use `wk_colors` and `theme_workshop()` in every plot
 - Render your own deck while iterating: `quarto render slides/0X_yourdeck.qmd`
 - Before handing off: run `quarto render` at the repo root once and commit the
   updated `_freeze/` folder — then nobody else re-executes your chunks
@@ -23,6 +30,23 @@ idiom used across our decks — copy the source, keep the class names.
 ::: {.notes}
 Speaker notes go in a `.notes` div — press `s` in the browser for speaker view.
 :::
+
+## Shared deck skeleton {.smaller}
+
+Every segment follows the same section order, so attendees see the identical
+workflow three times:
+
+1. **Model intuition** — what process does the model describe?
+2. **See the data** — the raw dataset, before any model
+3. **Specify** — the bmm formula and model object
+4. **Fit** — load the cached fit (never fit live)
+5. **Evaluate** — posterior summaries, plots, hypothesis tests
+6. **Extension** — richer data or model, *same workflow*
+7. **Take-home** — notebook, readings, segue to the next part
+
+Timing rule: the schedule has **no buffer**, so the *Extension* section is
+your designated flex material — plan your talk so it can be cut live without
+breaking the storyline if the session runs long.
 
 ## Section dividers {.section-divider}
 
@@ -55,9 +79,9 @@ Text or bullets on the left:
 library(ggplot2)
 set.seed(1)
 ggplot(data.frame(x = rnorm(500)), aes(x)) +
-  geom_histogram(bins = 30, fill = "#0028a5") +
-  geom_vline(xintercept = 0, color = "#dc6800", linewidth = 1) +
-  theme_minimal(base_size = 18)
+  geom_histogram(bins = 30, fill = wk_colors[["blue"]]) +
+  geom_vline(xintercept = 0, color = wk_colors[["orange"]], linewidth = 1) +
+  theme_workshop()
 ```
 :::
 
@@ -85,27 +109,25 @@ Illustrative syntax only (`eval: false`) — real fits are cached, see next slid
 ## Loading a cached fit {.smaller}
 
 The load-bearing pattern: **never fit live**. Fit once locally, `saveRDS()`
-into `models/`, load the cached object on the slide:
+into `models/`, then load the cached object on the slide with a plain
+`readRDS()` — no `file.exists()` guard (a guard fails *silently* and the
+next chunk errors confusingly; a plain `readRDS()` fails loudly, at render
+time, where you can fix it):
 
 ```{r}
-#| code-line-numbers: "1|3"
-fit_file <- here::here("models", "template_fit.rds")
-
-if (file.exists(fit_file)) fit <- readRDS(fit_file)
+#| eval: false
+fit <- readRDS(here::here("models", "sdt_binary.rds"))
+summary(fit)
 ```
 
-```{r}
-#| echo: false
-#| output: asis
-if (!file.exists(here::here("models", "template_fit.rds"))) {
-  cat("> `models/template_fit.rds` not found — this guard lets the template",
-      "render on a fresh clone. Your deck should `summary(fit)` here.")
-}
-```
+(`eval: false` here only because the template ships no fit — in your deck
+this chunk executes at render time.)
 
 ::: {.notes}
 Workflow: fit in your examples/ notebook or a scratch script, saveRDS() to
-models/, commit the .rds together with your deck and _freeze/ update.
+models/ under the name contracted in models/README.md, record the bmm/brms
+versions in that README's table, and commit the .rds together with your
+deck and _freeze/ update. Fits must be made with CRAN versions of bmm/brms.
 :::
 
 ## Posterior visualization
@@ -149,9 +171,28 @@ abline(0, 1, lty = 2, col = "grey50")
 ```
 
 ::: {.notes}
-webR needs internet (CDN) — every webr slide MUST have a static pre-rendered
-fallback figure elsewhere in the deck in case the venue network dies.
+webR needs internet (CDN) — every webr slide MUST have a static fallback
+twin: the next slide shows the pattern.
 :::
+
+## Static fallback twin (webR insurance) {.smaller}
+
+Every webR slide gets a **twin slide like this one**: the same figure,
+rendered at render time at a representative parameter value. No network at
+the venue → skip the interactive slide, present its twin, story intact.
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-alt: "ROC curve for a sensitivity of d-prime = 1.5, with the chance diagonal as a dashed line."
+d <- 1.5
+far <- seq(0.001, 0.999, length.out = 200)
+hr  <- pnorm(qnorm(far) + d)
+plot(far, hr, type = "l", lwd = 3, col = wk_colors[["blue"]],
+     xlab = "False-alarm rate", ylab = "Hit rate",
+     main = sprintf("ROC curve for d' = %.1f", d), asp = 1)
+abline(0, 1, lty = 2, col = wk_colors[["grey"]])
+```
 
 ## Formulas
 
