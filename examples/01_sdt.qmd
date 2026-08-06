@@ -14,8 +14,7 @@ execute:
 
 ## Setup
 
-The SDT models are new in bmm. Until the next CRAN release (planned before
-the workshop) they live in a development version — install once with:
+The SDT models are new in bmm. Until the next CRAN release (planned before the workshop) they live in a development version — install once with:
 
 ```{r}
 #| label: install
@@ -36,17 +35,9 @@ source(here("_common.R"))  # shared workshop colors + ggplot theme
 
 ## Data
 
-Recognition memory data from Koen, Aly, Wang, & Yonelinas (2013), as
-distributed with the MPTinR package: participants studied word lists and
-judged old/new test words on a 6-point confidence scale (1 = *sure new* …
-6 = *sure old*). Two between-subjects test conditions (48 participants
-each): a recognition test under **full attention** (Experiment 2) and a
-test given **immediately after study** (Experiment 4).
+Recognition memory data from Koen, Aly, Wang, & Yonelinas (2013), as distributed with the MPTinR package: participants studied word lists and judged old/new test words on a 6-point confidence scale (1 = *sure new* … 6 = *sure old*). Two between-subjects test conditions (48 participants each): a recognition test under **full attention** (Experiment 2) and a test given **immediately after study** (Experiment 4).
 
-All columns are documented in the codebook: `data/README.md`. The
-full-attention condition is also the example dataset in the Vuorre (2025)
-tutorial in `resources/01_sdt/`, so you can read this notebook and that
-paper side by side.
+All columns are documented in the codebook: `data/README.md`. The full-attention condition is also the example dataset in the Vuorre (2025) tutorial in `resources/01_sdt/`, so you can read this notebook and that paper side by side.
 
 ```{r}
 #| label: data
@@ -54,8 +45,7 @@ dat <- read.csv(here("data", "sdt_recognition.csv"))
 glimpse(dat)
 ```
 
-Before any model: hit and false-alarm rates per participant, the raw
-material of every SDT analysis.
+Before any model: hit and false-alarm rates per participant, the raw material of every SDT analysis.
 
 ```{r}
 #| label: descriptives
@@ -74,13 +64,9 @@ dat |>
 
 ## Specify: the model and its formula
 
-Binary SDT describes each old/new decision with two parameters: the
-distance between the noise and signal evidence distributions (sensitivity
-$d'$) and the location of the decision boundary (criterion $c$; 0 =
-unbiased, positive = conservative).
+Binary SDT describes each old/new decision with two parameters: the distance between the noise and signal evidence distributions (sensitivity $d'$) and the location of the decision boundary (criterion $c$; 0 = unbiased, positive = conservative).
 
-`sdt_binary()` expects one row per participant × stimulus class, with the
-count of "old" responses and the number of trials:
+`sdt_binary()` expects one row per participant × stimulus class, with the count of "old" responses and the number of trials:
 
 ```{r}
 #| label: aggregate-binary
@@ -99,9 +85,7 @@ sdt_model <- sdt_binary(response = "n_old", stimulus = "is_old",
                         n_trials = "n_trials")
 ```
 
-The **formula addresses the model parameters by name** — this is the core
-of the bmm workflow. One regression formula per parameter says how it
-varies over conditions and participants:
+The **formula addresses the model parameters by name** — this is the core of the bmm workflow. One regression formula per parameter says how it varies over conditions and participants:
 
 ```{r}
 #| label: formula
@@ -116,8 +100,7 @@ fit_sdt <- bmm(
 )
 ```
 
-With treatment coding (`full_attention` is the reference level), the four
-population-level coefficients are:
+With treatment coding (`full_attention` is the reference level), the four population-level coefficients are:
 
 | Coefficient | Meaning |
 | --- | --- |
@@ -126,15 +109,11 @@ population-level coefficients are:
 | `criterion_Intercept` | criterion $c$, full-attention condition |
 | `criterion_conditionimmediate` | **difference in $c$**, immediate − full attention |
 
-Everything you know about R's linear formulas transfers: interactions,
-multiple predictors, and `(1 | pid)` for hierarchical participant-level
-parameters — but the "outcome" of each formula is a *cognitive model
-parameter*, not a raw response.
+Everything you know about R's linear formulas transfers: interactions, multiple predictors, and `(1 | pid)` for hierarchical participant-level parameters — but the "outcome" of each formula is a *cognitive model parameter*, not a raw response.
 
 ## Fit: load the cached model
 
-All workshop models ship pre-fitted in `models/` — nothing to compile,
-nothing to wait for:
+All workshop models ship pre-fitted in `models/` — nothing to compile, nothing to wait for:
 
 ```{r}
 #| label: load-fit
@@ -144,14 +123,11 @@ summary(fit_sdt)
 
 ### Optional: re-fit the model yourself
 
-You do **not** need this to follow the workshop. Re-fitting requires the
-Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes:
-the full fitting script is `models/fit_sdt.R`.
+You do **not** need this to follow the workshop. Re-fitting requires the Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes: the full fitting script is `models/fit_sdt.R`.
 
 ## Evaluate: posteriors, hypotheses, model checks
 
-The posterior draws of the coefficients *are* draws of the SDT
-parameters, so condition-specific $d'$ and $c$ are simple sums of draws:
+The posterior draws of the coefficients *are* draws of the SDT parameters, so condition-specific $d'$ and $c$ are simple sums of draws:
 
 ```{r}
 #| label: posterior
@@ -190,8 +166,7 @@ sdt_pars |>
 
 ### Testing parameter differences is one line
 
-Because condition differences are *coefficients on the parameters*,
-testing them needs no extra machinery:
+Because condition differences are *coefficients on the parameters*, testing them needs no extra machinery:
 
 ```{r}
 #| label: hypotheses
@@ -202,15 +177,11 @@ hypothesis(fit_sdt, "dprime_conditionimmediate = 0")
 hypothesis(fit_sdt, "criterion_conditionimmediate < 0")
 ```
 
-Participants tested immediately after study show *lower* sensitivity and
-a *more liberal* criterion than participants tested under full attention
-after a filler task — and the model quantifies both differences with full
-posterior uncertainty, from one formula.
+Participants tested immediately after study show *lower* sensitivity and a *more liberal* criterion than participants tested under full attention after a filler task — and the model quantifies both differences with full posterior uncertainty, from one formula.
 
 ### Model-implied ROC
 
-The bmm SDT toolkit turns the posterior into the classic SDT graphics —
-here the model-implied ROC curve with the observed operating points:
+The bmm SDT toolkit turns the posterior into the classic SDT graphics — here the model-implied ROC curve with the observed operating points:
 
 ```{r}
 #| label: roc
@@ -223,8 +194,7 @@ plot(roc_sdt(fit_sdt), observed = roc_observed(fit_sdt))
 attr(auc_sdt(fit_sdt), "summary")
 ```
 
-And the latent-distribution view that every SDT figure in a textbook
-draws by hand — reconstructed from the fitted posterior:
+And the latent-distribution view that every SDT figure in a textbook draws by hand — reconstructed from the fitted posterior:
 
 ```{r}
 #| label: latent
@@ -234,10 +204,7 @@ plot(latent_sdt(fit_sdt))
 
 ## Extension: rating-scale SDT
 
-The 6-point confidence ratings contain more information than the binary
-old/new split: `sdt_rating()` places $K-1 = 5$ confidence thresholds on
-the same latent evidence axis. It expects one count column per rating
-category:
+The 6-point confidence ratings contain more information than the binary old/new split: `sdt_rating()` places $K-1 = 5$ confidence thresholds on the same latent evidence axis. It expects one count column per rating category:
 
 ```{r}
 #| label: aggregate-rating
@@ -249,11 +216,7 @@ rating_counts <- dat |>
 head(rating_counts, 4)
 ```
 
-Recognition ROCs are classically *asymmetric* — old items have more
-variable memory strength than new items, the very phenomenon Koen et al.
-(2013) studied. With rating data, bmm can estimate that signal-SD ratio
-(`sdratio`) — the unequal-variance SDT model — with one more formula
-line, while `dprime` and `criterion` keep their condition effects:
+Recognition ROCs are classically *asymmetric* — old items have more variable memory strength than new items, the very phenomenon Koen et al. (2013) studied. With rating data, bmm can estimate that signal-SD ratio (`sdratio`) — the unequal-variance SDT model — with one more formula line, while `dprime` and `criterion` keep their condition effects:
 
 ```{r}
 #| label: formula-rating
@@ -276,12 +239,7 @@ fit_rating <- readRDS(here("models", "sdt_rating.rds"))
 summary(fit_rating)
 ```
 
-`exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the
-old-item distribution is wider than the new-item distribution. Note a
-substantive nuance: under the unequal-variance model the $d'$ difference
-between conditions points the same way but is less certain — parameter
-estimates depend on the measurement model, which is exactly why the model
-is worth stating explicitly:
+`exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the old-item distribution is wider than the new-item distribution. Note a substantive nuance: under the unequal-variance model the $d'$ difference between conditions points the same way but is less certain — parameter estimates depend on the measurement model, which is exactly why the model is worth stating explicitly:
 
 ```{r}
 #| label: rating-dprime
@@ -293,13 +251,8 @@ fit_rating |>
   median_qi(value)
 ```
 
-Where to go from here: the bmm SDT article (`vignette("bmm_sdt")` in the
-development version) covers the ROC/zROC diagnostics, threshold
-parameterizations, and the criterion-free `sdt_mafc()` and
-`sdt_ranking()` models; the Vuorre (2025) preprint in `resources/01_sdt/`
-builds the same models from raw brms formulas.
+Where to go from here: the bmm SDT article (`vignette("bmm_sdt")` in the development version) covers the ROC/zROC diagnostics, threshold parameterizations, and the criterion-free `sdt_mafc()` and `sdt_ranking()` models; the Vuorre (2025) preprint in `resources/01_sdt/` builds the same models from raw brms formulas.
 
 ## Further reading
 
-See `resources/01_sdt/` for PDFs and `resources/README.md` for the full
-reading list with DOIs.
+See `resources/01_sdt/` for PDFs and `resources/README.md` for the full reading list with DOIs.

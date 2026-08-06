@@ -231,6 +231,20 @@ $code-block-font-size: 0.65em;
   font-size: 14px;
 }
 
+// Attribution footer — present on every slide, but it must never compete
+// with the content. Keep it small and quiet.
+.reveal .footer,
+.reveal .footer p {
+  color: $uzh-gray;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.reveal .footer a {
+  color: $uzh-gray;
+  text-decoration: none;
+}
+
 // Fragments with subtle animation
 .reveal .fragment.fade-in-then-semi-out.visible:not(.current-fragment) {
   opacity: 0.4;

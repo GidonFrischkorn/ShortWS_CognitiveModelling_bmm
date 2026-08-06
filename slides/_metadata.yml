@@ -18,6 +18,9 @@ format:
     navigation-mode: linear
     controls: true
     progress: true
+    # Attribution on every slide — the decks get screenshotted and reshared,
+    # and the LICENSE file does not travel with a screenshot.
+    footer: "Frischkorn, Li & Chávez De la Peña · Psychonomics 2026 · [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)"
 
 webr:
   packages:

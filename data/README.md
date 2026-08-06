@@ -4,6 +4,24 @@ Each presenter adds their segment's dataset here and documents it below.
 Keep files small (plain-text CSV preferred) — this repo is public and cloned
 by participants.
 
+## Licensing
+
+**The datasets in this folder are not covered by the repository license.**
+They are redistributed from their original sources and carry those sources'
+terms; the workshop presenters claim no rights over them. Cite the original
+study, not this repository, when you use one of these datasets.
+
+Presenters: when you add a dataset, record its source and terms in the
+codebook below. If a dataset is not yours to redistribute publicly, do not
+put it here — link to its repository instead.
+
+| File | Source | Terms |
+| --- | --- | --- |
+| `sdt_recognition.csv` | Koen et al. (2013), via the `roc6` dataset in [MPTinR](https://cran.r-project.org/package=MPTinR) | MPTinR is GPL-2 \| GPL-3; cite Koen et al. (2013) and Klauer & Kellen (2015) |
+| `m3_simple_span.csv` | TODO — Chenyu | TODO |
+| `m3_complex_span.csv` | TODO — Chenyu | TODO |
+| `ezddm_perceptual.csv` | TODO — Adriana | TODO |
+
 ## Naming contract
 
 | File | Segment | Added by | Status |

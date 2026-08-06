@@ -1,4 +1,4 @@
-# Fitting Cognitive Measurement Models with bmm
+# Analyzing Behavioral Data at the Cognitive Process Level with bmm in R
 
 Materials for a 90-minute lunchtime workshop at the **Psychonomic Society
 Annual Meeting, November 2026, San Diego**.
@@ -120,6 +120,22 @@ live, put its URL (and a QR code) on every deck's title and take-home slides
 — for many attendees at a lunchtime session, the published site *is* the
 workshop takeaway.
 
-## License
+## License and citation
 
-See [LICENSE](LICENSE).
+Different parts of this repository carry different terms — the workshop
+content is share-alike and non-commercial, the scripts are not.
+
+| Path | License | What that means |
+| --- | --- | --- |
+| `slides/`, `examples/`, `index.qmd`, figures, prose | [CC BY-NC-SA 4.0](LICENSE) | Reuse and adapt freely for teaching and research, **credit the presenters**, no commercial use, and derivatives must carry the same license |
+| `_common.R`, `Install_Packages.R`, `Check_Setup.R`, `data/prepare_*.R`, `models/fit_*.R` | [MIT](LICENSE-CODE) | Take them, adapt them to your own data, no strings — including at a company |
+| `data/` | Third-party, see [data/README.md](data/README.md) | Redistributed source data; cite the original study |
+| `resources/` | Third-party, see [resources/README.md](resources/README.md) | Papers copyright their authors and publishers |
+| `_extensions/` | Third-party | quarto-live, under its own license |
+
+The scripts are deliberately left permissive: the point of the workshop is
+that you can apply these models to your own data, and that shouldn't depend
+on who employs you.
+
+To cite the materials, use the "Cite this repository" button on GitHub or see
+[CITATION.cff](CITATION.cff).

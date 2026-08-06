@@ -1,5 +1,5 @@
 ---
-title: "Fitting Cognitive Measurement Models with bmm"
+title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 subtitle: "Part 3: The EZ-Drift Diffusion Model"
 author: "Adriana F. Chávez De la Peña"
 institute: "University of California, Irvine"
