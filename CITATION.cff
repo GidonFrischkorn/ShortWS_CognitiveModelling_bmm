@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use these workshop materials, please cite them as below."
+title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
+abstract: >-
+  Materials for a 90-minute lunchtime workshop at the Psychonomic Society
+  Annual Meeting 2026 (San Diego): slides, take-home notebooks, datasets, and
+  pre-fitted models introducing signal detection theory, the Memory
+  Measurement Model (M3), and the EZ-drift diffusion model with the bmm R
+  package.
+type: software
+authors:
+  - family-names: Frischkorn
+    given-names: "Gidon T."
+    orcid: "https://orcid.org/0000-0002-5055-9764"
+    affiliation: "University of Zurich"
+  - family-names: Li
+    given-names: Chenyu
+    affiliation: "University of Zurich"
+  - family-names: "Chávez De la Peña"
+    given-names: "Adriana F."
+    affiliation: "University of California, Irvine"
+keywords:
+  - bmm
+  - Bayesian measurement models
+  - cognitive modeling
+  - signal detection theory
+  - drift diffusion model
+  - working memory
+  - brms
+  - R
+license: CC-BY-NC-SA-4.0
+repository-code: "https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm"
+year: 2026

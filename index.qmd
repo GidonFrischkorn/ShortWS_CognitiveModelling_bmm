@@ -1,5 +1,5 @@
 ---
-title: "Fitting Cognitive Measurement Models with bmm"
+title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 subtitle: "Lunchtime workshop — Psychonomic Society Annual Meeting 2026, San Diego"
 format:
   html:
@@ -7,16 +7,9 @@ format:
     embed-resources: true
 ---
 
-Welcome! This page collects everything from the workshop: the slides, the
-take-home notebooks, and the reading list. Nothing here requires an R
-installation — you can read all materials right in your browser and set up R
-whenever you like.
+Welcome! This page collects everything from the workshop: the slides, the take-home notebooks, and the reading list. Nothing here requires an R installation — you can read all materials right in your browser and set up R whenever you like.
 
-The [bmm](https://cran.r-project.org/package=bmm) (Bayesian Measurement
-Models) R package lets you fit cognitive measurement models — signal
-detection, working-memory measurement, drift diffusion — with a model-first
-interface: you specify the cognitive model, bmm handles the translation to
-Bayesian hierarchical estimation in Stan.
+The [bmm](https://cran.r-project.org/package=bmm) (Bayesian Measurement Models) R package lets you fit cognitive measurement models — signal detection, working-memory measurement, drift diffusion — with a model-first interface: you specify the cognitive model, bmm handles the translation to Bayesian hierarchical estimation in Stan.
 
 ## Schedule
 
@@ -36,32 +29,38 @@ Bayesian hierarchical estimation in Stan.
 | Part 2: The Memory Measurement Model (M3) | [slides](slides/02_M3.html) | [notebook](examples/02_m3.html) |
 | Part 3: The EZ-Drift Diffusion Model | [slides](slides/03_EZDDM.html) | [notebook](examples/03_ezddm.html) |
 
-The notebooks show each complete analysis with output — read them like a
-tutorial, or run them yourself after the setup below.
+The notebooks show each complete analysis with output — read them like a tutorial, or run them yourself after the setup below.
 
 ## Run the materials yourself (optional)
 
-1. Install [R](https://cran.r-project.org/) (≥ 4.3) and
-   [RStudio](https://posit.co/download/rstudio-desktop/) or
-   [Positron](https://positron.posit.co/).
-2. Download the workshop repository:
-   <https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm>
-3. Open `ShortWS_CognitiveModelling_bmm.Rproj`, then run
-   `source("Install_Packages.R")` once and `source("Check_Setup.R")` to
-   verify everything works.
+1. Install [R](https://cran.r-project.org/) (≥ 4.3) and [RStudio](https://posit.co/download/rstudio-desktop/) or [Positron](https://positron.posit.co/).
+2. Download the workshop repository: <https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm>
+3. Open `ShortWS_CognitiveModelling_bmm.Rproj`, then run `source("Install_Packages.R")` once and `source("Check_Setup.R")` to verify everything works.
 
-Every model shown in the workshop ships pre-fitted in `models/`, so **you do
-not need the Stan toolchain** — the notebooks load cached fits and run in
-seconds.
+Every model shown in the workshop ships pre-fitted in `models/`, so **you do not need the Stan toolchain** — the notebooks load cached fits and run in seconds.
 
 ## Reading list
 
-Tutorial papers and background reading for each segment are listed in the
-repository's [resources folder](https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm/tree/main/resources)
-with DOIs; open-access PDFs are included there.
+Tutorial papers and background reading for each segment are listed in the repository's [resources folder](https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm/tree/main/resources) with DOIs; open-access PDFs are included there.
 
 ## Contact
 
 - Gidon T. Frischkorn (University of Zurich) — bmm intro & SDT
 - Chenyu Li (University of Zurich) — Memory Measurement Model
 - Adriana F. Chávez De la Peña (University of California, Irvine) — EZ-DDM
+
+## Reuse and citation
+
+Please reuse these materials in your own teaching and research — that is what
+they are for. The slides and notebooks are licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/): adapt them freely, credit the
+presenters, keep them non-commercial, and share derivatives under the same
+terms. The R scripts are MIT-licensed with no such restriction, so you can
+adapt them to your own data whatever your setting.
+
+Datasets and papers in the repository carry their original sources' terms —
+see the [repository README](https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm#license-and-citation).
+
+To cite: Frischkorn, G. T., Li, C., & Chávez De la Peña, A. F. (2026).
+*Analyzing Behavioral Data at the Cognitive Process Level with bmm in R*.
+Psychonomic Society Annual Meeting, San Diego.
+<https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm>

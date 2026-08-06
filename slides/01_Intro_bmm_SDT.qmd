@@ -1,5 +1,5 @@
 ---
-title: "Fitting Cognitive Measurement Models with bmm"
+title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 subtitle: "Part 1: The bmm Workflow & Signal Detection Theory"
 author: "Gidon T. Frischkorn"
 institute: "University of Zurich"
