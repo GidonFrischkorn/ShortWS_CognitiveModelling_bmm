@@ -4,10 +4,8 @@ subtitle: "Part 3: The EZ-Drift Diffusion Model"
 author: "Adriana F. Chávez De la Peña"
 institute: "University of California, Irvine"
 date: "November 2026"
-format: live-revealjs
+format: revealjs
 ---
-
-{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
 
 ## Choice and RT as evidence accumulation {.section-divider}
 
@@ -19,8 +17,9 @@ outcome of a latent evidence-accumulation process.
 TODO: A computationally accessible reformulation of the three-parameter DDM;
 drift rate, boundary separation, non-decision time from accuracy and RT
 summary statistics.
-Candidate webR demo: forward equations — parameter sliders → predicted
-accuracy/RT summaries (closed form, see `00_template.qmd`).
+Candidate figure: forward equations — a few parameter settings side by
+side → predicted accuracy/RT summaries (closed form, rendered at render
+time — see the demo-figure pattern in `00_template.qmd`).
 
 ## Fitting the EZ-DDM in bmm {.section-divider}
 

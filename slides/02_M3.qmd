@@ -4,10 +4,8 @@ subtitle: "Part 2: The Memory Measurement Model (M3)"
 author: "Chenyu Li"
 institute: "University of Zurich"
 date: "November 2026"
-format: live-revealjs
+format: revealjs
 ---
-
-{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
 
 ## The Memory Measurement Model {.section-divider}
 
@@ -17,8 +15,9 @@ sources (and additional processes such as removal).
 ## From activation to response probabilities {.section-divider}
 
 TODO: How activation sources map onto response categories.
-Candidate webR demo: activation-parameter sliders → predicted category
-probabilities (closed form, see `00_template.qmd`).
+Candidate figure: a few activation-parameter settings side by side →
+predicted category probabilities (closed form, rendered at render time —
+see the demo-figure pattern in `00_template.qmd`).
 
 ## Fitting M3 to simple span data {.section-divider}
 

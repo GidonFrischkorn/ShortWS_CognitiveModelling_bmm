@@ -1,5 +1,5 @@
 # Check_Setup.R -- Psychonomics 2026 lunchtime workshop
-# "Fitting cognitive measurement models with bmm"
+# "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 #
 # Run this AFTER Install_Packages.R to verify you are ready:
 #   1. Open ShortWS_CognitiveModelling_bmm.Rproj in RStudio/Positron.

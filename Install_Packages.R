@@ -1,5 +1,5 @@
 # Install_Packages.R -- Psychonomics 2026 lunchtime workshop
-# "Fitting cognitive measurement models with bmm"
+# "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 #
 # Run this script once before the workshop.
 

@@ -84,11 +84,13 @@ fully rendered notebooks) — nothing to install, readable on any device.
   bmm/brms and record them in the `models/README.md` table — participants
   install from CRAN, and dev-version fits can break for them. Commit the
   `.rds` with your deck.
-- **webR cells need internet.** Interactive cells (quarto-live) load webR
-  from a CDN at presentation time. Every webR slide needs a static *twin*
-  slide with the same figure rendered at render time (pattern in the
-  template) in case the venue network fails. Stan/bmm cannot run in webR —
-  interactive cells are for closed-form demos and posterior exploration only.
+- **Nothing runs in the browser.** Decks are plain reveal.js: all code on the
+  slides executes at render time and the output is baked in, so the venue
+  network is irrelevant. For a closed-form "what if", show a few parameter
+  values side by side (pattern in the template). If you want to *run*
+  something in front of the audience, do it in the IDE from your `examples/`
+  notebook (load the cached fit, evaluate) — the slide carries the same
+  output as insurance.
 - **Rendering.** While iterating: `quarto render slides/02_M3.qmd` (executes
   only your deck). Before handing off: run `quarto render` at the repo root
   once and commit the updated `_freeze/` folder — the freeze cache is what
@@ -131,7 +133,6 @@ content is share-alike and non-commercial, the scripts are not.
 | `_common.R`, `Install_Packages.R`, `Check_Setup.R`, `data/prepare_*.R`, `models/fit_*.R` | [MIT](LICENSE-CODE) | Take them, adapt them to your own data, no strings — including at a company |
 | `data/` | Third-party, see [data/README.md](data/README.md) | Redistributed source data; cite the original study |
 | `resources/` | Third-party, see [resources/README.md](resources/README.md) | Papers copyright their authors and publishers |
-| `_extensions/` | Third-party | quarto-live, under its own license |
 
 The scripts are deliberately left permissive: the point of the workshop is
 that you can apply these models to your own data, and that shouldn't depend
