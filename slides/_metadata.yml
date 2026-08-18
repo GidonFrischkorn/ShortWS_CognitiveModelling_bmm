@@ -4,6 +4,10 @@
 
 engine: knitr
 
+# Native browser MathML: formulas render without loading MathJax from a CDN,
+# so the decks work with no network at the venue (see README, presenter notes).
+html-math-method: mathml
+
 format:
   revealjs:
     theme: [default, custom.scss]
