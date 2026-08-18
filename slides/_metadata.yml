@@ -1,11 +1,11 @@
 # Shared configuration for all workshop decks in slides/.
-# Individual decks only declare title/subtitle/author/date + `format: live-revealjs`.
-# Do NOT add a `revealjs:` key here — that would render every deck twice.
+# Individual decks only declare title/subtitle/author/date + `format: revealjs`.
+# Do NOT add a second format key here — that would render every deck twice.
 
 engine: knitr
 
 format:
-  live-revealjs:
+  revealjs:
     theme: [default, custom.scss]
     slide-number: true
     transition: fade
@@ -21,10 +21,6 @@ format:
     # Attribution on every slide — the decks get screenshotted and reshared,
     # and the LICENSE file does not travel with a screenshot.
     footer: "Frischkorn, Li & Chávez De la Peña · Psychonomics 2026 · [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)"
-
-webr:
-  packages:
-    - ggplot2
 
 execute:
   echo: true

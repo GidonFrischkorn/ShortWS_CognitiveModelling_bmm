@@ -4,10 +4,8 @@ subtitle: "Copy these patterns into your own deck"
 author: "Gidon T. Frischkorn, Chenyu Li & Adriana F. Chávez De la Peña"
 institute: "Psychonomic Society Annual Meeting 2026, San Diego"
 date: "November 2026"
-format: live-revealjs
+format: revealjs
 ---
-
-{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
 
 ```{r}
 #| include: false
@@ -146,53 +144,32 @@ fit |>
 (Chunk shown with `eval: false` here because the template ships no fit —
 in your deck, drop that option so the plot renders from your cached model.)
 
-## Interactive webR cell {.smaller .scrollable}
+## Closed-form demo figure {.smaller}
 
-An editable cell running R **in the audience's browser** (quarto-live).
-Use only for closed-form demos — Stan/bmm cannot run in webR.
-Drag the slider; the cell re-runs reactively:
-
-```{ojs}
-//| echo: false
-d = Inputs.range([0, 4], {value: 1.5, step: 0.1, label: "Sensitivity d'"})
-```
-
-```{webr}
-#| input:
-#|   - d
-#| autorun: true
-#| fig-height: 4
-far <- seq(0.001, 0.999, length.out = 200)
-hr  <- pnorm(qnorm(far) + d)
-plot(far, hr, type = "l", lwd = 3, col = "#0028a5",
-     xlab = "False-alarm rate", ylab = "Hit rate",
-     main = sprintf("ROC curve for d' = %.1f", d), asp = 1)
-abline(0, 1, lty = 2, col = "grey50")
-```
-
-::: {.notes}
-webR needs internet (CDN) — every webr slide MUST have a static fallback
-twin: the next slide shows the pattern.
-:::
-
-## Static fallback twin (webR insurance) {.smaller}
-
-Every webR slide gets a **twin slide like this one**: the same figure,
-rendered at render time at a representative parameter value. No network at
-the venue → skip the interactive slide, present its twin, story intact.
+Everything on the slides is computed **at render time** — no code runs in
+the browser and no network is needed at the venue. For a closed-form
+"what if" (a parameter sweep, a criterion shift), show a few representative
+values side by side instead of a live slider:
 
 ```{r}
 #| echo: false
 #| fig-height: 4
-#| fig-alt: "ROC curve for a sensitivity of d-prime = 1.5, with the chance diagonal as a dashed line."
-d <- 1.5
+#| fig-alt: "ROC curves for sensitivities d-prime = 0.5, 1.5, and 2.5, with the chance diagonal as a dashed line."
 far <- seq(0.001, 0.999, length.out = 200)
-hr  <- pnorm(qnorm(far) + d)
-plot(far, hr, type = "l", lwd = 3, col = wk_colors[["blue"]],
-     xlab = "False-alarm rate", ylab = "Hit rate",
-     main = sprintf("ROC curve for d' = %.1f", d), asp = 1)
+plot(NA, xlim = c(0, 1), ylim = c(0, 1), asp = 1,
+     xlab = "False-alarm rate", ylab = "Hit rate", main = "ROC curves")
 abline(0, 1, lty = 2, col = wk_colors[["grey"]])
+cols <- c(wk_colors[["grey"]], wk_colors[["blue"]], wk_colors[["orange"]])
+ds <- c(0.5, 1.5, 2.5)
+for (i in seq_along(ds)) lines(far, pnorm(qnorm(far) + ds[i]), lwd = 3, col = cols[i])
+legend("bottomright", legend = sprintf("d' = %.1f", ds), col = cols, lwd = 3, bty = "n")
 ```
+
+::: {.notes}
+Want to *run* something in front of the audience? Do it in the IDE from the
+segment's `examples/` notebook (load the cached fit, evaluate) — the slide
+carries the same output as insurance.
+:::
 
 ## Formulas
 

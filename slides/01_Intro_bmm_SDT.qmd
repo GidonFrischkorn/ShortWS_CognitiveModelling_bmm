@@ -4,16 +4,14 @@ subtitle: "Part 1: The bmm Workflow & Signal Detection Theory"
 author: "Gidon T. Frischkorn"
 institute: "University of Zurich"
 date: "November 2026"
-format: live-revealjs
+format: revealjs
 ---
-
-{{< include ../_extensions/r-wasm/live/_knitr.qmd >}}
 
 <!--
 Timing (target ~25 min talk; 30 min hard cap; leave room for questions):
   min 9 — reach SDT divider | min 15 — Specify | min 20 — Evaluate | min 22 — FLEX go/no-go
-Cut ladder: (1) rating FLEX section -1:40; (2) static twin instead of webR -1:00;
-            (3) drop latent_sdt slide -0:45; (4) merge t-test slide into question slide -0:45
+Cut ladder: (1) rating FLEX section -1:40; (2) drop latent_sdt slide -0:45;
+            (3) merge t-test slide into question slide -0:45
 -->
 
 ```{r}
@@ -360,53 +358,16 @@ describe the whole observer — separation and threshold. Next slide moves the
 threshold.
 :::
 
-## Move the criterion — accuracy moves, memory doesn't {.smaller .scrollable}
-
-Drag the slider. Watch what moves — and what doesn't:
-
-```{ojs}
-//| echo: false
-crit = Inputs.range([-1.5, 1.5], {value: 0, step: 0.1, label: "criterion c"})
-```
-
-```{webr}
-#| input:
-#|   - crit
-#| autorun: true
-#| fig-height: 4
-dprime <- 1.3
-hr  <- 1 - pnorm(crit, dprime, 1)
-far <- 1 - pnorm(crit, 0, 1)
-acc <- (hr + (1 - far)) / 2
-curve(dnorm(x, 0, 1), from = -3.5, to = 5, n = 300, lwd = 3, col = "grey50",
-      xlab = "memory-strength evidence", ylab = "", yaxt = "n", bty = "n",
-      main = sprintf("HR = %.2f    FAR = %.2f    accuracy = %.2f",
-                     hr, far, acc))
-curve(dnorm(x, dprime, 1), n = 300, lwd = 3, col = "#0028a5", add = TRUE)
-xs <- seq(crit, 5, length.out = 200)
-polygon(c(xs, rev(xs)), c(dnorm(xs, 0, 1), rep(0, 200)),
-        col = adjustcolor("grey50", 0.4), border = NA)
-polygon(c(xs, rev(xs)), c(dnorm(xs, dprime, 1), rep(0, 200)),
-        col = adjustcolor("#0028a5", 0.3), border = NA)
-abline(v = crit, lwd = 3, col = "#dc6800")
-```
-
-::: {.notes}
-d' is fixed at 1.3 — memory never changes on this slide. Drag left: hits AND
-false alarms rise together, accuracy shifts. Everything an accuracy analysis
-sees just moved without any change in memory. Hold that thought for the real
-data. Checkpoint: if webR has not loaded by now, skip to the next slide —
-same story, two fixed values.
-:::
-
 ## Move the criterion — accuracy moves, memory doesn't {.smaller}
+
+Same d' (memory), two criteria. Watch what moves — and what doesn't:
 
 ```{r}
 #| echo: false
 #| fig-height: 4.5
 #| fig-alt: "Two panels with identical new-item and old-item evidence distributions but different criterion placements; hit rate, false-alarm rate, and accuracy differ between panels although d-prime is identical."
 dprime <- 1.3
-twin <- expand_grid(
+crit_demo <- expand_grid(
   crit = c(0, -0.7),
   item = c("new items", "old items"),
   x    = seq(-3.5, 5, length.out = 400)
@@ -420,7 +381,7 @@ twin <- expand_grid(
     panel = fct_reorder(panel, -crit)
   )
 
-ggplot(twin, aes(x, dens)) +
+ggplot(crit_demo, aes(x, dens)) +
   geom_area(data = ~ filter(.x, x >= crit), aes(fill = item),
             alpha = 0.4, position = "identity") +
   geom_line(aes(color = item), linewidth = 1.2) +
@@ -439,9 +400,10 @@ ggplot(twin, aes(x, dens)) +
 ```
 
 ::: {.notes}
-Static twin of the slider slide — present only when webR or the venue wifi
-fails; otherwise skip straight past. Same d', different criterion: hits, false
-alarms, and accuracy all change, memory does not.
+d' is fixed at 1.3 — memory never changes on this slide. Left panel: neutral
+criterion. Right panel: liberal criterion — hits AND false alarms rise
+together, accuracy shifts. Everything an accuracy analysis sees just moved
+without any change in memory. Hold that thought for the real data.
 :::
 
 ## The data: recognition memory {.smaller}

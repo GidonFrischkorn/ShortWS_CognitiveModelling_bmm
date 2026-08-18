@@ -16,8 +16,6 @@ NOT covered by this license:
     carry their original terms -- see `data/README.md`.
   * The papers in `resources/` are copyright their respective authors and
     publishers -- see `resources/README.md`.
-  * The Quarto extension in `_extensions/` is third-party software under its
-    own license.
 
 =======================================================================
 
