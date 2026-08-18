@@ -34,7 +34,7 @@ fit_rating <- readRDS(here::here("models", "sdt_rating.rds"))
 Regression, *t*-test, ANOVA — one model, three names:
 
 ::: {.formula-box}
-$$y \sim \mathcal{N}(\mu, \sigma) \qquad\qquad \mu = \beta_0 + \beta_1 X$$
+$$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu = \beta_0 + \beta_1 X$$
 :::
 
 :::: {.columns}
@@ -209,7 +209,7 @@ cognitive mechanism. Nothing here says memory, bias, or speed of processing.
 ## One principle all the way down
 
 ::: {.formula-box}
-$$y \sim \mathcal{N}(\mu, \sigma) \qquad\qquad \mu \sim \text{predictors}$$
+$$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu \sim \text{predictors}$$
 :::
 
 ::: {.formula-box .fragment}

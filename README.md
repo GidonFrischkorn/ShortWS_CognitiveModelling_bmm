@@ -84,6 +84,12 @@ fully rendered notebooks) — nothing to install, readable on any device.
   bmm/brms and record them in the `models/README.md` table — participants
   install from CRAN, and dev-version fits can break for them. Commit the
   `.rds` with your deck.
+- **Math renders natively.** `html-math-method: mathml` in `_metadata.yml` —
+  formulas are typeset by the browser itself, with no MathJax loaded from a
+  CDN (Quarto's default would). Keep display math simple and avoid exotic
+  fonts: write distributions as `\text{Normal}(\mu, \sigma)`, not
+  `\mathcal{N}` (the calligraphic glyph has no offline fallback and renders
+  as an empty box).
 - **Nothing runs in the browser.** Decks are plain reveal.js: all code on the
   slides executes at render time and the output is baked in, so the venue
   network is irrelevant. For a closed-form "what if", show a few parameter
@@ -106,6 +112,23 @@ fully rendered notebooks) — nothing to install, readable on any device.
 quarto render              # everything → _output/
 quarto render slides/01_Intro_bmm_SDT.qmd   # a single deck
 ```
+
+### PDF handouts of a deck
+
+For review, for backup on a conference laptop, and for sharing after the
+session, export any deck to PDF with
+[decktape](https://github.com/astefanutti/decktape) (`npm i -g decktape`):
+
+```bash
+decktape reveal --size 1280x720 \
+  "file://$PWD/_output/slides/01_Intro_bmm_SDT.html" \
+  _output/pdf/01_Intro_bmm_SDT.pdf
+```
+
+On macOS add `--chrome-path "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"`
+if decktape does not find a browser. Fragments are printed in their final
+state, i.e. one page per slide. Alternatively, open the deck in a browser,
+press `e` for print view and use the browser's "Save as PDF".
 
 ## Publishing (GitHub Pages)
 
