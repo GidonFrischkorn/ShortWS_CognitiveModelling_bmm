@@ -2,7 +2,7 @@
 title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 subtitle: "Part 2: The Memory Measurement Model (M3)"
 author: "Chenyu Li"
-institute: "University of Zurich"
+institute: "University of Chicago"
 date: "November 2026"
 format: revealjs
 ---
