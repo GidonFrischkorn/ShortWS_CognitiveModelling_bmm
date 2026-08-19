@@ -1,0 +1,90 @@
+# Renders the workshop site and deploys it to GitHub Pages.
+#
+# The whole point of this workflow is that it needs NO R and NO Stan toolchain.
+# Every chunk's output is already in the committed `_freeze/` cache, so Quarto
+# replays the site instead of executing anything (~10 s, verified). That is what
+# lets a co-presenter's push publish itself without them owning the development
+# version of bmm or a working cmdstan.
+#
+# The guard step below enforces that contract instead of trusting it: it puts
+# failing stubs for `R` and `Rscript` on the PATH, so if anyone edits a .qmd
+# without committing the regenerated `_freeze/`, the build goes red with a clear
+# message rather than quietly publishing a stale or half-built site.
+
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; let a newer push supersede a queued one, but do
+# not cancel a deploy that is already mid-flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          # Pinned to the version that produced the committed _freeze/ cache.
+          version: 1.10.18
+
+      - name: Guard — the build must not execute R
+        run: |
+          mkdir -p "$RUNNER_TEMP/no-r"
+          for bin in R Rscript; do
+            printf '%s\n' \
+              '#!/bin/sh' \
+              'echo "::error::The freeze cache is stale - Quarto tried to execute R. Run '\''quarto render'\'' at the repo root locally and commit the updated _freeze/ folder."' \
+              'exit 127' > "$RUNNER_TEMP/no-r/$bin"
+            chmod +x "$RUNNER_TEMP/no-r/$bin"
+          done
+          echo "$RUNNER_TEMP/no-r" >> "$GITHUB_PATH"
+
+      - name: Render site
+        run: quarto render
+
+      - name: Add .nojekyll
+        # Without it, GitHub's Jekyll pass drops every directory whose name
+        # starts with an underscore — including site_libs — and each page
+        # silently loses its CSS and JavaScript. Actions-based deployment does
+        # not run Jekyll, but this costs nothing and survives a switch back to
+        # branch-based publishing.
+        run: touch _output/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _output
+
+  deploy:
+    needs: build
+    # Pull requests build (to check the freeze cache) but never publish.
+    # While the repository is private, GitHub Pages is unavailable on a free
+    # plan, so deployment stays switched off and only the build check runs.
+    # It turns itself on the moment the repository becomes public — provided
+    # Settings → Pages → Source is set to "GitHub Actions".
+    if: github.event_name != 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
