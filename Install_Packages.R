@@ -20,6 +20,11 @@ pkgs <- c(
 new_pkgs <- pkgs[!pkgs %in% rownames(installed.packages())]
 if (length(new_pkgs) > 0) install.packages(new_pkgs)
 
+# NOTE (Part 1 SDT): the signal-detection models (sdt_yn, sdt_rating) are not
+# in the CRAN version of bmm yet. Until the release lands, the Part 1 notebook
+# needs the development version -- see Part 3 below. Everything else in the
+# workshop works with the CRAN version.
+
 ## Part 2: OPTIONAL -- only needed to re-fit models yourself ----------------
 # All workshop models are provided as fitted objects in models/*.rds, so you
 # do NOT need this to follow the workshop or run the notebooks.

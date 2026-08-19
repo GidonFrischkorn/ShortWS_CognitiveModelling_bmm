@@ -4,7 +4,6 @@ subtitle: "Take-home notebook — Psychonomics 2026 bmm workshop, Part 2"
 author: "Chenyu Li"
 format:
   html:
-    embed-resources: true
     toc: true
 execute:
   echo: true

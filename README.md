@@ -38,7 +38,7 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
 | --- | --- |
 | `index.qmd` | Landing page for the published site (schedule + links to all materials) |
 | `slides/` | Quarto reveal.js decks (`00_template.qmd` = shared pattern reference) |
-| `examples/` | Take-home Quarto notebooks, one per segment |
+| `examples/` | Take-home Quarto notebooks, one per segment, plus `00_your_own_data.qmd` — the bridge from the demos to the attendee's own dataset |
 | `data/` | Datasets used in slides and notebooks (its README is the single source for codebooks) |
 | `models/` | Pre-fitted bmm models (`.rds`) — no Stan toolchain needed to follow along |
 | `resources/` | Tutorial papers and background reading per segment |
@@ -60,6 +60,16 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
 4. Run `source("Check_Setup.R")` — it verifies that the packages and the
    pre-fitted models load and tells you that you're ready.
 5. Start with the notebooks in `examples/`.
+
+⚠️ Part 1 (signal detection) currently needs the **development** version of
+bmm: `sdt_yn()` and `sdt_rating()` are not in the CRAN release yet. Install it
+with `remotes::install_github("venpopov/bmm")`. This goes away once the
+release lands — see `models/README.md`.
+
+Once you have run the workshop's own notebooks, `examples/00_your_own_data.qmd`
+is the one to read next: which bmm model fits your paradigm, what shape your
+data has to be in, how to write the formula for your design, how to set up the
+Stan toolchain, and what the first error messages mean.
 
 No time for setup? All materials are also published as a website (slides and
 fully rendered notebooks) — nothing to install, readable on any device.
@@ -97,6 +107,36 @@ fully rendered notebooks) — nothing to install, readable on any device.
   something in front of the audience, do it in the IDE from your `examples/`
   notebook (load the cached fit, evaluate) — the slide carries the same
   output as insurance.
+
+- **Attendees do not follow along on a screen.** The QR code appears exactly
+  twice — once early, once on the take-home slide — and the early one is
+  spoken as *"scan it now and put your phone away"*. This is deliberate: an
+  audience reading the notebook on a laptop follows neither the notebook nor
+  you, and the notebooks contain nothing the projector is not already
+  showing. Do not pace your talk to a read-along, and do not narrate page
+  numbers.
+
+- **Two interactive beats, both cheap, both with static insurance.**
+  Part 1 uses them at `## Lower accuracy — but why?` (two shows of hands
+  before the reveal, ~40 s) and at `## Specify: one formula per parameter`
+  (live in the IDE, ~2:15). Both are documented in the deck's speaker notes
+  with the exact sequence. The rule that makes a live demo safe: **never
+  demo anything whose output is not already baked into an adjacent slide**,
+  so you can abandon it mid-way and simply advance.
+
+  Safe live moves on a cached fit — all sub-second, none can fail on stage:
+  `hypothesis()` with any new expression (0.02 s), `spread_draws()` (0.03 s),
+  `ranef()` (0.08 s), `fixef()`, `posterior_summary()`, `conditional_effects()`
+  (0.9 s), and building a derived quantity from draws. Printing a model
+  object or `bmm::parameters()` is instant. Do **not** re-fit live: even a
+  fast model prints sampler output and needs cmdstan.
+
+- **QR code.** `slides/images/qr_site.png` encodes the published site URL and
+  is committed as a static asset — no R package, no render-time generation,
+  no CDN. If the URL ever changes, regenerate it with
+  `qrencode -o slides/images/qr_site.png -s 10 -m 2 -l M "<new-url>"` and
+  **scan it with a phone before the session** — that is the one check the
+  render cannot do for you.
 - **Rendering.** While iterating: `quarto render slides/02_M3.qmd` (executes
   only your deck). Before handing off: run `quarto render` at the repo root
   once and commit the updated `_freeze/` folder — the freeze cache is what
@@ -140,10 +180,19 @@ materials without installing anything:
 quarto publish gh-pages    # render + push to the gh-pages branch
 ```
 
-Run from the repo root after your changes are committed. Once the site is
-live, put its URL (and a QR code) on every deck's title and take-home slides
-— for many attendees at a lunchtime session, the published site *is* the
-workshop takeaway.
+Run from the repo root after your changes are committed. The site is a
+Quarto **website** with a docked sidebar and local search (`_quarto.yml`) —
+the sidebar applies to `index.qmd` and the notebooks; Quarto does not apply
+it to reveal.js output, so the decks are unaffected. Note that the notebooks
+deliberately do **not** use `embed-resources`: in a website project it fights
+the shared `site_libs` and inflates every page (4.1 MB → 71 KB for the SDT
+notebook), which matters when a room full of people loads the site at once.
+
+The QR code on the slides points at
+`https://gidonfrischkorn.github.io/ShortWS_CognitiveModelling_bmm/`. That URL
+is 52 characters and nobody types it from memory in December — if a short,
+speakable URL is wanted (custom domain or a shorter repo name), decide it
+*before* the conference and regenerate the QR.
 
 ## License and citation
 

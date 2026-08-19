@@ -1,17 +1,15 @@
 # Fit the two Part-1 SDT models with bmm and cache them in models/
 # (naming contract in models/README.md).
 #
-# The SDT models (sdt_binary, sdt_rating + post-processing toolkit) are new
-# in bmm — currently on the PR #370 stack (venpopov/bmm#370), planned for
-# CRAN release before the workshop. Until then this script installs the
-# development version from the PR branch; once the release is out, swap the
-# install step for the CRAN version and re-fit (version contract in
-# models/README.md).
+# The SDT models (sdt_yn, sdt_rating + post-processing toolkit) are new in
+# bmm and not in the CRAN version yet (1.3.1 has no SDT models), so this
+# script needs the development version. Once the release is out, install
+# bmm from CRAN instead and re-fit (version contract in models/README.md).
 #
 # Run from the repo root: Rscript models/fit_sdt.R
 
-if (!"sdt_binary" %in% getNamespaceExports("bmm")) {
-  remotes::install_github("venpopov/bmm@sdt-post-processing", upgrade = "never")
+if (!"sdt_yn" %in% getNamespaceExports("bmm")) {
+  remotes::install_github("venpopov/bmm", upgrade = "never")
 }
 
 library(bmm)
@@ -21,8 +19,8 @@ dat <- read.csv(file.path("data", "sdt_recognition.csv"))
 
 options(mc.cores = 4, brms.backend = "cmdstanr")
 
-# --- Binary (Yes/No) SDT -------------------------------------------------
-# sdt_binary() expects one row per (participant x stimulus class) with the
+# --- Yes/No (binary) SDT -------------------------------------------------
+# sdt_yn() expects one row per (participant x stimulus class) with the
 # count of "old" responses and the number of trials.
 binary_counts <- dat |>
   summarise(
@@ -33,16 +31,16 @@ binary_counts <- dat |>
 
 fit_binary <- bmm(
   formula = bmf(
-    dprime    ~ 1 + condition + (1 | pid),
+    d         ~ 1 + condition + (1 | pid),
     criterion ~ 1 + condition + (1 | pid)
   ),
   data  = binary_counts,
-  model = sdt_binary(response = "n_old", stimulus = "is_old",
-                     n_trials = "n_trials"),
+  model = sdt_yn(response = "n_old", stimulus = "is_old",
+                 n_trials = "n_trials"),
   chains = 4, iter = 2000, warmup = 1000,
   seed = 2026
 )
-saveRDS(fit_binary, file.path("models", "sdt_binary.rds"))
+saveRDS(fit_binary, file.path("models", "sdt_yn.rds"))
 
 # --- Rating-scale SDT ----------------------------------------------------
 # sdt_rating() expects one row per (participant x stimulus class) with one
@@ -57,7 +55,7 @@ rating_counts <- dat |>
 
 fit_rating <- bmm(
   formula = bmf(
-    dprime    ~ 1 + condition + (1 | pid),
+    d         ~ 1 + condition + (1 | pid),
     criterion ~ 1 + condition + (1 | pid),
     spacing   ~ 1,
     sdratio   ~ 1
@@ -69,5 +67,5 @@ fit_rating <- bmm(
 )
 saveRDS(fit_rating, file.path("models", "sdt_rating.rds"))
 
-cat("\n==== sdt_binary ====\n"); print(summary(fit_binary))
+cat("\n==== sdt_yn ====\n"); print(summary(fit_binary))
 cat("\n==== sdt_rating ====\n"); print(summary(fit_rating))
