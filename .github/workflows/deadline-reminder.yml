@@ -1,0 +1,125 @@
+# Posts a Slack reminder before a milestone is due, naming only the work that has
+# no pull request open yet. Silence means every part is on its way.
+#
+# The reminder escalates instead of nagging daily: 7 days out (configurable),
+# then 3 days, 1 day, and on the due date; after that, the day it goes overdue
+# and once a week while open issues remain.
+#
+# "Has a pull request" means an open PR references the issue — "Closes #12" from
+# the PR template, or a link made by hand in the Development panel. Any open PR
+# mentioning the issue counts, so keep bare "#12" out of PRs that are not the
+# work itself.
+#
+# Needs one secret, SLACK_WEBHOOK_URL (a Slack incoming webhook for the channel).
+# Without it the job stays green and writes the reminder to the run log instead,
+# so the workflow can be merged before the webhook exists.
+
+name: Deadline reminder
+
+on:
+  schedule:
+    # 07:00 UTC — early morning in Zurich, late evening in California.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      days_ahead:
+        description: "Warn about milestones due in this many days (default 7). Set it to the real distance of a milestone to test the workflow."
+        required: false
+        default: "7"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and post the reminder
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          LEAD_DAYS: ${{ github.event.inputs.days_ahead || '7' }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          today=$(date -u +%Y-%m-%d)
+          message=""
+
+          while IFS=$'\t' read -r number title due_on; do
+            [ -n "$due_on" ] || continue
+
+            due_date=$(date -u -d "$due_on" +%Y-%m-%d)
+            days=$(( ( $(date -u -d "$due_date" +%s) - $(date -u -d "$today" +%s) ) / 86400 ))
+
+            kind=""
+            if [ "$days" -ge 0 ]; then
+              if [ "$days" -eq "$LEAD_DAYS" ] || [ "$days" -eq 3 ] || [ "$days" -eq 1 ] || [ "$days" -eq 0 ]; then
+                kind="due"
+              fi
+            else
+              overdue=$(( -days ))
+              if [ "$overdue" -eq 1 ] || [ $(( overdue % 7 )) -eq 0 ]; then
+                kind="overdue"
+              fi
+            fi
+            [ -n "$kind" ] || continue
+
+            # Open issues in this milestone (the endpoint also returns pull
+            # requests, hence the filter), each with its assignees.
+            issues=$(gh api "repos/$GH_REPO/issues?milestone=$number&state=open&per_page=100" --paginate \
+                       --jq '.[] | select(.pull_request == null)
+                             | [(.number|tostring), .title, ([.assignees[].login] | join(", "))] | @tsv')
+            [ -n "$issues" ] || continue
+
+            waiting=""
+            while IFS=$'\t' read -r inum ititle iwho; do
+              [ -n "$inum" ] || continue
+              # An issue counts as under way once an open pull request references
+              # it ("Closes #12" in the template) or is linked to it by hand.
+              # Matching on the issue number alone would be fooled by any PR that
+              # happens to contain that digit.
+              linked=$(gh api "repos/$GH_REPO/issues/$inum/timeline?per_page=100" --paginate \
+                         --jq '[.[] | select((.event == "cross-referenced"
+                                              and .source.issue.pull_request != null
+                                              and .source.issue.state == "open")
+                                             or .event == "connected")] | length')
+              [ "$linked" -eq 0 ] || continue
+              waiting="${waiting}• ${ititle}${iwho:+ (${iwho})} — <${REPO_URL}/issues/${inum}|#${inum}>\n"
+            done <<< "$issues"
+
+            [ -n "$waiting" ] || continue
+
+            pretty_due=$(date -u -d "$due_date" "+%-d %b")
+            if [ "$kind" = "due" ]; then
+              if [ "$days" -eq 0 ]; then
+                header="*${title}* — due today (${pretty_due})"
+              else
+                header="*${title}* — due in ${days} day$([ "$days" -eq 1 ] || echo s) (${pretty_due})"
+              fi
+              message="${message}⏰ ${header}\nNo pull request open yet:\n${waiting}\n"
+            else
+              message="${message}🔴 *${title}* — was due ${pretty_due}, still open:\n${waiting}\n"
+            fi
+          done <<< "$(gh api "repos/$GH_REPO/milestones?state=open&per_page=100" --paginate \
+                        --jq '.[] | [(.number|tostring), .title, (.due_on // "")] | @tsv')"
+
+          if [ -z "$message" ]; then
+            echo "Nothing to remind about today."
+            exit 0
+          fi
+
+          printf '%b\n' "$message" | tee -a "$GITHUB_STEP_SUMMARY"
+
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "::notice::SLACK_WEBHOOK_URL is not set — reminder written to the run log only."
+            exit 0
+          fi
+
+          payload=$(printf '%b' "$message" | jq -Rs '{text: .}')
+          curl -sS --fail-with-body -X POST -H 'Content-type: application/json' \
+               --data "$payload" "$SLACK_WEBHOOK_URL" > /dev/null
+          echo "Reminder posted to Slack."
