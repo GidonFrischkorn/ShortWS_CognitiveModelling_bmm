@@ -49,7 +49,7 @@ Tutorial papers and background reading for each segment are listed in the reposi
 ## Contact
 
 - Gidon T. Frischkorn (University of Zurich) — bmm intro & SDT
-- Chenyu Li (University of Zurich) — Memory Measurement Model
+- Chenyu Li (University of Chicago) — Memory Measurement Model
 - Adriana F. Chávez De la Peña (University of California, Irvine) — EZ-DDM
 
 ## Reuse and citation

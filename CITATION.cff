@@ -15,9 +15,11 @@ authors:
     affiliation: "University of Zurich"
   - family-names: Li
     given-names: Chenyu
+    orcid: "https://orcid.org/0000-0001-8815-6189"
     affiliation: "University of Chicago"
   - family-names: "Chávez De la Peña"
     given-names: "Adriana F."
+    orcid: "https://orcid.org/0009-0000-7599-6621"
     affiliation: "University of California, Irvine"
 keywords:
   - bmm
