@@ -1,10 +1,46 @@
 project:
-  type: default
+  type: website
   output-dir: _output
   render:
     - "index.qmd"
     - "slides/*.qmd"
     - "examples/*.qmd"
+
+# The site is a reading companion, not a replacement for the talk: the
+# sidebar gives attendees a way to navigate and search the notebooks after
+# the session. The decks stay plain reveal.js — Quarto does not apply the
+# sidebar to revealjs output, so they are unaffected by anything here.
+website:
+  title: "bmm workshop"
+  description: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
+  site-url: "https://gidonfrischkorn.github.io/ShortWS_CognitiveModelling_bmm/"
+  repo-url: "https://github.com/GidonFrischkorn/ShortWS_CognitiveModelling_bmm"
+  search: true
+  page-navigation: true
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - text: "Overview"
+        href: index.qmd
+      - text: "Using bmm on your own data"
+        href: examples/00_your_own_data.qmd
+      - section: "Take-home notebooks"
+        contents:
+          - text: "Part 1 — Signal Detection Theory"
+            href: examples/01_sdt.qmd
+          - text: "Part 2 — Memory Measurement Model"
+            href: examples/02_m3.qmd
+          - text: "Part 3 — EZ-Drift Diffusion Model"
+            href: examples/03_ezddm.qmd
+      - section: "Slides"
+        contents:
+          - text: "Part 1 — bmm workflow & SDT"
+            href: slides/01_Intro_bmm_SDT.html
+          - text: "Part 2 — M3"
+            href: slides/02_M3.html
+          - text: "Part 3 — EZ-DDM"
+            href: slides/03_EZDDM.html
 
 execute:
   freeze: auto

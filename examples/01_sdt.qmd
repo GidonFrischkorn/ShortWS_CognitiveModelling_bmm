@@ -4,7 +4,6 @@ subtitle: "Take-home notebook — Psychonomics 2026 bmm workshop, Part 1"
 author: "Gidon T. Frischkorn"
 format:
   html:
-    embed-resources: true
     toc: true
 execute:
   echo: true
@@ -14,13 +13,15 @@ execute:
 
 ## Setup
 
-The SDT models are new in bmm. Until the next CRAN release (planned before the workshop) they live in a development version — install once with:
+The SDT models are new in bmm and are not in the CRAN version yet, so this notebook needs the development version — install once with:
 
 ```{r}
 #| label: install
 #| eval: false
-remotes::install_github("venpopov/bmm@sdt-post-processing")
+remotes::install_github("venpopov/bmm")
 ```
+
+If `library(bmm)` works but `sdt_yn()` gives you `could not find function`, you are on the CRAN version and this install step is the fix.
 
 ```{r}
 #| label: setup
@@ -64,9 +65,9 @@ dat |>
 
 ## Specify: the model and its formula
 
-Binary SDT describes each old/new decision with two parameters: the distance between the noise and signal evidence distributions (sensitivity $d'$) and the location of the decision boundary (criterion $c$; 0 = unbiased, positive = conservative).
+Yes/no SDT describes each old/new decision with two parameters: the distance between the noise and signal evidence distributions (sensitivity $d'$) and the location of the decision boundary (criterion $c$; 0 = unbiased, positive = conservative).
 
-`sdt_binary()` expects one row per participant × stimulus class, with the count of "old" responses and the number of trials:
+`sdt_yn()` expects one row per participant × stimulus class, with the count of "old" responses and the number of trials. **This data shape is a contract** — getting it wrong is the first error most people hit, so check it against `head()` before fitting:
 
 ```{r}
 #| label: aggregate-binary
@@ -81,18 +82,21 @@ head(binary_counts, 4)
 
 ```{r}
 #| label: model-object
-sdt_model <- sdt_binary(response = "n_old", stimulus = "is_old",
-                        n_trials = "n_trials")
+sdt_model <- sdt_yn(response = "n_old", stimulus = "is_old",
+                    n_trials = "n_trials")
+sdt_model
 ```
 
-The **formula addresses the model parameters by name** — this is the core of the bmm workflow. One regression formula per parameter says how it varies over conditions and participants:
+Printing the model object shows you what you just built: its parameters, the link function each one uses, and which are fixed rather than estimated. `bmm::parameters(sdt_model)` gives the same information with full descriptions — write the `bmm::` prefix, because tidybayes exports a `parameters()` too and whichever package you attached last wins.
+
+The **formula addresses the model parameters by name** — this is the core of the bmm workflow. One regression formula per parameter says how it varies over conditions and participants. `bmf()` ("bmm formula") is where those go; it takes one ordinary R formula per parameter, and `(1 | pid)` is standard mixed-model syntax for "let this parameter vary across participants", exactly as in `lme4` or `brms`:
 
 ```{r}
 #| label: formula
 #| eval: false
 fit_sdt <- bmm(
   formula = bmf(
-    dprime    ~ 1 + condition + (1 | pid),
+    d         ~ 1 + condition + (1 | pid),
     criterion ~ 1 + condition + (1 | pid)
   ),
   data  = binary_counts,
@@ -104,8 +108,8 @@ With treatment coding (`full_attention` is the reference level), the four popula
 
 | Coefficient | Meaning |
 | --- | --- |
-| `dprime_Intercept` | $d'$, full-attention condition |
-| `dprime_conditionimmediate` | **difference in $d'$**, immediate − full attention |
+| `d_Intercept` | $d'$, full-attention condition |
+| `d_conditionimmediate` | **difference in $d'$**, immediate − full attention |
 | `criterion_Intercept` | criterion $c$, full-attention condition |
 | `criterion_conditionimmediate` | **difference in $c$**, immediate − full attention |
 
@@ -117,9 +121,15 @@ All workshop models ship pre-fitted in `models/` — nothing to compile, nothing
 
 ```{r}
 #| label: load-fit
-fit_sdt <- readRDS(here("models", "sdt_binary.rds"))
+fit_sdt <- readRDS(here("models", "sdt_yn.rds"))
 summary(fit_sdt)
 ```
+
+Three things to read in that output before you trust anything else:
+
+- **`Rhat`** compares variation between and within the four chains. It should be 1.00; anything above ~1.01 means the chains have not agreed on the same answer and the estimates are not usable yet.
+- **`Bulk_ESS` / `Tail_ESS`** are effective sample sizes — how many *independent* draws the correlated MCMC draws are worth. A few hundred is enough for a point estimate; aim for >1000 before quoting the tails of an interval.
+- **`sdratio_Intercept` is exactly 0 with no uncertainty** because `sdt_yn()` fixes it there. That is the equal-variance assumption made visible: the signal and noise distributions are held to the same SD, which is what makes `d` here equal to the textbook $d'$. The rating model at the end of this notebook estimates it instead.
 
 ### Optional: re-fit the model yourself
 
@@ -132,17 +142,17 @@ The posterior draws of the coefficients *are* draws of the SDT parameters, so co
 ```{r}
 #| label: posterior
 sdt_pars <- fit_sdt |>
-  spread_draws(b_dprime_Intercept, b_dprime_conditionimmediate,
+  spread_draws(b_d_Intercept, b_d_conditionimmediate,
                b_criterion_Intercept, b_criterion_conditionimmediate) |>
   mutate(
-    dprime_full = b_dprime_Intercept,
-    dprime_imm  = b_dprime_Intercept + b_dprime_conditionimmediate,
-    c_full      = b_criterion_Intercept,
-    c_imm       = b_criterion_Intercept + b_criterion_conditionimmediate
+    d_full = b_d_Intercept,
+    d_imm  = b_d_Intercept + b_d_conditionimmediate,
+    c_full = b_criterion_Intercept,
+    c_imm  = b_criterion_Intercept + b_criterion_conditionimmediate
   )
 
 sdt_pars |>
-  pivot_longer(dprime_full:c_imm,
+  pivot_longer(d_full:c_imm,
                names_to = c("parameter", "condition"), names_sep = "_") |>
   group_by(parameter, condition) |>
   median_qi(value)
@@ -152,9 +162,9 @@ sdt_pars |>
 #| label: posterior-plot
 #| fig-alt: "Posterior distributions of d-prime and criterion for the full-attention and immediate conditions, shown as halfeye plots."
 sdt_pars |>
-  pivot_longer(dprime_full:c_imm,
+  pivot_longer(d_full:c_imm,
                names_to = c("parameter", "condition"), names_sep = "_") |>
-  mutate(parameter = recode(parameter, dprime = "d'", c = "criterion c"),
+  mutate(parameter = recode(parameter, d = "d'", c = "criterion c"),
          condition = recode(condition, full = "full attention", imm = "immediate")) |>
   ggplot(aes(x = value, y = condition, fill = condition)) +
   stat_halfeye(alpha = 0.8) +
@@ -171,7 +181,7 @@ Because condition differences are *coefficients on the parameters*, testing them
 ```{r}
 #| label: hypotheses
 # Does sensitivity differ between the two test conditions?
-hypothesis(fit_sdt, "dprime_conditionimmediate = 0")
+hypothesis(fit_sdt, "d_conditionimmediate = 0")
 
 # Is the immediate group more liberal (lower criterion)?
 hypothesis(fit_sdt, "criterion_conditionimmediate < 0")
@@ -216,14 +226,14 @@ rating_counts <- dat |>
 head(rating_counts, 4)
 ```
 
-Recognition ROCs are classically *asymmetric* — old items have more variable memory strength than new items, the very phenomenon Koen et al. (2013) studied. With rating data, bmm can estimate that signal-SD ratio (`sdratio`) — the unequal-variance SDT model — with one more formula line, while `dprime` and `criterion` keep their condition effects:
+Recognition ROCs are classically *asymmetric* — old items have more variable memory strength than new items, the very phenomenon Koen et al. (2013) studied. With rating data, bmm can estimate that signal-SD ratio (`sdratio`) — the unequal-variance SDT model — with one more formula line, while `d` and `criterion` keep their condition effects:
 
 ```{r}
 #| label: formula-rating
 #| eval: false
 fit_rating <- bmm(
   formula = bmf(
-    dprime    ~ 1 + condition + (1 | pid),
+    d         ~ 1 + condition + (1 | pid),
     criterion ~ 1 + condition + (1 | pid),
     spacing   ~ 1,
     sdratio   ~ 1
@@ -239,14 +249,16 @@ fit_rating <- readRDS(here("models", "sdt_rating.rds"))
 summary(fit_rating)
 ```
 
-`exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the old-item distribution is wider than the new-item distribution. Note a substantive nuance: under the unequal-variance model the $d'$ difference between conditions points the same way but is less certain — parameter estimates depend on the measurement model, which is exactly why the model is worth stating explicitly:
+`sdratio` is the *log* SD ratio, so 0 would mean equal variance. `exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the old-item distribution is wider than the new-item distribution.
+
+Two things worth saying out loud. First, once `sdratio` is free, bmm's `d` is $d_a$ — the separation measured in units of the two distributions' root-mean-square SD — rather than the textbook $d'$; the two coincide only under equal variance, which is exactly the assumption the yes/no model made for us. Second, the condition difference in sensitivity points the same way as before but is now less certain, with an interval that includes zero. Neither result is more "correct" than the other: parameter estimates are estimates *under a measurement model*, which is precisely why the model belongs in your methods section.
 
 ```{r}
-#| label: rating-dprime
+#| label: rating-d
 fit_rating |>
-  spread_draws(b_dprime_conditionimmediate, b_sdratio_Intercept) |>
+  spread_draws(b_d_conditionimmediate, b_sdratio_Intercept) |>
   mutate(sd_ratio = exp(b_sdratio_Intercept)) |>
-  pivot_longer(c(b_dprime_conditionimmediate, sd_ratio)) |>
+  pivot_longer(c(b_d_conditionimmediate, sd_ratio)) |>
   group_by(name) |>
   median_qi(value)
 ```

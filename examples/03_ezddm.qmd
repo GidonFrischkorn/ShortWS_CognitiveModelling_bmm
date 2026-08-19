@@ -4,7 +4,6 @@ subtitle: "Take-home notebook — Psychonomics 2026 bmm workshop, Part 3"
 author: "Adriana F. Chávez De la Peña"
 format:
   html:
-    embed-resources: true
     toc: true
 execute:
   echo: true
