@@ -141,7 +141,9 @@ fully rendered notebooks) — nothing to install, readable on any device.
   only your deck). Before handing off: run `quarto render` at the repo root
   once and commit the updated `_freeze/` folder — the freeze cache is what
   lets everyone else (and a fresh clone) render the full project without
-  executing your chunks.
+  executing your chunks. This is not on your honour: CI rebuilds the site with
+  R made unavailable, so forgetting the `_freeze/` commit turns the build red
+  (see [Publishing](#publishing-github-pages)).
 - **Literature.** Add readings to `resources/README.md` with DOIs; include
   the PDF in your segment's subfolder only if it is open access or a
   redistributable preprint — this repository is public.
@@ -174,25 +176,69 @@ press `e` for print view and use the browser's "Save as PDF".
 
 The rendered site — `index.qmd` landing page, all decks, all notebooks — is
 published to GitHub Pages so attendees can follow along and revisit the
-materials without installing anything:
+materials without installing anything. **Publishing is automatic:** push to
+`main` and `.github/workflows/publish.yml` renders the site and deploys it.
+Nobody has to run a publish command, and nobody needs R installed to publish.
+
+That last part is the reason the workflow exists. Every chunk's output is
+already in the committed `_freeze/` cache, so the CI build replays the site
+without executing anything — no R, no bmm, no Stan toolchain, about ten
+seconds. A co-presenter can fix a typo from the GitHub web editor and the
+site updates itself.
+
+The workflow enforces that property rather than trusting it: before rendering
+it puts failing stubs for `R` and `Rscript` on the `PATH`. So if you edit a
+`.qmd` and forget to commit the regenerated `_freeze/`, the build goes **red**
+with a message telling you exactly that — instead of quietly publishing a
+stale page. If you see that error, the fix is always the same:
 
 ```bash
-quarto publish gh-pages    # render + push to the gh-pages branch
+quarto render          # at the repo root
+git add _freeze/ && git commit -m "update freeze cache"
 ```
 
-Run from the repo root after your changes are committed. The site is a
-Quarto **website** with a docked sidebar and local search (`_quarto.yml`) —
-the sidebar applies to `index.qmd` and the notebooks; Quarto does not apply
-it to reveal.js output, so the decks are unaffected. Note that the notebooks
-deliberately do **not** use `embed-resources`: in a website project it fights
-the shared `site_libs` and inflates every page (4.1 MB → 71 KB for the SDT
-notebook), which matters when a room full of people loads the site at once.
+Pull requests run the same build (so the freeze check applies before merge)
+but never deploy.
+
+### One-time setup
+
+1. The repository must be **public** — GitHub Pages is not available on
+   private repositories on a free plan. Until it is, the workflow still runs
+   the build check on every push and simply skips deployment.
+2. **Settings → Pages → Source: GitHub Actions.**
+
+Nothing else. There is no `gh-pages` branch: the workflow uploads the site as
+an artifact and deploys that, which keeps 9 MB of rendered output per publish
+out of the git history.
+
+If you ever need to publish by hand — CI down, or a preview from a branch:
+
+```bash
+quarto publish gh-pages    # render + push to a gh-pages branch
+```
+
+This is the fallback, not the normal path. It renders locally, so it needs a
+working R with the packages the decks use, and it creates the `gh-pages`
+branch the workflow deliberately avoids.
+
+### Site details
+
+The site is a Quarto **website** with a docked sidebar and local search
+(`_quarto.yml`) — the sidebar applies to `index.qmd` and the notebooks; Quarto
+does not apply it to reveal.js output, so the decks are unaffected. The
+notebooks deliberately do **not** use `embed-resources`: in a website project
+it fights the shared `site_libs` and inflates every page (4.1 MB → 71 KB for
+the SDT notebook), which matters when a room full of people loads the site at
+once. The build also writes a `.nojekyll` file into the output; GitHub's
+Jekyll pass would otherwise drop directories whose names begin with an
+underscore and every page would silently lose its CSS and JavaScript.
 
 The QR code on the slides points at
-`https://gidonfrischkorn.github.io/ShortWS_CognitiveModelling_bmm/`. That URL
-is 52 characters and nobody types it from memory in December — if a short,
-speakable URL is wanted (custom domain or a shorter repo name), decide it
-*before* the conference and regenerate the QR.
+`https://gidonfrischkorn.github.io/ShortWS_CognitiveModelling_bmm/`, which is
+the URL this setup publishes to. That URL is 52 characters and nobody types it
+from memory in December — if a short, speakable URL is wanted (custom domain
+or a shorter repo name), decide it *before* the conference and regenerate the
+QR, because a printed QR pointing at a dead URL cannot be fixed.
 
 ## License and citation
 
