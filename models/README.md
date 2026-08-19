@@ -3,9 +3,12 @@
 All models shown in the workshop ship here as fitted objects, so slides and
 notebooks never fit live and participants never need the Stan toolchain.
 
-Workflow: fit locally (in your `examples/` notebook or a scratch script),
-`saveRDS(fit, here::here("models", "<name>.rds"))`, commit the `.rds`
-together with your deck and the updated `_freeze/` entries.
+Workflow: fit locally from your fitting script (`models/fit_*.R`, mirroring
+`models/fit_sdt.R`) and let **brms cache the fit for you** — pass
+`file = here::here("models", "<name>")` to the fitting call instead of a
+manual `saveRDS()` (decided 2026-08-18). Re-running the script then reloads
+the cached fit rather than refitting. Commit the `.rds` together with your
+deck and the updated `_freeze/` entries.
 
 **Version contract:** fit every shipped model with the **CRAN** versions of
 bmm and brms — participants install from CRAN, and an `.rds` produced with a
@@ -14,23 +17,46 @@ used in the table below (`packageVersion("bmm")`, `packageVersion("brms")`).
 Development versions (`Install_Packages.R`, Part 3) are for prototyping only;
 re-fit with CRAN versions before committing.
 
+Confirmed on 2026-08-18: **M3 and EZ-DDM need no development-version
+features** — both segments fit with CRAN bmm, so the only dev-version
+dependency in this repo is the SDT exception below.
+
 ## Naming contract
 
 | File | Model | Added by | Fitted with (bmm / brms) | Status |
 | --- | --- | --- | --- | --- |
 | `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
-| `m3_simple.rds` | M3, simple span | Chenyu | — | TODO |
-| `m3_complex.rds` | M3, complex span | Chenyu | — | TODO |
-| `ezddm_summary.rds` | EZ-DDM from summary statistics | Adriana | — | TODO |
-| `ddm_trial.rds` | Trial-level DDM | Adriana | — | TODO |
+| `m3_simple.rds` | M3, simple span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
+| `m3_complex.rds` | M3, complex span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
+| `ezddm_summary.rds` | EZ-DDM from summary statistics — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
+| `ddm_trial.rds` | Trial-level DDM — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
+
+As with the datasets, these file names were contracted before the kickoff and
+**not re-discussed** on 2026-08-18. They stand by default and are checked for
+consistency at PR review; which fits a segment actually ships depends on what
+that segment ends up covering, so flag a change in your PR rather than
+silently renaming.
 
 **SDT exception to the CRAN contract:** the SDT models (`sdt_yn()`,
 `sdt_rating()`) are new in bmm and **not in the CRAN version** — CRAN is
 still at 1.3.1, which has no SDT models at all. The current fits were made
-with the development version (1.4.1.9000). **Re-fit both SDT models with
-the CRAN release as soon as it is out** and update the table above.
-Fitting script: `models/fit_sdt.R` (installs the dev version if needed).
+with the development version (1.4.1.9000). Fitting script: `models/fit_sdt.R`
+(installs the dev version if needed).
+
+**The release now has a date: 30 September 2026** (agreed with Ven Popov on
+2026-08-18), including the SDT models. Consequences:
+
+- **All results get re-generated at the beginning of October** with the
+  release version — not only the SDT fits — and the table above updated.
+  Anyone rendering before that is rendering against dev-version fits.
+- Until then, running the Part-1 code (deck or `examples/01_sdt.qmd`) requires
+  the development version installed. Nothing else in the repo does.
+- While re-generating, check whether anything new in the release is worth
+  showing, since the workshop is about getting people started. Candidates:
+  `report_prior()` (prior summary in prose) and `native_parameters()`
+  (posterior draws from the parameter to the native scale) — **verify names
+  and behaviour against the actual release** before a slide depends on them.
 
 ⚠️ **Standing release risk.** Until that release lands, every take-home path
 for Part 1 depends on attendees installing bmm from GitHub — which
@@ -50,4 +76,7 @@ which the yes/no model fixes by default). In the rating model, where
 
 Keep each `.rds` well under ~50 MB (fewer chains / thinned draws if needed);
 GitHub hard-rejects files over 100 MB. Check with `ls -lh models/` before
-committing.
+committing. With the amount of data these models see, no fit is expected to
+come close — the SDT fits are 12 MB each. If one ever does, the fallback
+agreed on 2026-08-18 is to host the fit objects in a companion OSF project or
+Zenodo deposit and download them, rather than committing them here.
