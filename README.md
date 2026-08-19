@@ -147,6 +147,18 @@ fully rendered notebooks) — nothing to install, readable on any device.
 - **Literature.** Add readings to `resources/README.md` with DOIs; include
   the PDF in your segment's subfolder only if it is open access or a
   redistributable preprint — this repository is public.
+- **Branch, then open a pull request.** Each presenter works on their own
+  branch and opens a PR against `main`; the other two review it. The PR is
+  where we give each other feedback and streamline the three parts into one
+  workshop, not a formality before merging — so open it while the segment is
+  still malleable rather than when it is finished. The PR template lists what
+  gets checked (`_freeze/` committed, file names matching the contracts in
+  `data/README.md` and `models/README.md`, codebook and model table filled).
+  Pull before you start; `_freeze/` is the one folder that can conflict, and a
+  root render resolves it.
+- **What is due when** lives in the repository's milestones, and every
+  deliverable has an issue with its own checklist. A reminder posts to Slack
+  before a deadline, naming only the parts that have no PR open yet.
 
 ## Rendering the materials
 
