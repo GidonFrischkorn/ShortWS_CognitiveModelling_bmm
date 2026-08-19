@@ -18,24 +18,35 @@ put it here — link to its repository instead.
 | File | Source | Terms |
 | --- | --- | --- |
 | `sdt_recognition.csv` | Koen et al. (2013), via the `roc6` dataset in [MPTinR](https://cran.r-project.org/package=MPTinR) | MPTinR is GPL-2 \| GPL-3; cite Koen et al. (2013) and Klauer & Kellen (2015) |
-| `m3_simple_span.csv` | TODO — Chenyu | TODO |
-| `m3_complex_span.csv` | TODO — Chenyu | TODO |
-| `ezddm_perceptual.csv` | TODO — Adriana | TODO |
+| `m3_simple_span.csv` | Oberauer (2019), <https://doi.org/10.5334/joc.86>, via the M3 tutorial supplement (Frischkorn & Li, 2026), <https://osf.io/yb7wm/> | OSF project is **CC BY-NC 4.0** (checked 2026-08-19); cite Oberauer (2019) and the tutorial |
+| `m3_complex_span.csv` | Li, Frischkorn, & Oberauer (2026), Exp. 1, <https://doi.org/10.1037/xlm0001585>, via the same supplement | as above |
+| `ezddm_perceptual.csv` | Chávez De la Peña & Vandekerckhove (2025), <https://doi.org/10.3758/s13423-025-02729-y>, supplement <https://osf.io/bzkpn/> | OSF project is **CC BY 4.0** (checked 2026-08-19); cite the PB&R paper **and the original study the data come from** — TODO Adriana, see below |
 
 ## Naming contract
 
 | File | Segment | Added by | Status |
 | --- | --- | --- | --- |
 | `sdt_recognition.csv` | Recognition memory (binary + rating SDT) | Gidon | done |
-| `m3_simple_span.csv` | Simple span (M3) | Chenyu | TODO |
-| `m3_complex_span.csv` | Complex span (M3 extension) | Chenyu | TODO |
-| `ezddm_perceptual.csv` | Perceptual decision making (EZ-DDM / DDM) | Adriana | TODO |
+| `m3_simple_span.csv` | Simple span (M3) | Chenyu | TODO — by 2026-09-30 |
+| `m3_complex_span.csv` | Complex span (M3 extension) | Chenyu | TODO — by 2026-09-30 |
+| `ezddm_perceptual.csv` | Perceptual decision making (EZ-DDM / DDM) | Adriana | TODO — by 2026-09-30 |
+
+The file names above were contracted before the kickoff and were **not
+re-discussed** on 2026-08-18. They stand by default; keep them unless you have
+a reason to change one, and flag a rename in your PR — the notebook and deck
+that reference the file have to change with it.
 
 ## Codebooks
 
 **This file is the single source for all codebooks.** Document every column
 of your dataset here when you add it; slides and notebooks reference this
 file instead of duplicating column descriptions (duplicates drift apart).
+
+**Each presenter writes their own codebook** (decided 2026-08-18), in the same
+PR that adds the CSV. Use the `sdt_recognition.csv` entry below as the model
+for length and level of detail: what participants did, what one row is (trial
+or aggregate), sample size, which factors are within- vs. between-subjects,
+then the column table with types and value ranges.
 
 ### sdt_recognition.csv
 
@@ -71,12 +82,29 @@ are aggregated).
 
 ### m3_simple_span.csv
 
-TODO
+**TODO — Chenyu, by 2026-09-30.**
+
+Source (from the tutorial, not yet confirmed against the committed CSV):
+cued recall with words in boxes from Oberauer (2019), two experiments of 20
+participants each differing in stimulus set (open vs. closed), aggregated to
+response frequencies per participant × recognition condition.
 
 ### m3_complex_span.csv
 
-TODO
+**TODO — Chenyu, by 2026-09-30.**
+
+Source (same caveat): the complex-span filtering task of Li, Frischkorn, &
+Oberauer (2026), Experiment 1, 45 participants after exclusions,
+within-subjects, pre-aggregated into frequencies across five response
+categories.
 
 ### ezddm_perceptual.csv
 
-TODO
+**TODO — Adriana, by 2026-09-30.**
+
+Open first: the PB&R paper contributes no data of its own — its empirical
+sections re-analyse Ratcliff & Rouder (1998; numerosity/brightness, speed vs.
+accuracy instructions, Appendix D) and Vandekerckhove, Panis, & Wagemans
+(2007; shape perception, nine participants, Appendix E). Say which one this
+file is, so the Source/Terms row above can name the study that has to be
+cited.
