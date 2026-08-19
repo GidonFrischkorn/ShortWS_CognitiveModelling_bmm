@@ -78,7 +78,7 @@ fully rendered notebooks) — nothing to install, readable on any device.
 
 - **Start from the template.** `slides/00_template.qmd` demonstrates every
   slide and code pattern (section dividers, line-stepped code, cached-fit
-  loading, interactive webR cells, speaker notes). Shared deck options live
+  loading, closed-form demo figures, speaker notes). Shared deck options live
   in `slides/_metadata.yml`; your deck YAML stays minimal.
 - **Follow the shared skeleton.** Every segment uses the same section order —
   model intuition → see the data → specify → fit → evaluate → extension →
