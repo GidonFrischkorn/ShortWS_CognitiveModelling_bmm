@@ -1,0 +1,9 @@
+# Shared configuration for the take-home notebooks in examples/.
+# Format and theme come from the website config in _quarto.yml; this file only
+# carries what the notebooks need on top of it.
+
+# Native browser MathML, the same choice the decks make in slides/_metadata.yml.
+# Quarto's html default loads MathJax from jsDelivr (plus a polyfill from
+# cdnjs), which put the only two external requests of the whole site on
+# 01_sdt.html — the one notebook that writes any math.
+html-math-method: mathml
