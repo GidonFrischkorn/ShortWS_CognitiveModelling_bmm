@@ -117,7 +117,7 @@ fully rendered notebooks) — nothing to install, readable on any device.
   numbers.
 
 - **Two interactive beats, both cheap, both with static insurance.**
-  Part 1 uses them at `## Lower accuracy — but why?` (two shows of hands
+  Part 1 uses them at `## Why is accuracy lower?` (two shows of hands
   before the reveal, ~40 s) and at `## Specify: one formula per parameter`
   (live in the IDE, ~2:15). Both are documented in the deck's speaker notes
   with the exact sequence. The rule that makes a live demo safe: **never
