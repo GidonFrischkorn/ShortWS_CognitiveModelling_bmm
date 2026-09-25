@@ -38,6 +38,9 @@ fit_binary <- bmm(
   model = sdt_yn(response = "n_old", stimulus = "is_old",
                  n_trials = "n_trials"),
   chains = 4, iter = 2000, warmup = 1000,
+  # Keep draws from the prior: hypothesis() needs them for the Bayes factor
+  # (Savage-Dickey) of point hypotheses such as "d_conditionimmediate = 0".
+  sample_prior = "yes",
   seed = 2026
 )
 saveRDS(fit_binary, file.path("models", "sdt_yn.rds"))
@@ -63,6 +66,9 @@ fit_rating <- bmm(
   data  = rating_counts,
   model = sdt_rating(response = paste0("r", 1:6), stimulus = "is_old"),
   chains = 4, iter = 2000, warmup = 1000,
+  # Keep draws from the prior: hypothesis() needs them for the Bayes factor
+  # (Savage-Dickey) of point hypotheses such as "d_conditionimmediate = 0".
+  sample_prior = "yes",
   seed = 2026
 )
 saveRDS(fit_rating, file.path("models", "sdt_rating.rds"))

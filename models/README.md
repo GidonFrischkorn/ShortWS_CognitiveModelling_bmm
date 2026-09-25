@@ -52,6 +52,11 @@ with the development version (1.4.1.9000). Fitting script: `models/fit_sdt.R`
   Anyone rendering before that is rendering against dev-version fits.
 - Until then, running the Part-1 code (deck or `examples/01_sdt.qmd`) requires
   the development version installed. Nothing else in the repo does.
+- `fit_sdt.R` now fits with `sample_prior = "yes"` (added 2026-09-25), so
+  `hypothesis()` can report Bayes factors for point hypotheses. The current
+  `.rds` files predate this: until the refit, `Evid.Ratio` and `Post.Prob`
+  for `d_conditionimmediate = 0` show `NA`. The refit also picks up the
+  random-effect SD priors that bmm will set for the SDT models.
 - While re-generating, check whether anything new in the release is worth
   showing, since the workshop is about getting people started. Candidates:
   `report_prior()` (prior summary in prose) and `native_parameters()`

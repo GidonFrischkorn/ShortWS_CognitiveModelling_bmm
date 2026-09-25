@@ -100,7 +100,8 @@ fit_sdt <- bmm(
     criterion ~ 1 + condition + (1 | pid)
   ),
   data  = binary_counts,
-  model = sdt_model
+  model = sdt_model,
+  sample_prior = "yes"  # prior draws: Bayes factors in hypothesis()
 )
 ```
 
@@ -239,7 +240,8 @@ fit_rating <- bmm(
     sdratio   ~ 1
   ),
   data  = rating_counts,
-  model = sdt_rating(response = paste0("r", 1:6), stimulus = "is_old")
+  model = sdt_rating(response = paste0("r", 1:6), stimulus = "is_old"),
+  sample_prior = "yes"  # prior draws: Bayes factors in hypothesis()
 )
 ```
 
