@@ -7,6 +7,11 @@
 # bmm from CRAN instead and re-fit (version contract in models/README.md).
 #
 # Run from the repo root: Rscript models/fit_sdt.R
+#
+# Fits are cached through bmm's `file` argument with file_refit = "on_change"
+# (see the comment at the first bmm() call). To force a refit when nothing
+# in the model changed, e.g. a bmm release that leaves the Stan code as it
+# is, delete models/sdt_*.rds or set file_refit = "always".
 
 if (!"sdt_yn" %in% getNamespaceExports("bmm")) {
   remotes::install_github("venpopov/bmm", upgrade = "never")
@@ -41,9 +46,15 @@ fit_binary <- bmm(
   # Keep draws from the prior: hypothesis() needs them for the Bayes factor
   # (Savage-Dickey) of point hypotheses such as "d_conditionimmediate = 0".
   sample_prior = "yes",
-  seed = 2026
+  seed = 2026,
+  # Cache: with "on_change", a rerun reuses models/sdt_yn.rds unless the model
+  # changed. bmm regenerates the Stan code and Stan data for this call and
+  # refits only if they, or the data, differ from the cached fit (new priors,
+  # formula, or sample_prior). Sampler settings (chains, iter, seed) are not
+  # compared and do not trigger a refit.
+  file = file.path("models", "sdt_yn"),
+  file_refit = "on_change"
 )
-saveRDS(fit_binary, file.path("models", "sdt_yn.rds"))
 
 # --- Rating-scale SDT ----------------------------------------------------
 # sdt_rating() expects one row per (participant x stimulus class) with one
@@ -69,9 +80,10 @@ fit_rating <- bmm(
   # Keep draws from the prior: hypothesis() needs them for the Bayes factor
   # (Savage-Dickey) of point hypotheses such as "d_conditionimmediate = 0".
   sample_prior = "yes",
-  seed = 2026
+  seed = 2026,
+  file = file.path("models", "sdt_rating"),
+  file_refit = "on_change"  # see the cache comment at the first fit
 )
-saveRDS(fit_rating, file.path("models", "sdt_rating.rds"))
 
 cat("\n==== sdt_yn ====\n"); print(summary(fit_binary))
 cat("\n==== sdt_rating ====\n"); print(summary(fit_rating))
