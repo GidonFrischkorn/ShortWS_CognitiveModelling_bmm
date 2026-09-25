@@ -259,6 +259,24 @@ $code-block-font-size: 0.65em;
   font-size: 0.55em;
 }
 
+// Counterpart to reveal.js's built-in `semi-fade-out`: dimmed until its
+// fragment step, then full opacity. Used for step lists synced with code
+// highlighting.
+.reveal .slides section .fragment.semi-fade-in {
+  opacity: 0.5;
+  visibility: inherit;
+}
+
+.reveal .slides section .fragment.semi-fade-in.visible {
+  opacity: 1;
+}
+
+// Long code chunk that must fit on one slide: add `#| class-source: code-small`
+.reveal div.sourceCode.code-small pre,
+.reveal pre.code-small {
+  font-size: 0.55em;
+}
+
 // Fit index verdict colors
 .fit-good {
   color: $uzh-accent-green;
