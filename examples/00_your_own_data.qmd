@@ -171,7 +171,8 @@ fit <- bmm(
   ),
   data  = counts,
   model = sdt_yn(response = "n_old", stimulus = "is_old",
-                 n_trials = "n_trials")
+                 n_trials = "n_trials"),
+  sample_prior = "yes"  # prior draws: Bayes factors in hypothesis()
 )
 ```
 
