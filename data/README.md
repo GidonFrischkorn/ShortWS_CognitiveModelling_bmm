@@ -27,8 +27,8 @@ put it here — link to its repository instead.
 | File | Segment | Added by | Status |
 | --- | --- | --- | --- |
 | `sdt_recognition.csv` | Recognition memory (binary + rating SDT) | Gidon | done |
-| `m3_simple_span.csv` | Simple span (M3) | Chenyu | TODO — by 2026-09-30 |
-| `m3_complex_span.csv` | Complex span (M3 extension) | Chenyu | TODO — by 2026-09-30 |
+| `m3_simple_span.csv` | Simple span (M3) | Chenyu | done |
+| `m3_complex_span.csv` | Complex span (M3 extension) | Chenyu | done |
 | `ezddm_perceptual.csv` | Perceptual decision making (EZ-DDM / DDM) | Adriana | TODO — by 2026-09-30 |
 
 The file names above were contracted before the kickoff and were **not
@@ -82,21 +82,71 @@ are aggregated).
 
 ### m3_simple_span.csv
 
-**TODO — Chenyu, by 2026-09-30.**
+Simple-span data from Oberauer (2019), Experiments 1 and 2, as used in
+the [M3 tutorial](https://osf.io/yb7wm/) (Frischkorn & Li, 2026). Reproducible
+preparation: `data/prepare_m3.R`; its output matches the tutorial's aggregated
+CSV.
 
-Source (from the tutorial, not yet confirmed against the committed CSV):
-cued recall with words in boxes from Oberauer (2019), two experiments of 20
-participants each differing in stimulus set (open vs. closed), aggregated to
-response frequencies per participant × recognition condition.
+Participants studied words in boxes and then selected the word associated
+with a probed position. The two experiments had 20 participants each and
+differed in whether words were new on every trial (`openset`) or reused
+(`closedset`). Experiment (`exp`) was a between-subjects factor; set size
+and the composition of the test options varied within participants.
+
+One row contains response counts for one participant at one set size and
+one combination of test options: 40 participants × 24 conditions = 960 rows,
+with 23 trials per row. The response-count columns sum to 23; `n_*` columns
+give the number of available options in each category on each trial.
+
+| Column | Type | Values | Description |
+| --- | --- | --- | --- |
+| `id` | chr | 40 unique IDs ending `_openset` or `_closedset` | Participant ID, unique across experiments |
+| `exp` | chr | `openset`, `closedset` | Between-subjects experiment / stimulus set |
+| `setsize` | int | 2, 4, 6, 8 | Number of studied word–box pairs |
+| `ss_fac` | int | 2, 4, 6, 8 | Set size, converted to a factor for the M3 fit |
+| `ss_lin` | num | −3.8333…, −1.8333…, 0.1667…, 2.1667… | Centered set size (`setsize - mean(setsize)`), retained to match the tutorial's public dataset |
+| `corr` | int | 6–23 | Correct responses |
+| `other` | int | 0–17 | Responses selecting another studied item |
+| `npl` | int | 0–9 | Responses selecting a non-presented lure |
+| `n_corr` | int | 1 | Available correct options |
+| `n_other` | int | 0, 1, 3, 5, 7 | Available other-list options |
+| `n_npl` | int | 0, 1, 2, 4 | Available non-presented lure options |
 
 ### m3_complex_span.csv
 
-**TODO — Chenyu, by 2026-09-30.**
+Complex-span filtering data from Li, Frischkorn, & Oberauer (2026),
+Experiment 1, <https://doi.org/10.1037/xlm0001585>, obtained through the
+[M3 tutorial supplement](https://osf.io/yb7wm/). Reproducible preparation:
+`data/prepare_m3.R`; the output matches the tutorial's aggregated CSV.
 
-Source (same caveat): the complex-span filtering task of Li, Frischkorn, &
-Oberauer (2026), Experiment 1, 45 participants after exclusions,
-within-subjects, pre-aggregated into frequencies across five response
-categories.
+Participants studied three target images while judging image sizes. The
+within-subjects conditions were `control` (no distractors), `pre` (targets
+cued before the judgment), and `retro` (targets cued after the judgment).
+Each target was tested against 12 image options. Distractors were either
+paired with the tested target (`distc`) or with another target (`disto`).
+
+The public data contain 50 participants. Following the companion script,
+five were excluded for a judgment response rate below 50% or accuracy below
+70% among answered judgments. Trials with missing images and unanswered
+retrieval tests were removed. The original study also used survey exclusions;
+that survey is not public, so this preparation applies only the tutorial's
+performance criteria. One row is one participant × condition: 45 participants
+× 3 conditions = 135 rows. Each row contains 48–60 completed retrieval responses.
+
+| Column | Type | Values | Description |
+| --- | --- | --- | --- |
+| `participant` | int | 45 IDs from 1–50 | Participant ID after exclusions |
+| `condition` | chr | `control`, `pre`, `retro` | Within-subjects cue condition |
+| `corr` | int | 7–60 | Correct target responses |
+| `other` | int | 0–28 | Responses selecting another target |
+| `distc` | int | 0–16 | Responses selecting the distractor paired with the tested target |
+| `disto` | int | 0–17 | Responses selecting another distractor |
+| `npl` | int | 0–19 | Responses selecting a not-presented lure |
+| `n_corr` | int | 1 | Available correct options |
+| `n_other` | int | 2 | Available other-target options |
+| `n_distc` | int | 0, 1 | Paired-distractor options; 0 in control |
+| `n_disto` | int | 0, 2 | Other-distractor options; 0 in control |
+| `n_npl` | int | 6, 9 | Lure options; 9 in control, 6 in pre/retro |
 
 ### ezddm_perceptual.csv
 

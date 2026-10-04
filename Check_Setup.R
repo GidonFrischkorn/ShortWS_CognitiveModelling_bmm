@@ -13,7 +13,7 @@ fail <- "✗"  # cross
 problems <- 0L
 
 cat("== Checking packages ==\n")
-pkgs <- c("bmm", "brms", "tidyverse", "here", "tidybayes", "bayesplot")
+pkgs <- c("bmm", "brms", "tidyverse", "here", "tidybayes", "bayesplot", "ggh4x")
 for (p in pkgs) {
   if (requireNamespace(p, quietly = TRUE)) {
     cat(sprintf("  %s %s (%s)\n", ok, p, as.character(utils::packageVersion(p))))

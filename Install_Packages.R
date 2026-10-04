@@ -14,6 +14,7 @@ pkgs <- c(
   "here",       # project-relative file paths
   "tidybayes",  # tidy access to posterior draws
   "bayesplot",  # posterior visualization
+  "ggh4x",      # independent axes in the M3 predictive-check grid
   "quarto"      # render the .qmd notebooks from R (optional convenience)
 )
 
