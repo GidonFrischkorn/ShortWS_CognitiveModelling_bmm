@@ -27,8 +27,8 @@ dependency in this repo is the SDT exception below.
 | --- | --- | --- | --- | --- |
 | `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
-| `m3_simple.rds` | M3, simple span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
-| `m3_complex.rds` | M3, complex span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
+| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, experiment × set size on `a` + `c`) | Chenyu | 1.3.1 / 2.23.0 | done |
+| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, condition on `a` + `c` + `f`) | Chenyu | 1.3.1 / 2.23.0 | done |
 | `ezddm_summary.rds` | EZ-DDM from summary statistics — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
 | `ddm_trial.rds` | Trial-level DDM — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
 
