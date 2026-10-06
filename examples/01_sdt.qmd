@@ -18,10 +18,10 @@ The SDT models are new in bmm and are not in the CRAN version yet, so this noteb
 ```{r}
 #| label: install
 #| eval: false
-remotes::install_github("venpopov/bmm")
+remotes::install_github("popov-lab/bmm@develop")
 ```
 
-If `library(bmm)` works but `sdt_yn()` gives you `could not find function`, you are on the CRAN version and this install step is the fix.
+If `library(bmm)` works but `sdt_yn()` or `parameter_info()` gives you `could not find function`, you are on the CRAN version (or an older development build) and this install step is the fix.
 
 ```{r}
 #| label: setup
@@ -87,7 +87,7 @@ sdt_model <- sdt_yn(response = "n_old", stimulus = "is_old",
 sdt_model
 ```
 
-Printing the model object shows you what you just built: its parameters, the link function each one uses, and which are fixed rather than estimated. `bmm::parameters(sdt_model)` gives the same information with full descriptions — write the `bmm::` prefix, because tidybayes exports a `parameters()` too and whichever package you attached last wins.
+Printing the model object shows you what you just built: its parameters, the link function each one uses, and which are fixed rather than estimated. `parameter_info(sdt_model)` gives the same information with full descriptions. If you misspell a parameter in the formula, the error message lists the valid names.
 
 The **formula addresses the model parameters by name** — this is the core of the bmm workflow. One regression formula per parameter says how it varies over conditions and participants. `bmf()` ("bmm formula") is where those go; it takes one ordinary R formula per parameter, and `(1 | pid)` is standard mixed-model syntax for "let this parameter vary across participants", exactly as in `lme4` or `brms`:
 
@@ -132,11 +132,64 @@ Three things to read in that output before you trust anything else:
 - **`Bulk_ESS` / `Tail_ESS`** are effective sample sizes — how many *independent* draws the correlated MCMC draws are worth. A few hundred is enough for a point estimate; aim for >1000 before quoting the tails of an interval.
 - **`sdratio_Intercept` is exactly 0 with no uncertainty** because `sdt_yn()` fixes it there. That is the equal-variance assumption made visible: the signal and noise distributions are held to the same SD, which is what makes `d` here equal to the textbook $d'$. The rating model at the end of this notebook estimates it instead.
 
+### Which priors were used?
+
+Every bmm model comes with default priors, so the fit above used priors even though the formula never mentions them. `prior_info()` lists each one, on the scale the model samples on, and says whether it is a bmm default or one you set:
+
+```{r}
+#| label: prior-info
+prior_info(fit_sdt)
+```
+
+`prior_info(fit_sdt, format = "text")` writes the same information as sentences for a methods section.
+
 ### Optional: re-fit the model yourself
 
 You do **not** need this to follow the workshop. Re-fitting requires the Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes: the full fitting script is `models/fit_sdt.R`.
 
 ## Evaluate: posteriors, hypotheses, model checks
+
+### First: does the model describe the data?
+
+Before interpreting any parameter, simulate new data from the fitted model and compare it with the real data (a *posterior predictive check*). The one-line version:
+
+```{r}
+#| label: pp-check
+#| fig-alt: "Default posterior predictive check: density of the observed counts of old responses with densities of 50 simulated datasets overlaid."
+pp_check(fit_sdt, ndraws = 50)
+```
+
+That plot mixes hits with false alarms and 100-trial with 150-trial cells, so its bumps are hard to read. Converting the simulated counts to per-participant rates and splitting by item type gives a clearer picture:
+
+```{r}
+#| label: ppc-rates
+#| fig-alt: "Densities of per-participant false-alarm and hit rates in 50 datasets simulated from the fitted model (grey) and in the observed data (blue)."
+set.seed(2026)
+ppc_rows <- fit_sdt$data |>
+  as_tibble() |>
+  mutate(row = row_number(),
+         measure = ifelse(is_old == 1, "hit rate", "false-alarm rate"))
+
+ppc_sim <- posterior_predict(fit_sdt, ndraws = 50) |>   # draws x rows of fit_sdt$data
+  as_tibble(.name_repair = ~ as.character(seq_along(.x))) |>
+  mutate(draw = row_number()) |>
+  pivot_longer(-draw, names_to = "row", values_to = "n_old",
+               names_transform = as.integer) |>
+  left_join(select(ppc_rows, row, n_trials, measure), by = "row") |>
+  mutate(rate = n_old / n_trials)
+
+ggplot(ppc_sim, aes(rate)) +
+  geom_density(aes(group = draw), color = wk_colors[["grey"]], linewidth = 0.4) +
+  geom_density(data = mutate(ppc_rows, rate = n_old / n_trials),
+               color = wk_colors[["blue"]], linewidth = 1.5) +
+  facet_wrap(~ measure, scales = "free") +
+  labs(x = "Proportion \"old\" responses per participant", y = NULL) +
+  theme_workshop()
+```
+
+The real data (blue) sit inside the simulated ones (grey). Read this check for what it is: with two numbers per participant (hit and false-alarm rate) and two parameters per participant ($d'$ and $c$), the yes/no model can reproduce any participant, so a good match here says the fit worked, not that SDT is right. Data with more response categories can contradict the model; the rating model at the end of this notebook is that test.
+
+### Posteriors
 
 The posterior draws of the coefficients *are* draws of the SDT parameters, so condition-specific $d'$ and $c$ are simple sums of draws:
 
@@ -187,6 +240,13 @@ hypothesis(fit_sdt, "d_conditionimmediate = 0")
 # Is the immediate group more liberal (lower criterion)?
 hypothesis(fit_sdt, "criterion_conditionimmediate < 0")
 ```
+
+How to read the two outputs:
+
+- **`Estimate`, `CI.Lower`, `CI.Upper`**: the posterior mean of the difference and its credible interval. For the directional test (`< 0`) the interval is one-sided, so it differs slightly from the 95% interval in `fixef()`.
+- **`Evid.Ratio`** for `= 0` is a Bayes factor *in favour of no difference* (Savage-Dickey; it needs `sample_prior = "yes"` at fit time and is `NA` without it). Values below 1 favour a difference, so `1 / Evid.Ratio` is the evidence for one.
+- **`Evid.Ratio`** for `< 0` is the posterior odds that the difference is negative, and **`Post.Prob`** the matching probability: the share of posterior draws below zero.
+- **`Star`** marks hypotheses whose interval excludes the tested value.
 
 Participants tested immediately after study show *lower* sensitivity and a *more liberal* criterion than participants tested under full attention after a filler task — and the model quantifies both differences with full posterior uncertainty, from one formula.
 
@@ -251,9 +311,16 @@ fit_rating <- readRDS(here("models", "sdt_rating.rds"))
 summary(fit_rating)
 ```
 
-`sdratio` is the *log* SD ratio, so 0 would mean equal variance. `exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the old-item distribution is wider than the new-item distribution.
+`summary()` adds a note under the coefficients: with `sdratio` free, `d` is no longer the textbook $d'$ (more on that below). `sdratio` is the *log* SD ratio, so 0 would mean equal variance. `exp(sdratio)` clearly above 1 (≈ 1.4) confirms the classic finding: the old-item distribution is wider than the new-item distribution.
 
 Two things worth saying out loud. First, once `sdratio` is free, bmm's `d` is $d_a$ — the separation measured in units of the two distributions' root-mean-square SD — rather than the textbook $d'$; the two coincide only under equal variance, which is exactly the assumption the yes/no model made for us. Second, the condition difference in sensitivity points the same way as before but is now less certain, with an interval that includes zero. Neither result is more "correct" than the other: parameter estimates are estimates *under a measurement model*, which is precisely why the model belongs in your methods section.
+
+`sdt_sensitivity()` converts `d` into the other scales per condition: `da` (what `d` estimates here), `dn` (noise-SD units, the textbook $d'$) and `ds` (signal-SD units):
+
+```{r}
+#| label: rating-sensitivity
+sdt_sensitivity(fit_rating, measure = c("da", "dn"))
+```
 
 ```{r}
 #| label: rating-d
@@ -265,7 +332,7 @@ fit_rating |>
   median_qi(value)
 ```
 
-Where to go from here: the bmm SDT article (`vignette("bmm_sdt")` in the development version) covers the ROC/zROC diagnostics, threshold parameterizations, and the criterion-free `sdt_mafc()` and `sdt_ranking()` models; the Vuorre (2025) preprint in `resources/01_sdt/` builds the same models from raw brms formulas.
+Where to go from here: the [bmm SDT article](https://popov-lab.github.io/bmm/dev/articles/bmm_sdt.html) (online only, not installed with the package) covers the ROC/zROC diagnostics, threshold parameterizations, and the criterion-free `sdt_mafc()` and `sdt_ranking()` models; the Vuorre (2025) preprint in `resources/01_sdt/` builds the same models from raw brms formulas.
 
 ## Further reading
 

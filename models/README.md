@@ -25,8 +25,8 @@ dependency in this repo is the SDT exception below.
 
 | File | Model | Added by | Fitted with (bmm / brms) | Status |
 | --- | --- | --- | --- | --- |
-| `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
-| `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1.9000 (dev) / 2.23.0 | done (re-fit at release) |
+| `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.3.2.9000 (develop `1625e860`, 2026-10-05) / 2.23.0 | done (re-fit at release) |
+| `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.3.2.9000 (develop `1625e860`, 2026-10-05) / 2.23.0 | done (re-fit at release) |
 | `m3_simple.rds` | M3, simple span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
 | `m3_complex.rds` | M3, complex span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
 | `ezddm_summary.rds` | EZ-DDM from summary statistics — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
@@ -41,7 +41,9 @@ silently renaming.
 **SDT exception to the CRAN contract:** the SDT models (`sdt_yn()`,
 `sdt_rating()`) are new in bmm and **not in the CRAN version** — CRAN is
 still at 1.3.1, which has no SDT models at all. The current fits were made
-with the development version (1.4.1.9000). Fitting script: `models/fit_sdt.R`
+on 2026-10-05 with the develop branch of popov-lab/bmm (1.3.2.9000 at
+`1625e860`, which carries the SDT models after review; the earlier fits used a
+feature-branch build numbered 1.4.1.9000). Fitting script: `models/fit_sdt.R`
 (installs the dev version if needed).
 
 **The release now has a date: 30 September 2026** (agreed with Ven Popov on
@@ -53,15 +55,19 @@ with the development version (1.4.1.9000). Fitting script: `models/fit_sdt.R`
 - Until then, running the Part-1 code (deck or `examples/01_sdt.qmd`) requires
   the development version installed. Nothing else in the repo does.
 - `fit_sdt.R` now fits with `sample_prior = "yes"` (added 2026-09-25), so
-  `hypothesis()` can report Bayes factors for point hypotheses. The current
-  `.rds` files predate this: until the refit, `Evid.Ratio` and `Post.Prob`
-  for `d_conditionimmediate = 0` show `NA`. The refit also picks up the
-  random-effect SD priors that bmm will set for the SDT models.
+  `hypothesis()` can report Bayes factors for point hypotheses. The
+  2026-10-05 refit includes the prior draws and bmm's new default
+  random-effect SD priors (`exponential(1)` on `d`, `exponential(2)` on
+  `criterion`, replacing brms's `student_t(3, 0, 43)` fallback). Estimates
+  match the earlier fits to two decimals. The fits now use 4000 iterations
+  after warmup thinned by 4: with 1000 unthinned, the criterion
+  coefficients had Rhat up to 1.03.
 - While re-generating, check whether anything new in the release is worth
   showing, since the workshop is about getting people started. Candidates:
-  `report_prior()` (prior summary in prose) and `native_parameters()`
-  (posterior draws from the parameter to the native scale) — **verify names
-  and behaviour against the actual release** before a slide depends on them.
+  `prior_info()` (prior table, or prose with `format = "text"`) and
+  `native_parameters()` (posterior draws on the native scale). Both exist on
+  develop as of 2026-10-05; `prior_info()` is now in `examples/01_sdt.qmd`.
+  **Verify against the actual release** before a slide depends on them.
 
 ⚠️ **Standing release risk.** Until that release lands, every take-home path
 for Part 1 depends on attendees installing bmm from GitHub — which
