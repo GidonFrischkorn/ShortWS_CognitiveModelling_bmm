@@ -150,7 +150,7 @@ bmf(d ~ 1 + condition + (1 + condition | pid),
 Three things worth internalising:
 
 - **You write one formula per parameter, and you choose which.** Any parameter you do not name gets an intercept only. Deciding that memory varies with your manipulation but bias does not — or vice versa — *is* your hypothesis, expressed in code.
-- **The left-hand side must be a parameter name, not a column in your data.** `bmm::parameters(model)` lists the legal ones with descriptions.
+- **The left-hand side must be a parameter name, not a column in your data.** The error names the legal ones, and `parameter_info(model)` describes them.
 - **`(1 | pid)` is not optional in practice.** Without it, every participant is assumed to have the same parameter value, and the uncertainty you report will be far too small.
 
 ### A worked translation
@@ -234,7 +234,7 @@ You are on the CRAN version of bmm, which does not yet include the SDT models. I
 ```{r}
 #| label: fix-install
 #| eval: false
-remotes::install_github("venpopov/bmm")
+remotes::install_github("popov-lab/bmm@develop")
 ```
 
 The same message for any other model name means the same thing: check `supported_models()` against `packageVersion("bmm")`.
@@ -246,11 +246,11 @@ The left-hand side of a formula is not a parameter of this model. bmm's sensitiv
 ```{r}
 #| label: fix-parameters
 #| eval: false
-bmm::parameters(sdt_yn(response = "n_old", stimulus = "is_old",
+parameter_info(sdt_yn(response = "n_old", stimulus = "is_old",
                        n_trials = "n_trials"))
 ```
 
-Write the `bmm::` prefix — tidybayes also exports a `parameters()`, and whichever package you attached last wins. That masking clash is not a bmm bug, it is ordinary R, and it will bite you again elsewhere.
+(Older development builds called this `parameters()`. tidybayes exports a function of that name too, so if you are on such a build, write `bmm::parameters()`.)
 
 ### `Stimulus variable 'is_old_' missing in the data`
 
@@ -289,5 +289,5 @@ One more that costs nothing and catches a lot: fit the model to data you **simul
 
 - `?modelname` and `vignette(package = "bmm")` — the model-specific documentation, which is more detailed than anything in this workshop.
 - The reading list in `resources/README.md`, with DOIs — for the theory behind each model rather than the code.
-- [github.com/venpopov/bmm/issues](https://github.com/venpopov/bmm/issues) — bugs and feature requests. A reproducible example with 10 rows of data gets answered; "it doesn't work" does not.
+- [github.com/popov-lab/bmm/issues](https://github.com/popov-lab/bmm/issues) — bugs and feature requests. A reproducible example with 10 rows of data gets answered; "it doesn't work" does not.
 - The three of us. If you get stuck on the translation step — which model, what data shape, what formula — send us ten rows of your data and a sentence about your design, and we will write the formula with you. That offer is the reason this notebook exists.
