@@ -21,6 +21,10 @@ fit_rating <- readRDS(here::here("models", "sdt_rating.rds"))
 
 # Proportions without the leading zero (APA style): 0.742 -> ".74"
 fmt_prop <- function(x) sub("^0\\.", ".", sprintf("%.2f", x))
+# Three decimals, never rounded up to 1: .9995 -> "> .999"
+fmt_prop3 <- function(x) {
+  if (x > 0.999) "> .999" else sub("^0\\.", ".", sprintf("%.3f", x))
+}
 
 item_colors <- c("new items" = wk_colors[["grey"]],
                  "old items" = wk_colors[["blue"]])
@@ -31,15 +35,18 @@ item_colors <- c("new items" = wk_colors[["grey"]],
 <!--
 Timing (target ~25 min talk; 30 min hard cap; leave room for questions):
   min 9: reach SDT divider | min 13: hands-up beat | min 16: Specify
-  min 18: live IDE beat | min 23: Evaluate | min 25: FLEX go/no-go
+  min 18: live IDE beat | min 23: Evaluate (+0:30 for the predictive
+  check) | min 25: FLEX go/no-go
 
 Two interactive beats, both rehearsed, both with static insurance in the deck:
   - "Why is accuracy lower?": two shows of hands before the reveal (~0:40)
   - "Specify: one formula per parameter": live in the IDE. Type bmf(), break
-    it with `dprime`, fix it with parameters() (~2:15). The next slide shows
+    it with `dprime`, fix it with parameter_info() (~2:15). The next slide shows
     the same error and fix, so the demo can be dropped at any point.
 
-Cut ladder: (1) rating FLEX section -1:40; (2) live IDE beat, keep the static
+Cut ladder: (1) rating FLEX section -1:40 (if cut, say one sentence on the
+            take-home slide: with confidence ratings the equal-variance
+            assumption fails and the d' difference becomes uncertain); (2) live IDE beat, keep the static
             "A common first error" slide -2:15; (3) drop latent_sdt slide -0:45;
             (4) merge t-test slide into question slide -0:45
 Never cut the hands-up beat. It costs 40 s, and it is what makes the
@@ -165,6 +172,10 @@ trials and the means become Gaussian, whatever the single trials look like.
 However, that is also the problem. The same Gaussian fits any process that
 could have produced those means, so once we aggregate, the model can no
 longer tell us anything about the process.
+
+Second problem: a mean enters the t-test as if it were measured without
+error. A participant with 20 trials and one with 200 count the same.
+(Keep this for the Specify slide, where we aggregate ourselves.)
 :::
 
 ## Closer to the data: model the trials {.smaller}
@@ -274,7 +285,7 @@ d ~ condition. The formulas work exactly the way everyone already knows.
 - Runs on brms and Stan, but **you don't write Stan code**
 :::
 
-[venpopov.com/bmm](https://venpopov.com/bmm/)
+[popov-lab.github.io/bmm](https://popov-lab.github.io/bmm/)
 :::
 
 ::::
@@ -447,7 +458,9 @@ threshold.
 
 ## Moving the criterion changes accuracy {.smaller}
 
-Assume two people with the same memory strength but different criteria:
+Assume two people with the same memory strength but different criteria
+($c = 0$: halfway between the distributions; negative: says "old" more
+readily):
 
 ```{r}
 #| include: false
@@ -557,6 +570,7 @@ package:
   each:
   - `full_attention`: test under full attention (Exp. 2)
   - `immediate`: test immediately after study (Exp. 4)
+- Old/new response: ratings 4 to 6 count as "old"
 - `r format(nrow(dat), big.mark = ",")` trials in total; codebook in
   `data/README.md`
 :::
@@ -572,6 +586,9 @@ Same data as the Vuorre (2025) tutorial in resources/01_sdt, which uses only
 the full-attention condition, so attendees can read the paper and the
 notebook side by side. The binary response is say_old = rating >= 4,
 following Koen et al.'s own first analysis.
+
+If someone asks: the two conditions come from two experiments of the same
+paper, so the contrast is a demonstration, not a clean manipulation.
 :::
 
 ## See the data before any model
@@ -587,6 +604,8 @@ pp_rates <- dat |>
 rates_plot <- function(show_imm = FALSE) {
   ggplot(pp_rates, aes(new, old, color = condition, alpha = condition)) +
     geom_abline(linetype = "dashed", color = wk_colors[["grey"]]) +
+    annotate("text", x = 0.86, y = 0.8, label = "chance", angle = 45,
+             size = 5, color = wk_colors[["grey"]]) +
     geom_point(size = 3) +
     scale_color_manual(
       values = c(full_attention = wk_colors[["blue"]],
@@ -626,7 +645,7 @@ rates_plot(show_imm = TRUE)
 ::::
 
 ::: {.notes}
-On entry: the full-attention group only. Everyone sits above the dashed
+On entry: the full-attention group only. One point is one person. Everyone sits above the dashed
 diagonal, so every participant has d' > 0. Click: the immediate group. The
 orange cloud sits further to the right, which means more false alarms. The
 model answers two questions, for each person and each group: how sensitive,
@@ -709,7 +728,7 @@ dumbbell_plot <- function(show_fa = FALSE) {
                   hjust = ifelse(condition == "immediate", -0.25, 1.25)),
               size = 5.5, fontface = "bold") +
     annotate("text", x = mean(fa$rate), y = 0.6,
-             label = "the accuracy difference comes from here",
+             label = "false alarms differ most",
              size = 5, color = wk_colors[["orange"]], alpha = fa_alpha) +
     scale_color_manual(values = c("full attention" = wk_colors[["blue"]],
                                   immediate = wk_colors[["orange"]]),
@@ -725,8 +744,8 @@ dumbbell_plot <- function(show_fa = FALSE) {
 ```
 
 ::: {.fragment}
-**Hands up:** Did the immediate group *remember less*, or did they just *say
-"old" more often*?
+**Hands up:** Did the immediate group *remember less*, or did they *say "old"
+more often*?
 :::
 
 :::: {.r-stack}
@@ -754,8 +773,8 @@ dumbbell_plot(show_fa = TRUE)
 ::::
 
 ::: {.fragment}
-Worse memory or a more liberal criterion? **Proportion correct cannot tell
-them apart.**
+Worse memory, a more liberal criterion, or both? **Proportion correct cannot
+tell them apart.**
 :::
 
 ::: {.notes}
@@ -779,8 +798,8 @@ The same three steps come back for the M3 and the DDM.
 
 ## Specify: choose the model {.smaller}
 
-`sdt_yn()` needs counts per participant and stimulus type. Three lines of
-dplyr get us there:
+`sdt_yn()` needs counts per participant and stimulus type. One `summarise()`
+gets us there:
 
 ```{r}
 #| results: hold
@@ -800,6 +819,13 @@ The model object knows its parameters (d, criterion, and sdratio, which is
 fixed at 0: the equal-variance assumption), its data requirements, and its
 default priors. Printing it in the console shows all three; the live demo on
 the next slide does that.
+
+Say it here, because someone will notice that we just aggregated after
+criticizing aggregation: we keep the number of trials next to every count.
+A proportion correct in a t-test is treated as a noise-free value. The count
+with its n_trials goes into a binomial likelihood, so the model knows that
+88 out of 100 is less certain than 880 out of 1000, and that uncertainty
+travels through to d', c, and every test.
 :::
 
 ## Specify: one formula per parameter {.smaller}
@@ -816,7 +842,8 @@ fit_sdt <- bmm(
     criterion ~ 1 + condition + (1 | pid)
   ),
   data  = binary_counts,
-  model = sdt_model
+  model = sdt_model,
+  sample_prior = "yes"  # needed for Bayes factors later
 )
 ```
 
@@ -827,9 +854,9 @@ same random-effect syntax as in `lme4` and `brms`.
 | Coefficient | Meaning |
 | --- | --- |
 | `d_Intercept` | $d'$, full-attention group |
-| `d_conditionimmediate` | **difference in $d'$** |
+| `d_conditionimmediate` | **difference in $d'$** (immediate − full) |
 | `criterion_Intercept` | criterion $c$, full-attention group |
-| `criterion_conditionimmediate` | **difference in $c$** |
+| `criterion_conditionimmediate` | **difference in $c$** (immediate − full) |
 :::
 
 ::: {.notes}
@@ -843,11 +870,13 @@ from the top BEFORE the talk so the objects exist. Rehearsed sequence:
 
   1. Type the bmf() call and print it: the formula is an object you create.
   2. Break it on purpose: change `d` to `dprime` and run. The error appears
-     at once: "Unrecognized model parameters: 'dprime'". Read it out loud.
+     at once: "Unrecognized model parameters: 'dprime'", followed by the
+     names the model does have. Read it out loud.
      Say: this is the error you will get, and it tells you exactly what is
      wrong.
-  3. Fix it by asking the package: `bmm::parameters(sdt_model)` lists the
-     valid names with descriptions. Change it back.
+  3. Point out that the error already lists the valid names. For the
+     descriptions, ask the package: `parameter_info(sdt_model)`. Change it
+     back.
 
 Do NOT run bmm() for real. If anything misbehaves, press Escape and advance;
 the next slide shows the same error and fix. ***
@@ -861,24 +890,31 @@ not, the error message says so:
 ```{r}
 #| eval: false
 bmf(dprime ~ 1 + condition)   # dprime? d? What are the names?
-#> Error: Unrecognized model parameters: 'dprime'
+#> Error: Unrecognized model parameters: 'dprime'. Signal Detection
+#> Theory (Yes/No) has the parameters 'd', 'criterion', 'sdratio'
 ```
 
 ::: {.fragment}
-Rather than guessing, ask the model. Every bmm model lists its parameters:
+The error already names the valid parameters. For what each one means, ask
+the model:
 
 ```{r}
 #| eval: false
-bmm::parameters(sdt_model)
+parameter_info(sdt_model)
 ```
 
 ```{r}
 #| echo: false
-bmm::parameters(sdt_model) |>
+# Plain-language gloss of the package descriptions: in the development
+# version, the one for d opens with "d_a", a term this talk only reaches on
+# the rating slide.
+plain <- c(d = "sensitivity d′", criterion = "response bias c",
+           sdratio = "spread of old vs. new items (equal by default)")
+parameter_info(sdt_model) |>
   as.data.frame() |>
   transmute(
     Parameter    = sprintf("`%s`", parameter),
-    `What it is` = sub(":.*", "", description),
+    `What it is` = plain[parameter],
     Estimated    = ifelse(fixed, sprintf("no (fixed at %s)", value), "yes")
   ) |>
   knitr::kable()
@@ -887,14 +923,13 @@ bmm::parameters(sdt_model) |>
 
 ::: {.notes}
 The typo is not the point. The point is that the bmm error names what is
-wrong, and parameters() gives the answer without leaving the console.
-Attendees who see an error treated as information are less likely to give up
-at their own first error.
+wrong and lists the right answer, and parameter_info() explains each name
+without leaving the console. Attendees who see an error treated as
+information are less likely to give up at their own first error.
 
-Why the bmm:: prefix: tidybayes also exports a parameters() function, and
-whichever package is attached last wins. If it comes up, one sentence is
-enough: this is an ordinary R masking conflict, not a bmm quirk, and bmm::
-resolves it.
+"Estimated: no (fixed at 0)" for sdratio is the equal-variance assumption:
+the old-item and new-item distributions have the same spread. The rating
+model at the end frees it.
 :::
 
 ## Fit: load the cached model {.smaller}
@@ -908,9 +943,11 @@ fixef(fit_sdt) |> round(2)
 ```
 
 ::: {.incremental}
+- `Q2.5` to `Q97.5`: the range of plausible values (95% interval, next
+  section); `sdratio` is fixed at 0 (equal spread)
 - Lower $d'$ in the immediate group: a **memory** difference
 - **And** a lower criterion: they say "old" more readily, which keeps their
-  hit rate up
+  hit rate up. **Both**, then.
 :::
 
 ::: {.notes}
@@ -923,7 +960,63 @@ rather than estimated. The rating model at the end estimates it.
 
 ## Evaluate: posteriors and tests {.section-divider}
 
-Each posterior draw of the coefficients is a draw of the SDT parameters.
+Every result from here on summarizes one distribution per parameter.
+
+```{r}
+#| include: false
+# Posterior predictive check: 50 datasets simulated from the fit, as
+# per-participant "old" rates, against the observed rates. Rows of
+# posterior_predict() follow fit_sdt$data.
+set.seed(2026)
+ppc_rows <- fit_sdt$data |>
+  as_tibble() |>
+  mutate(row = row_number(),
+         measure = ifelse(is_old == 1, "hit rate", "false-alarm rate"))
+ppc_sim <- posterior_predict(fit_sdt, ndraws = 50) |>
+  as_tibble(.name_repair = ~ as.character(seq_along(.x))) |>
+  mutate(draw = row_number()) |>
+  pivot_longer(-draw, names_to = "row", values_to = "n_old",
+               names_transform = as.integer) |>
+  left_join(select(ppc_rows, row, n_trials, measure), by = "row") |>
+  mutate(rate = n_old / n_trials)
+ppc_obs <- mutate(ppc_rows, rate = n_old / n_trials)
+```
+
+::: {.fragment}
+```{r}
+#| label: ppc
+#| echo: false
+#| fig-height: 3.2
+#| fig-alt: "Posterior predictive check: densities of per-participant false-alarm and hit rates in 50 datasets simulated from the fitted model, drawn as thin grey lines, closely surround the density of the observed rates, drawn as a thick blue line."
+ggplot(ppc_sim, aes(rate)) +
+  geom_density(aes(group = draw), color = wk_colors[["grey"]],
+               alpha = 0.3, linewidth = 0.4) +
+  geom_density(data = ppc_obs, color = wk_colors[["blue"]], linewidth = 1.6) +
+  facet_wrap(~ measure, scales = "free") +
+  labs(x = "Proportion \"old\" responses per participant", y = NULL) +
+  theme_workshop() +
+  theme(axis.text.y = element_blank(),
+        plot.background = element_rect(fill = "white", color = NA))
+```
+
+First check: data simulated from the fit (grey) look like the real data
+(blue).
+:::
+
+::: {.notes}
+On entry: the line on screen, then click. Before we interpret anything, we
+check that the model describes the data. bmm simulates new datasets from the
+fitted model (grey lines, 50 of them) and we lay the real data on top
+(blue). If the blue line sat outside the grey band, we would stop here. In
+code this is posterior_predict() on the fit; pp_check() gives a quick
+version, and the notebook has both.
+
+Be honest if asked: with two numbers per person (hit rate, false-alarm
+rate) and two parameters per person (d', c), the yes/no model can reproduce
+any person. So this check catches a broken fit (sampler, data coding), not a
+wrong theory. The confidence ratings are where SDT can fail, and the rating
+model at the end tests exactly that.
+:::
 
 ## What a Bayesian fit gives you {.smaller}
 
@@ -979,7 +1072,11 @@ post_plot(show_ci = TRUE)
 ::: {.notes}
 Forty-five seconds of Bayes is all we need today. First the distribution:
 every value under the curve is a plausible d', and a wider curve means more
-uncertainty. Click: the bar below is the 95% credible interval. Every plot
+uncertainty. The fit stores these as 4,000 draws, each one plausible set
+of parameter values. Click: the bar below is the 95% credible interval: the
+95% most plausible values, read the way you wish a confidence interval
+could be read. Priors: bmm sets default priors for every parameter, and you
+can see and change them; the notebook shows how. Every plot
 and test that follows summarizes this object, with no p-values and no
 sampler details.
 :::
@@ -1047,12 +1144,39 @@ Condition differences are coefficients on the parameters, so we can test them
 directly:
 
 ```{r}
-hypothesis(fit_sdt, "d_conditionimmediate = 0")$hypothesis
+#| results: hide
+hyp <- hypothesis(fit_sdt, c("d_conditionimmediate = 0",
+                             "criterion_conditionimmediate < 0"))
+```
+
+```{r}
+#| include: false
+# The slide shows a readable digest of hyp$hypothesis. Estimates and 95%
+# intervals come from fixef() (hypothesis() gives a one-sided interval for
+# "< 0"). For "= 0", Evid.Ratio is the Bayes factor FOR the null, so the
+# evidence for a difference is its inverse.
+fe <- fixef(fit_sdt)
+hyp_tab <- tibble(
+  Question = c("Does $d'$ differ?", "Is $c$ lower (more liberal)?"),
+  Estimate = sprintf("%.2f", fe[c("d_conditionimmediate",
+                                  "criterion_conditionimmediate"), "Estimate"]),
+  `95% interval` = sprintf("[%.2f, %.2f]",
+    fe[c("d_conditionimmediate", "criterion_conditionimmediate"), "Q2.5"],
+    fe[c("d_conditionimmediate", "criterion_conditionimmediate"), "Q97.5"]),
+  Evidence = c(
+    sprintf("Bayes factor %.0f : 1 for a difference",
+            1 / hyp$hypothesis$Evid.Ratio[1]),
+    sprintf("probability %s that it is lower",
+            fmt_prop3(hyp$hypothesis$Post.Prob[2]))
+  )
+) |>
+  mutate(across(Estimate:`95% interval`, ~ gsub("-", "−", .x)))
 ```
 
 ::: {.fragment}
 ```{r}
-hypothesis(fit_sdt, "criterion_conditionimmediate < 0")$hypothesis
+#| echo: false
+knitr::kable(hyp_tab, align = "lccl")
 ```
 :::
 
@@ -1066,6 +1190,21 @@ Main point: testing whether a model parameter differs between groups works
 exactly like testing a regression slope. The immediate group is less
 sensitive and more liberal. These are two psychologically distinct effects;
 the model separates them, whereas raw accuracy mixes them.
+
+How to read the table: "= 0" asks whether there is a difference at all; the
+Bayes factor says how much more likely the data are with a difference than
+without one. "< 0" asks about a direction; the probability is the share of
+plausible values below zero. The raw hypothesis() output has the same
+numbers under the names Evid.Ratio and Post.Prob. For the "= 0" row,
+Evid.Ratio is the Bayes factor for NO difference, so invert it. The notebook
+shows the raw output. The Bayes factor needs prior draws, which is what
+sample_prior = "yes" in the bmm() call was for.
+
+If someone asks "why not compute d' per person by hand and run a t-test?":
+for these data you would get a similar answer. The model adds three things:
+no ad-hoc fixes when a hit or false-alarm rate is 0 or 1, uncertainty that
+carries into everything computed from the parameters, and the same workflow
+for models without a hand formula, which is what the next two parts show.
 :::
 
 ## Latent distributions from the fit {.smaller}
@@ -1121,7 +1260,9 @@ Same formula language, two more parameter lines. sdratio is on the log scale,
 so exp(0.35) ≈ 1.4: the old-item distribution is wider, which produces the
 classic asymmetric recognition ROC. Two points worth saying out loud. First,
 once sdratio is estimated, bmm's d is d_a rather than d'. The two coincide
-only under equal variance, which the yes/no model assumed. Second, the
+only under equal variance, which the yes/no model assumed. summary() of
+this fit prints that note itself, and sdt_sensitivity() converts d_a to d'
+(both in the notebook). Second, the
 sensitivity difference points the same way, but its credible interval now
 includes zero. Estimates depend on the measurement model, which is why you
 state the model explicitly.
@@ -1140,7 +1281,8 @@ state the model explicitly.
   and `auc_sdt()`
 - **`examples/00_your_own_data.qmd`**: which model fits your paradigm, what
   shape your data needs, and what usually goes wrong first
-- Data, codebook, and readings are on the site
+- **Your own fits** need bmm from GitHub and a Stan toolchain: step by step
+  in `00_your_own_data.qmd`
 - Next: the same three steps with the M3 (Chenyu)
 :::
 :::
