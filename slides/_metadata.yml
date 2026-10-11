@@ -1,5 +1,5 @@
 # Shared configuration for all workshop decks in slides/.
-# Individual decks only declare title/subtitle/author/date + `format: revealjs`.
+# Individual decks declare their theme; all other display options are shared here.
 # Do NOT add a second format key here — that would render every deck twice.
 
 engine: knitr
@@ -10,7 +10,6 @@ html-math-method: mathml
 
 format:
   revealjs:
-    theme: [default, custom.scss]
     slide-number: true
     transition: fade
     code-fold: false

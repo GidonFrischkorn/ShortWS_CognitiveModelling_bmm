@@ -1,0 +1,4 @@
+Carbon cursor-1 icon, original outline and proportions; white backing uses the original outer contour.
+Source: https://api.iconify.design/carbon/cursor-1.svg
+Carbon icons: https://github.com/carbon-design-system/carbon/tree/main/packages/icons
+License: Apache-2.0

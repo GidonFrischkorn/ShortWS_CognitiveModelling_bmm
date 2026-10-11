@@ -42,7 +42,8 @@ simple_span <- bind_rows(
   select(id, exp, setsize, ss_fac, ss_lin, corr, other, npl,
          n_corr, n_other, n_npl)
 
-## 2.3 Save
+## 2.3 Save the open-set teaching subset
+simple_span <- simple_span |> filter(exp == "openset")
 write_csv(simple_span, file.path("data", "m3_simple_span.csv"))
 
 # 3. Complex span
@@ -129,5 +130,6 @@ complex_span <- complex_span |>
   select(participant, condition, corr, other, distc, disto, npl,
          n_corr, n_other, n_distc, n_disto, n_npl)
 
-## 3.6 Save
+## 3.6 Save the pre-cue teaching subset
+complex_span <- complex_span |> filter(condition == "pre")
 write_csv(complex_span, file.path("data", "m3_complex_span.csv"))

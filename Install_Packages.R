@@ -15,6 +15,7 @@ pkgs <- c(
   "tidybayes",  # tidy access to posterior draws
   "bayesplot",  # posterior visualization
   "ggh4x",      # independent axes in the M3 predictive-check grid
+  "patchwork",  # combine M3 activation and filtering panels
   "quarto"      # render the .qmd notebooks from R (optional convenience)
 )
 
