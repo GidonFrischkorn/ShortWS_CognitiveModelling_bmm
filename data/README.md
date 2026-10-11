@@ -84,30 +84,29 @@ are aggregated).
 
 Simple-span data from Oberauer (2019), Experiments 1 and 2, as used in
 the [M3 tutorial](https://osf.io/yb7wm/) (Frischkorn & Li, 2026). Reproducible
-preparation: `data/prepare_m3.R`; its output matches the tutorial's aggregated
-CSV.
+preparation: `data/prepare_m3.R`; the workshop uses only the open-set subset
+of the tutorial's aggregated data.
 
 Participants studied words in boxes and then selected the word associated
-with a probed position. The two experiments had 20 participants each and
-differed in whether words were new on every trial (`openset`) or reused
-(`closedset`). Experiment (`exp`) was a between-subjects factor; set size
-and the composition of the test options varied within participants.
+with a probed position. The workshop retains the 20 participants who studied
+new words on every trial (`openset`); the closed-set experiment is omitted. Set size and the
+composition of the test options varied within participants.
 
 One row contains response counts for one participant at one set size and
-one combination of test options: 40 participants × 24 conditions = 960 rows,
+one combination of test options: 20 participants × 24 conditions = 480 rows,
 with 23 trials per row. The response-count columns sum to 23; `n_*` columns
 give the number of available options in each category on each trial.
 
 | Column | Type | Values | Description |
 | --- | --- | --- | --- |
-| `id` | chr | 40 unique IDs ending `_openset` or `_closedset` | Participant ID, unique across experiments |
-| `exp` | chr | `openset`, `closedset` | Between-subjects experiment / stimulus set |
+| `id` | chr | 20 unique IDs ending `_openset` | Participant ID, unique across experiments |
+| `exp` | chr | `openset` | Retained experiment / stimulus set |
 | `setsize` | int | 2, 4, 6, 8 | Number of studied word–box pairs |
 | `ss_fac` | int | 2, 4, 6, 8 | Set size, converted to a factor for the M3 fit |
 | `ss_lin` | num | −3.8333…, −1.8333…, 0.1667…, 2.1667… | Centered set size (`setsize - mean(setsize)`), retained to match the tutorial's public dataset |
-| `corr` | int | 6–23 | Correct responses |
-| `other` | int | 0–17 | Responses selecting another studied item |
-| `npl` | int | 0–9 | Responses selecting a non-presented lure |
+| `corr` | int | 10–23 | Correct responses |
+| `other` | int | 0–12 | Responses selecting another studied item |
+| `npl` | int | 0–6 | Responses selecting a non-presented lure |
 | `n_corr` | int | 1 | Available correct options |
 | `n_other` | int | 0, 1, 3, 5, 7 | Available other-list options |
 | `n_npl` | int | 0, 1, 2, 4 | Available non-presented lure options |
@@ -117,11 +116,12 @@ give the number of available options in each category on each trial.
 Complex-span filtering data from Li, Frischkorn, & Oberauer (2026),
 Experiment 1, <https://doi.org/10.1037/xlm0001585>, obtained through the
 [M3 tutorial supplement](https://osf.io/yb7wm/). Reproducible preparation:
-`data/prepare_m3.R`; the output matches the tutorial's aggregated CSV.
+`data/prepare_m3.R`; the workshop retains only the pre-cue subset of the
+tutorial's aggregated CSV.
 
 Participants studied three target images while judging image sizes. The
-within-subjects conditions were `control` (no distractors), `pre` (targets
-cued before the judgment), and `retro` (targets cued after the judgment).
+workshop retains the `pre` condition, in which targets were cued before the
+judgment; control and retro-cue conditions are omitted.
 Each target was tested against 12 image options. Distractors were either
 paired with the tested target (`distc`) or with another target (`disto`).
 
@@ -130,23 +130,24 @@ five were excluded for a judgment response rate below 50% or accuracy below
 70% among answered judgments. Trials with missing images and unanswered
 retrieval tests were removed. The original study also used survey exclusions;
 that survey is not public, so this preparation applies only the tutorial's
-performance criteria. One row is one participant × condition: 45 participants
-× 3 conditions = 135 rows. Each row contains 48–60 completed retrieval responses.
+performance criteria. One row is one participant in the pre-cue condition:
+45 participants × 1 condition = 45 rows. Each row contains 57–60 completed
+retrieval responses.
 
 | Column | Type | Values | Description |
 | --- | --- | --- | --- |
 | `participant` | int | 45 IDs from 1–50 | Participant ID after exclusions |
-| `condition` | chr | `control`, `pre`, `retro` | Within-subjects cue condition |
-| `corr` | int | 7–60 | Correct target responses |
+| `condition` | chr | `pre` | Retained pre-cue condition |
+| `corr` | int | 11–56 | Correct target responses |
 | `other` | int | 0–28 | Responses selecting another target |
 | `distc` | int | 0–16 | Responses selecting the distractor paired with the tested target |
-| `disto` | int | 0–17 | Responses selecting another distractor |
-| `npl` | int | 0–19 | Responses selecting a not-presented lure |
+| `disto` | int | 0–15 | Responses selecting another distractor |
+| `npl` | int | 0–16 | Responses selecting a not-presented lure |
 | `n_corr` | int | 1 | Available correct options |
 | `n_other` | int | 2 | Available other-target options |
-| `n_distc` | int | 0, 1 | Paired-distractor options; 0 in control |
-| `n_disto` | int | 0, 2 | Other-distractor options; 0 in control |
-| `n_npl` | int | 6, 9 | Lure options; 9 in control, 6 in pre/retro |
+| `n_distc` | int | 1 | Paired-distractor options |
+| `n_disto` | int | 2 | Other-distractor options |
+| `n_npl` | int | 6 | Non-presented lure options |
 
 ### ezddm_perceptual.csv
 

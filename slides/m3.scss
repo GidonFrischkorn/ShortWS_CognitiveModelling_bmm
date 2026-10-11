@@ -1,0 +1,896 @@
+/*
+  Shared reveal.js theme for the Psychonomics 2026 bmm lunchtime workshop.
+  Adapted from Workshop_SEM/slides_quarto/custom.scss (UZH palette).
+  Variable names keep the $uzh-* prefix; re-tint here if the decks should
+  match the bmm hex logo instead of UZH blue.
+*/
+
+/*-- scss:defaults --*/
+
+// UZH Color Palette
+$uzh-blue: #0028a5;
+$uzh-blue-light: #3353b7;
+$uzh-blue-lighter: #a8b8e0;
+$uzh-blue-bg: #e8ecf5;
+$uzh-gray: #a3adb7;
+$uzh-gray-dark: #4a5568;
+$uzh-gray-light: #f0f2f5;
+$uzh-white: #ffffff;
+$uzh-accent-green: #28a745;
+$uzh-accent-orange: #dc6800;
+$uzh-accent-red: #c53030;
+
+// Typography
+$font-family-sans-serif: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-monospace: "Fira Code", "Source Code Pro", "Consolas", monospace;
+$presentation-font-size-root: 36px;
+$presentation-h1-font-size: 1.6em;
+$presentation-h2-font-size: 1.3em;
+$presentation-h3-font-size: 1.1em;
+
+// Colors
+$body-bg: $uzh-white;
+$body-color: #2d3748;
+$link-color: $uzh-blue;
+$selection-bg: $uzh-blue-lighter;
+
+// Code
+$code-color: $uzh-blue;
+$code-bg: $uzh-gray-light;
+$code-block-bg: #f8f9fa;
+$code-block-font-size: 20px;
+
+/*-- scss:rules --*/
+
+// bmm logo: top-right corner, larger than Quarto's default (bottom-right, ~2.2rem)
+.reveal .slide-logo {
+  position: fixed;
+  top: 14px !important;
+  right: 18px !important;
+  bottom: auto !important;
+  left: auto !important;
+  height: 100px !important;
+  max-height: 100px !important;
+  width: auto !important;
+}
+
+// Slide titles
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  color: $uzh-blue;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+
+.reveal h2 {
+  border-bottom: 3px solid $uzh-blue;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.6em;
+}
+
+// Use ## Heading {.no-title} to keep the slide boundary without a visible title.
+.reveal .slide.no-title > h2 {
+  display: none;
+}
+
+// Title slide
+#title-slide {
+  text-align: left;
+
+  h1.title {
+    color: $uzh-blue;
+    font-size: 1.8em;
+    font-weight: 700;
+    margin-bottom: 0.3em;
+  }
+
+  .subtitle {
+    color: $uzh-blue-light;
+    font-size: 1.0em;
+    font-weight: 400;
+  }
+
+  .author, .date, .institute {
+    color: $uzh-gray-dark;
+    font-size: 0.7em;
+  }
+
+  .quarto-title-author-name,
+  .quarto-title-affiliation {
+    text-align: center;
+  }
+}
+
+// Section divider slides
+.reveal .slide.section-divider {
+  background-color: $uzh-blue;
+  height: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+
+  h2 {
+    color: $uzh-white;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+    font-size: 1.6em;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.reveal .slide.section-divider.present {
+  display: flex !important;
+}
+
+// Question slides
+.reveal .slide.question-slide {
+  background-color: $uzh-blue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h2 {
+    color: $uzh-white;
+    border-bottom: none;
+    font-size: 1.5em;
+    text-align: center;
+  }
+}
+
+// Exercise slides
+.reveal .slide.exercise-slide {
+  background-color: $uzh-blue-bg;
+
+  h2 {
+    color: $uzh-blue;
+  }
+}
+
+// Two-column layout
+.columns {
+  display: flex;
+  gap: 2em;
+}
+
+.column {
+  flex: 1;
+}
+
+// Code blocks
+.reveal pre {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: $code-block-font-size;
+}
+
+.reveal pre code {
+  padding: 1em;
+  line-height: 1.5;
+}
+
+// lavaan syntax highlighting
+.reveal code.sourceCode.r {
+  font-family: $font-family-monospace;
+}
+
+// Callout boxes for key concepts
+.callout-note {
+  border-left: 4px solid $uzh-blue;
+  background-color: $uzh-blue-bg;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+.callout-important {
+  border-left: 4px solid $uzh-accent-orange;
+  background-color: #fff8f0;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+.callout-exercise {
+  border-left: 4px solid $uzh-accent-green;
+  background-color: #f0fff4;
+  padding: 0.8em 1em;
+  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+}
+
+// Tables
+.reveal table {
+  border-collapse: collapse;
+  font-size: 0.7em;
+  margin: 0.5em auto;
+}
+
+.reveal table th {
+  background-color: $uzh-blue;
+  color: $uzh-white;
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+}
+
+.reveal table td {
+  padding: 0.4em 0.8em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.reveal table tr:nth-child(even) {
+  background-color: $uzh-gray-light;
+}
+
+.reveal .slide.m3-figure,
+.reveal .slide.m3-binding-slide,
+.reveal .slide.m3-task-slide,
+.reveal .slide.m3-design-slide,
+.reveal .slide.m3-model-slide,
+.reveal .slide.m3-complex-category-slide {
+  height: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
+
+  &.present {
+    display: flex !important;
+  }
+
+  > h2 {
+    flex-shrink: 0;
+  }
+
+  > .cell {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.m3-response-set-workflow {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+}
+
+.m3-real-tests {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.m3-real-test-example > p {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 26px;
+}
+
+.m3-response-set-details {
+  display: grid;
+  align-items: center;
+}
+
+.m3-response-set-details > * {
+  grid-area: 1 / 1;
+}
+
+.m3-response-set-combinations {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.reveal .m3-test-combinations {
+  display: block;
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.m3-real-tests .m3-real-test-screen {
+  height: 245px;
+}
+
+.m3-real-tests .m3-real-options {
+  gap: 3px 10px;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.m3-real-tests .m3-real-frames > span {
+  height: 26px;
+  line-height: 24px;
+}
+
+.m3-real-test-screen {
+  position: relative;
+  border: 2px solid black;
+  background: white;
+  color: black;
+}
+
+.m3-real-frames {
+  position: absolute;
+  top: 20%;
+  left: 5%;
+  width: 90%;
+  display: grid;
+  grid-template-columns: repeat(var(--set-size), minmax(0, 1fr));
+  justify-content: center;
+  gap: 6px;
+}
+
+.m3-real-frames > span {
+  box-sizing: border-box;
+  height: 48px;
+  border: 1px solid black;
+  font-size: 24px;
+  line-height: 46px;
+  text-align: center;
+}
+
+.m3-real-options {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translateX(-50%);
+  display: grid;
+  width: 65%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  font-size: 24px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.m3-test-correct { color: $uzh-blue; }
+.m3-test-other { color: $uzh-accent-orange; }
+.m3-test-npl { color: $uzh-gray-dark; }
+
+.m3-data-example {
+  margin-block: auto;
+  width: 100%;
+  height: 160px;
+  display: grid;
+  grid-template-columns: 0.7fr 1.2fr 1.5fr 1.5fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.m3-data-card {
+  box-sizing: border-box;
+  height: 140px;
+  border: 1px solid $uzh-gray;
+  border-radius: 6px;
+  padding: 16px 12px;
+  background: white;
+  text-align: center;
+  font-size: 24px;
+}
+
+.m3-data-values.m3-data-conditions {
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.m3-data-card .m3-exp-value {
+  font-size: 22px;
+  line-height: 30px;
+}
+
+.reveal .m3-data-card > p {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.m3-data-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 30px;
+}
+
+.m3-data-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.m3-data-values code,
+.m3-data-values span {
+  color: inherit;
+  font-size: 16px;
+}
+
+.m3-data-values.m3-data-id {
+  grid-template-columns: 1fr;
+}
+
+.m3-model-explanations {
+  display: grid;
+  min-height: 130px;
+  margin-top: 24px;
+}
+
+.m3-model-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.m3-model-explanations > .fragment {
+  grid-area: 1 / 1;
+  min-height: 0;
+}
+
+.reveal .columns.m3-choice-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  height: 100%;
+}
+
+.reveal .m3-choice-comparison > .m3-choice-panel {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  padding: 0;
+}
+
+.m3-choice-panel + .m3-choice-panel > .m3-choice-equation {
+  border-inline-start: 1px solid $uzh-gray;
+}
+
+.reveal .m3-choice-panel > h3 {
+  margin: 0;
+  text-align: center;
+}
+
+.reveal .m3-choice-panel > .m3-choice-equation {
+  position: relative;
+  box-sizing: border-box;
+  margin: 0 !important;
+  display: grid;
+  place-items: center;
+}
+
+.reveal .m3-choice-equation > p {
+  margin: 0;
+}
+
+.m3-formula-callout {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.m3-formula-callout > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.m3-formula-callout path {
+  fill: $uzh-blue-bg;
+  stroke: $uzh-blue;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.m3-callout-label {
+  position: absolute;
+  width: max-content;
+  padding: 8px 12px;
+  white-space: nowrap;
+  color: $body-color;
+  font-family: $font-family-sans-serif;
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+.m3-formula-callout .m3-callout-emphasis {
+  color: $uzh-accent-red;
+}
+
+.reveal .slide.m3-task-slide > .m3-task {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+}
+
+.reveal .m3-screen.m3-complex-screen {
+  background: #bababa;
+}
+
+.m3-complex-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 150px);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  justify-content: center;
+  column-gap: 140px;
+}
+
+.reveal #targets-and-distractors .fragment {
+  transition: none !important;
+}
+
+.reveal .m3-complex-prompt {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-block: 24px;
+  color: black;
+  font-size: 28px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.m3-complex-object,
+.m3-complex-choice,
+.m3-complex-legend-object {
+  background: transparent;
+  display: inline-block;
+  width: 150px;
+  height: 150px;
+  border: 0;
+  padding: 0;
+  flex: none;
+}
+
+.m3-complex-object {
+  position: relative;
+  cursor: pointer;
+}
+
+.m3-target-ring::after {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border: 3px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.reveal .m3-complex-screen svg,
+.reveal .m3-response-categories svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+}
+
+
+.reveal .m3-complex-screen .m3-demo-cursor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48px;
+  height: auto;
+  margin: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  pointer-events: none;
+}
+
+.m3-complex-test {
+  position: relative;
+}
+
+.m3-complex-color-cue {
+  position: absolute;
+  left: 14%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.m3-complex-options {
+  position: absolute;
+  left: 34%;
+  top: 50%;
+  width: 58%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  gap: 16px;
+  transform: translateY(-50%);
+}
+
+.m3-complex-choice {
+  width: 64px;
+  height: 64px;
+}
+
+.m3-response-categories {
+  display: grid;
+  gap: 18px;
+  text-align: left;
+  font-size: 24px;
+  margin-left: 72px;
+}
+
+.m3-response-categories > div > span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.m3-response-categories > div {
+  display: grid;
+  grid-template-columns: 285px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.m3-category-label {
+  min-width: 0;
+}
+
+.m3-response-categories .m3-category-items {
+  line-height: 1.3;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.m3-study-interval {
+  position: absolute;
+}
+
+.m3-category-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 540px minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.m3-category-layout > .m3-task {
+  margin: 0;
+}
+
+.m3-task-instructions {
+  display: grid;
+  gap: 1em;
+}
+
+.reveal .m3-task-instructions > p {
+  margin: 0;
+}
+
+.m3-category-stages {
+  display: grid;
+  align-items: center;
+}
+
+.m3-category-stages > * {
+  grid-area: 1 / 1;
+}
+
+.m3-category-layout .m3-screen {
+  width: 540px;
+}
+
+.m3-category-layout .m3-complex-choice {
+  width: 48px;
+  height: 48px;
+}
+
+.m3-category-layout .m3-complex-options {
+  gap: 12px;
+}
+
+.m3-category-layout .m3-complex-color-cue {
+  width: 48px;
+  height: 48px;
+}
+
+.m3-complex-legend-object {
+  width: 28px;
+  height: 28px;
+}
+
+.m3-binding-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.m3-binding-formula {
+  text-align: center;
+}
+
+.reveal math[display="block"] {
+  font-size: $presentation-font-size-root;
+}
+
+.reveal math[display="block"] mtable > mtr {
+  height: 1.6em;
+}
+
+.reveal math[display="block"] mtable > mtr > mtd {
+  padding: 0.2em 0.4em;
+  line-height: 1.2;
+  vertical-align: baseline;
+}
+
+.m3-binding-diagram svg {
+  width: 100%;
+  max-width: 100%;
+}
+
+.reveal .slide.m3-figure .cell-output-display img {
+  display: block;
+  margin-inline: auto;
+}
+
+// Path diagram container
+.path-diagram {
+  text-align: center;
+  margin: 0.5em 0;
+
+  img {
+    max-height: 450px;
+    border-radius: 4px;
+  }
+}
+
+// Speaker notes
+.reveal .speaker-notes {
+  font-family: $font-family-sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+// Footer with slide context
+.reveal .slide-number {
+  top: auto !important;
+  bottom: 12px !important;
+  left: auto !important;
+  right: 18px !important;
+  color: $uzh-blue;
+  font-size: 14px;
+}
+
+// Attribution footer — present on every slide, but it must never compete
+// with the content. Keep it small and quiet.
+.reveal .footer,
+.reveal .footer p {
+  color: $uzh-gray;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.reveal .footer a {
+  color: $uzh-gray;
+  text-decoration: none;
+}
+
+// Fragments with subtle animation
+.reveal .slides .fragment.m3-grow-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(0);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.reveal .slides .fragment.m3-grow-bar.visible {
+  transform: scaleY(1);
+}
+
+.reveal .slides .fragment.m3-filter-source.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.reveal .slides .m3-filter-source.visible .m3-grow-bar.visible {
+  transform: scaleY(0.5);
+}
+
+.reveal .slides .m3-filter-source.visible text {
+  opacity: 0;
+}
+
+.m3-removed-activation {
+  transform-box: fill-box;
+  transform-origin: center top;
+  transform: scaleY(0);
+  transition: transform 0.5s ease-out;
+}
+
+.m3-filter-result.visible .m3-removed-activation {
+  transform: scaleY(1);
+}
+
+.reveal .fragment.fade-in-then-semi-out.visible:not(.current-fragment) {
+  opacity: 0.4;
+}
+
+// Smaller text utility
+.small {
+  font-size: 0.7em;
+}
+
+.smaller {
+  font-size: 0.55em;
+}
+
+// Fit index verdict colors
+.fit-good {
+  color: $uzh-accent-green;
+  font-weight: 600;
+}
+
+.fit-acceptable {
+  color: $uzh-accent-orange;
+  font-weight: 600;
+}
+
+.fit-poor {
+  color: $uzh-accent-red;
+  font-weight: 600;
+}
+
+// Scrollable slides for interactive content
+.reveal .slide.scrollable {
+  overflow-y: auto;
+}
+
+// Full-width diagram slide (centered, no columns)
+.reveal .slide.diagram-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Comparison slide: exactly 2 items side by side
+.reveal .slide.comparison-slide .columns {
+  gap: 3em;
+  align-items: flex-start;
+}
+
+// Formula display
+.formula-box {
+  background-color: $uzh-gray-light;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.8em 1.2em;
+  margin: 0.5em 0;
+  text-align: center;
+}
+
+.reveal .m3-reading-slide > .columns {
+  font-size: 28px;
+}
+
+.reveal .m3-screen-instruction {
+  margin: 0;
+  max-width: 90%;
+  text-align: center;
+}

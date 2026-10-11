@@ -4,7 +4,9 @@ subtitle: "Part 1: The bmm Workflow & Signal Detection Theory"
 author: "Gidon T. Frischkorn"
 institute: "University of Zurich"
 date: "November 2026"
-format: revealjs
+format:
+  revealjs:
+    theme: [default, custom.scss]
 ---
 
 <!--
