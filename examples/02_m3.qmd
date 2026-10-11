@@ -11,14 +11,16 @@ execute:
   message: false
 ---
 
-These examples show how to apply M3 to simple-span and complex-span tasks.
-In simple span, M3 measures item memory and binding memory; in complex span,
-it adds a filtering parameter.
+M3 describes responses in terms of item and binding activation, with an
+additional filtering parameter for complex span. This notebook follows the
+same workflow as SDT: specify the model, load the fit, evaluate it, and
+interpret the parameters.
 
 ## Setup
 
 ```{r}
 #| label: setup
+options(width = 120)
 library(bmm)
 library(brms)
 library(tidyverse)
@@ -26,24 +28,31 @@ library(tidybayes)
 library(here)
 
 source(here("_common.R"))  # shared workshop colors + ggplot theme
+parameter_colors <- c(a = '#0028a5', c = '#dc6800', f = '#28a745')
+source_colors <- c(Observed = '#008577', Predicted = '#8054a1')
+source_shapes <- c(Observed = 16, Predicted = 17)
+source_lines <- c(Observed = 'solid', Predicted = 'dashed')
 ```
 
 ## Data
 
-The data come from two experiments by Oberauer (2019). Participants studied
-words in boxes and then selected the word associated with a probed position.
-There were 40 participants: 20 studied new words on every trial (`openset`),
-and 20 studied words drawn repeatedly from a small set (`closedset`). Each
-participant completed four set-size conditions (2, 4, 6, and 8 items).
+The workshop uses the open-set experiment from Oberauer (2019). Twenty
+participants studied words in boxes and then selected the word associated
+with a probed position. Words were rarely repeated across trials (`openset`).
+Each participant completed four set-size conditions (2, 4, 6, and 8 items),
+with different combinations of studied items and lures available at test.
 Responses fall into three categories: the correct item, another studied
-item, or a non-presented lure. The data contain aggregated response counts;
+item, or a not-presented lure. The data contain aggregated response counts;
 column definitions and data preparation are documented in the
 [codebook](../data/README.md).
+
+One row contains response counts for one participant at one set size and
+one combination of test options. The dataset contains 480 rows: 20
+participants × 24 combinations of set size and test options.
 
 ```{r}
 #| label: data
 dat_simple <- read.csv(here("data", "m3_simple_span.csv"))
-dat_simple$exp <- factor(dat_simple$exp, levels = c("openset", "closedset"))
 dat_simple$ss_fac <- factor(dat_simple$ss_fac, levels = c(2, 4, 6, 8))
 glimpse(dat_simple)
 ```
@@ -63,12 +72,10 @@ zero means that category was absent from the options.
 
 ## Specify: activation and response categories
 
-The simple-span M3 measures memory strength along two dimensions: item
-memory ($a$), memory for the studied items, and binding memory ($c$), memory
-for the associations between items and their positions (Oberauer &
-Lewandowsky, 2019). The table shows how these parameters contribute to each
-response category's activation, with baseline activation fixed at zero for
-the softmax model.
+The simple-span M3 distinguishes **item memory** ($a$), activation shared
+by the studied items, from **binding memory** ($c$), additional activation
+from the association with the probed position (Oberauer & Lewandowsky, 2019).
+The table shows activation per response option:
 
 | Response category | Response-count column | Activation per option | Option-count column |
 | --- | --- | --- | --- |
@@ -80,11 +87,22 @@ In `m3()`, `resp_cats` names the response-count columns and `num_options`
 names the corresponding option-count columns. **Both vectors must follow
 the table's order: correct, other studied items, then not-presented lures.**
 
-`version = "ss"` supplies these simple-span activation functions.
-The choice rule converts activation into response probabilities, taking the
-number of available options in each category into account. Here,
-`choice_rule = "softmax"` uses exponentiated activation values as weights,
-which are normalized across the available response options.
+`version = "ss"` supplies the activation functions in the table.
+`choice_rule = "softmax"` converts them to response-category probabilities
+by normalizing exponentiated activation, weighted by the number of options:
+
+$$
+P(k) = \frac{n_k\exp(A_k)}{\sum_j n_j\exp(A_j)},
+$$
+
+where $A_k$ is the activation per option and $n_k$ is the number of available
+options in the category. More options give a category more opportunities to
+be selected, even when activation per option stays the same.
+
+The slides show a common baseline $b$ as an activation source. It cancels
+from the softmax probabilities, so bmm fixes it at zero. **Zero activation
+does not mean zero probability:** a lure still has weight $\exp(0) = 1$.
+A category with no available options ($n_k = 0$), however, has probability zero.
 
 ```{r}
 #| label: model-object
@@ -97,28 +115,42 @@ model_simple <- m3(
 model_simple
 ```
 
-`bmf()` supplies one regression formula per cognitive parameter. Specify how
-the parameters vary across experiments, set sizes, and participants:
+Printing the model object shows its parameters, their link functions, and
+which parameters are fixed. For this softmax model, $a$ and $c$ use the
+identity link: their regression coefficients are on the activation scale.
+The fixed baseline needs no formula. The alternative `"simple"` choice rule
+shown in the slides uses a different parameter scale.
+
+The **formula addresses the model parameters by name**. `bmf()` takes one
+ordinary R regression formula per parameter, saying how that parameter
+varies over conditions and participants. Here, set size is categorical:
 
 ```{r}
 #| label: formula
 formula_simple <- bmf(
-  c ~ 0 + exp:ss_fac + (1 + ss_fac | gr(id, by = exp)),
-  a ~ 0 + exp:ss_fac + (1 + ss_fac | gr(id, by = exp))
+  c ~ 0 + ss_fac + (0 + ss_fac | id),
+  a ~ 0 + ss_fac + (0 + ss_fac | id)
 )
 formula_simple
 ```
 
-Here, `0 + exp:ss_fac` estimates a separate $a$ and $c$ for each experiment × set
-size cell.
+`0 + ss_fac` gives one population-level coefficient per set size, without
+a separate intercept. `(0 + ss_fac | id)` adds correlated participant
+deviations at each set size. Unlike the treatment coding in the SDT example,
+these coefficients are set-size means, not differences from a reference:
 
-`(1 + ss_fac | gr(id, by = exp))` allows participants to differ in their
-overall activation and set-size effects, with separate participant-effect
-distributions for the two experiments.
+| Coefficient | Meaning |
+| --- | --- |
+| `a_ss_fac2`, `a_ss_fac4`, `a_ss_fac6`, `a_ss_fac8` | Item activation $a$ at set sizes 2, 4, 6, and 8, respectively |
+| `c_ss_fac2`, `c_ss_fac4`, `c_ss_fac6`, `c_ss_fac8` | Binding activation $c$ at set sizes 2, 4, 6, and 8, respectively |
+
+The mixed-model syntax works as it did for SDT, but the outcome of each
+formula is a cognitive model parameter, not a raw response count.
 
 ## Fit: load the cached model
 
-Load the pre-fitted simple-span model:
+The workshop model ships pre-fitted in `models/`, so there is nothing to
+compile or wait for. Load it and inspect the summary:
 
 ```{r}
 #| label: load-fit
@@ -126,10 +158,18 @@ fit_simple <- readRDS(here("models", "m3_simple.rds"))
 summary(fit_simple)
 ```
 
-Check that `Rhat` is near 1 (ideally below 1.01) and that there are no
-divergent transitions. Bulk and tail ESS describe the effective sample sizes
-for posterior summaries. `nuts_params()` provides sampler diagnostics;
-use it to count divergent transitions:
+Read the sampling diagnostics before interpreting the coefficients:
+
+- **`Rhat`** compares variation between and within chains. Values near 1
+  indicate agreement; values above 1.01 warrant further investigation.
+- **`Bulk_ESS` / `Tail_ESS`** describe how many independent draws the
+  correlated MCMC draws are worth, for the bulk and tails of the posterior.
+  They help assess the precision of posterior means and interval endpoints.
+- **Divergent transitions** can indicate that the sampler has not explored
+  the posterior reliably. They are a sampling problem, not a test of whether
+  the model describes the observed responses.
+
+`nuts_params()` provides sampler diagnostics; use it to count divergences:
 
 ```{r}
 #| label: fit-diagnostics
@@ -137,222 +177,198 @@ nuts <- nuts_params(fit_simple)
 sum(nuts$Value[nuts$Parameter == "divergent__"])
 ```
 
-The cached simple-span fit has no divergent transitions, and all Rhat values
-are below 1.01.
+With 5,000 iterations per chain (2,000 warmup), this fit has no divergent
+transitions. The maximum unrounded Rhat is slightly above 1.01, although it
+rounds to 1.01, for a correlation between participant binding deviations.
+Minimum bulk and tail ESS are 1,218 and 2,862; the Rhat value warrants caution.
+
+### Which priors were used?
+
+The cached fit uses explicit `normal(3, 1)` priors for all population-level
+set-size means of $a$ and $c$. The identity link puts these priors directly
+on the activation scale: 3 is the prior mean and 1 is the prior standard
+deviation. These are priors on the set-size means, not on every participant's
+activation. The participant-level standard deviations and correlations use
+the package defaults. Inspect the fitted model's prior specification with:
+
+```{r}
+#| label: prior-info
+prior_summary(fit_simple)
+```
+
+Read the coefficient-specific rows (`ss_fac2`, `ss_fac4`, `ss_fac6`, and
+`ss_fac8`) for the priors on the set-size means. These override the general
+class-`b` entries for $a$ and $c$ in the prior table.
 
 ### Optional: re-fit the model yourself
 
-Re-fit the simple-span model if needed. This optional step requires the
-Stan toolchain (`Install_Packages.R`, Part 2) and overwrites the cached fit.
-`bmm()` combines the model, formulas, and data. `file_refit = "always"`
-forces a new fit even when a cached file exists.
-
-The [fitting script](../models/fit_m3.R) contains both fits. To re-fit a model
-with that script, change its `file_refit` setting from `"never"` to `"always"`.
-
-```{r}
-#| label: refit
-#| eval: false
-fit_simple <- bmm(
-  formula = formula_simple,
-  model = model_simple,
-  data = dat_simple,
-  prior = c(
-    prior(normal(3, 1), class = "b", nlpar = "a"),
-    prior(normal(3, 1), class = "b", nlpar = "c")
-  ),
-  chains = 4, cores = 4, iter = 4000, warmup = 2000,
-  control = list(adapt_delta = 0.99),
-  sample_prior = "yes", backend = "cmdstanr", seed = 2026,
-  file = here("models", "m3_simple"), file_refit = "always"
-)
-```
+You do not need to re-fit the models to follow the workshop. The
+[fitting script](../models/fit_m3.R) contains both fits and their priors.
+Re-fitting requires the Stan toolchain (`Install_Packages.R`, Part 2).
+Change `file_refit = "never"` to `"always"` in that script to re-fit and
+replace the cached models.
 
 ## Evaluate: model-implied response proportions
 
-`posterior_epred()` gives expected counts in each response category.
-Use these to compare observed and predicted response proportions:
+Before interpreting memory parameters, ask whether the model describes the
+responses, including the two kinds of error. `posterior_epred()` gives expected
+counts in each response category for each posterior draw. It does not simulate
+new response counts as `posterior_predict()` does. Here, compare the observed
+proportions with the model's posterior mean expected proportions:
 
 ```{r}
 #| label: participant-summary
-# Prepare observed and predicted counts.
-observed_counts <- dat_simple |> select(id, exp, setsize, corr, other, npl)
-
 set.seed(2026)
-expected_counts <- posterior_epred(fit_simple, ndraws = 200)
-predicted_counts <- dat_simple |> select(id, exp, setsize)
-# Average over draws, retaining data rows and response categories.
-predicted_counts[c("corr", "other", "npl")] <- apply(expected_counts, c(2, 3), mean)
-
-# Calculate participant proportions and summarise across participants.
-pp_data <- bind_rows(
-  Observed = observed_counts,
-  Predicted = predicted_counts,
-  .id = "source"
+expected_simple <- posterior_epred(fit_simple, ndraws = 200)
+predicted_simple <- dat_simple |> select(id, setsize)
+predicted_simple[c('corr', 'other', 'npl')] <- apply(expected_simple, c(2, 3), mean)
+pp_simple <- bind_rows(
+  Observed = dat_simple |> select(id, setsize, corr, other, npl),
+  Predicted = predicted_simple,
+  .id = 'source'
 ) |>
-  summarise(
-    corr = sum(corr),
-    other = sum(other),
-    npl = sum(npl),
-    .by = c(source, id, exp, setsize)
-  ) |>
+  summarise(across(c(corr, other, npl), sum), .by = c(source, id, setsize)) |>
   mutate(total = corr + other + npl) |>
-  pivot_longer(
-    c(corr, other, npl),
-    names_to = "category",
-    values_to = "count"
-  ) |>
-  mutate(proportion = count / total) |>
-  summarise(
-    se = sd(proportion) / sqrt(n()),
-    proportion = mean(proportion),
-    .by = c(source, exp, setsize, category)
-  )
-
-pp_data$category <- factor(
-  pp_data$category,
-  levels = c("corr", "other", "npl"),
-  labels = c("Correct", "Other items", "NPL")
-)
+  pivot_longer(c(corr, other, npl), names_to = 'category', values_to = 'count') |>
+  mutate(proportion = count / total,
+         category = factor(category, levels = c('corr', 'other', 'npl'),
+                           labels = c('Correct', 'Other items', 'NPL'))) |>
+  summarise(se = sd(proportion) / sqrt(n()), proportion = mean(proportion),
+            .by = c(source, setsize, category))
 ```
 
-Averaging 200 posterior draws produces one set of predictions per data row.
-The code then combines observed and predicted counts, calculates each
-participant's response proportions, and summarises their means and
-standard errors (SE).
+The code averages 200 posterior draws, then pools counts across test-option
+combinations to obtain each participant's proportions at each set size.
 
 ```{r}
 #| label: predictive-check
-#| fig-width: 10
-#| fig-alt: "Observed and M3-predicted mean response proportions with plus or minus one participant-level standard error, by response category and experiment."
-# Keep the y-axis identical across experiments within each category column.
-pp_limits <- pp_data |>
-  summarise(ymin = min(pmax(0, proportion - se)),
-            ymax = max(pmin(1, proportion + se)), .by = category) |>
-  crossing(exp = factor(levels(dat_simple$exp), levels = levels(dat_simple$exp)))
-
-dodge <- position_dodge(width = 0.5)
-pp_data |>
-  ggplot(aes(setsize, proportion, color = source, group = source)) +
-  geom_blank(data = pp_limits, aes(x = 2, y = ymin), inherit.aes = FALSE) +
-  geom_blank(data = pp_limits, aes(x = 2, y = ymax), inherit.aes = FALSE) +
-  geom_errorbar(aes(ymin = pmax(0, proportion - se),
-                    ymax = pmin(1, proportion + se)),
-                width = 0.15, position = dodge) +
-  geom_point(size = 2, position = dodge) +
+#| fig-width: 12
+#| fig-height: 4.8
+#| fig-alt: "Observed and predicted open-set response proportions across three categories; the legend is on the right."
+dodge <- position_dodge(width = 0.25)
+simple_predictive <- pp_simple |>
+  ggplot(aes(setsize, proportion, color = source, shape = source,
+             linetype = source, group = source)) +
+  geom_errorbar(aes(ymin = pmax(0, proportion - se), ymax = pmin(1, proportion + se)),
+                width = 0.12, position = dodge) +
   geom_line(position = dodge) +
-  ggh4x::facet_grid2(
-    rows = vars(exp), cols = vars(category),
-    scales = "free_y", independent = "y", axes = "y",
-    labeller = labeller(exp = c(openset = "Open set", closedset = "Closed set"))
-  ) +
-  ggh4x::scale_y_facet(category == "Other items",
-                       breaks = seq(0, 0.32, by = 0.08), limits = c(0, 0.32)) +
-  scale_color_manual(values = unname(wk_colors[c("blue", "orange")])) +
+  geom_point(size = 3, position = dodge) +
+  facet_wrap(~category, nrow = 1, scales = 'free_y') +
+  scale_color_manual(values = source_colors) +
+  scale_shape_manual(values = source_shapes) +
+  scale_linetype_manual(values = source_lines) +
   scale_x_continuous(breaks = c(2, 4, 6, 8)) +
-  labs(x = "Set size", y = "Response proportion", color = NULL) +
-  theme_workshop()
+  labs(x = 'Set size', y = 'Response proportion', color = NULL, shape = NULL, linetype = NULL) +
+  theme_workshop() + theme(legend.position = 'right')
+simple_predictive
 ```
 
-Error bars show ±1 SE across participants for each curve. The y-axis range
-differs between categories but is shared between experiments within a column.
-Observed and predicted means are close in both experiments, with no obvious
-systematic discrepancy in this summary of the response frequencies.
+Observed and predicted mean proportions are close across set sizes. Error
+bars show ±1 standard error (SE) across participants, not predictive intervals;
+the y-axis ranges differ by category. A good match here does not establish
+that the model reproduces variation across participants or test-option
+combinations.
 
 ## Interpret: item activation and context binding
 
-`fixef()` gives population-level posterior means and credible intervals.
-Inspect selected coefficients:
-
-```{r}
-#| label: posterior
-fixef(fit_simple)[c("a_expopenset:ss_fac2", "c_expopenset:ss_fac2"), ]
-```
-
-These rows show $a$ and $c$ for the open-set experiment at set size 2.
-
 `median_qi()` summarises posterior draws with medians and 95% credible
-intervals. Summarise all experiment × set size cells:
+intervals. Summarise the two parameters at each set size:
 
 ```{r}
 #| label: simple-parameters
 simple_parameters <- as.data.frame(fit_simple) |>
-  select(matches("^b_[ac]_exp.*:ss_fac")) |>
-  # Extract parameter, experiment, and set size from coefficient names.
-  pivot_longer(
-    everything(),
-    names_to = c("parameter", "experiment", "setsize"),
-    names_pattern = "^b_([ac])_exp(open|closed)set:ss_fac([2468])$",
-    values_to = "value"
-  ) |>
-  mutate(
-    parameter = factor(parameter, levels = c("a", "c")),
-    experiment = recode(experiment, open = "Open set", closed = "Closed set"),
-    experiment = factor(experiment, levels = c("Open set", "Closed set")),
-    setsize = as.integer(setsize)
-  ) |>
-  summarise(median_qi(value), .by = c(parameter, experiment, setsize))
+  select(matches('^b_[ac]_ss_fac[2468]$')) |>
+  pivot_longer(everything(), names_to = c('parameter', 'setsize'),
+               names_pattern = '^b_([ac])_ss_fac([2468])$', values_to = 'value') |>
+  mutate(setsize = as.integer(setsize), parameter = factor(parameter, levels = c('a', 'c'))) |>
+  summarise(median_qi(value), .by = c(parameter, setsize))
 simple_parameters |>
-  select(parameter, experiment, setsize, median = y, lower = ymin, upper = ymax)
+  select(parameter, setsize, median = y, lower = ymin, upper = ymax) |>
+  knitr::kable(digits = 2)
 ```
-
-The table reports a median and interval for each parameter, experiment,
-and set size.
 
 ```{r}
 #| label: posterior-plot
-#| fig-width: 10
-#| fig-alt: "Posterior medians and 95 percent credible intervals for item activation and context binding at each set size, shown by experiment."
-simple_parameters |>
-  ggplot(aes(setsize, y, color = experiment)) +
-  geom_pointrange(aes(ymin = ymin, ymax = ymax),
-                  position = position_dodge(width = 0.35)) +
-  facet_wrap(~parameter, labeller = as_labeller(c(
-    a = "Item activation (a)", c = "Context binding (c)"
+#| fig-width: 12
+#| fig-height: 5
+#| fig-alt: "Item memory and binding memory medians and 95 percent credible intervals across set sizes, in blue and orange facets on a 0 to 6 scale."
+simple_posterior <- simple_parameters |>
+  ggplot(aes(setsize, y, color = parameter, group = parameter)) +
+  geom_line(position = dodge) +
+  geom_pointrange(aes(ymin = ymin, ymax = ymax), position = dodge) +
+  facet_wrap(~parameter, nrow = 1, labeller = as_labeller(c(
+    a = 'Item memory (a)', c = 'Binding memory (c)'
   ))) +
-  scale_color_manual(values = unname(wk_colors[c("blue", "orange")])) +
+  scale_color_manual(values = parameter_colors, guide = 'none') +
+  scale_y_continuous(limits = c(0, 6), breaks = 0:6, expand = expansion(mult = 0)) +
   scale_x_continuous(breaks = c(2, 4, 6, 8)) +
-  labs(x = "Set size", y = "Activation", color = NULL) +
-  theme_workshop() +
-  theme(panel.spacing.x = grid::unit(1.5, "lines"))
+  labs(x = 'Set size', y = 'Activation', color = NULL) +
+  theme_workshop() + theme(legend.position = 'bottom')
+simple_posterior
 ```
 
-Context binding $c$ is lower at the larger set sizes in both experiments.
-Item activation $a$ has higher posterior medians in the open-set experiment
-than in the closed-set experiment at each set size, with greater uncertainty
-at the smaller set sizes. These patterns describe the cell estimates; we
-have not estimated posterior contrasts for these differences. Points are
-posterior medians and bars are 95% credible intervals describing parameter
-uncertainty, rather than the participant-level SE in the response-proportion
-check.
+Binding memory $c$ has lower posterior medians at larger set sizes. Item
+memory $a$ also has lower medians at larger set sizes, with greater uncertainty
+at the smaller set sizes. The bars are 95% credible intervals, rather than
+the participant-level SE shown in the response-proportion check.
+
+A posterior contrast asks a more specific question: **is binding activation
+lower at set size 8 than at set size 2?** With this coding, subtract the
+two set-size coefficients within each posterior draw:
+
+```{r}
+#| label: binding-contrast
+hypothesis(fit_simple, "c_ss_fac8 - c_ss_fac2 < 0")
+```
+
+How to read the output:
+
+- **`Estimate`** is the posterior mean of $c_8 - c_2$. A negative value means
+  lower binding activation at set size 8.
+- **`CI.Lower` / `CI.Upper`** give the 5th and 95th posterior percentiles
+  for this directional test: a central 90% interval, rather than the
+  two-sided 95% intervals plotted above.
+- **`Post.Prob`** is the proportion of posterior draws in which $c_8 - c_2 < 0$.
+- **`Evid.Ratio`** is the posterior odds of a negative difference versus a
+  nonnegative difference, not a point-null Bayes factor. Here it is infinite
+  because no sampled difference is nonnegative; this does not imply certainty.
+
+The posterior mean difference is approximately −2.52 activation units, and
+all sampled differences are negative (`Post.Prob = 1`). The posterior
+therefore strongly supports lower binding activation at set size 8 than at
+set size 2 under this model.
 
 ## Extension: complex span
 
 Li, Frischkorn, and Oberauer (2026), Experiment 1, added distractor processing
-to the memory task. Participants studied three target images while making
-size judgments. Targets were cued before processing (**pre-cue**) or after
-processing (**retro-cue**); a **control** condition contained no distractors.
-The tutorial preparation retains 45 participants, with one row per participant
-× condition. See the [codebook](../data/README.md) for exclusions and column definitions.
+to the memory task. Participants viewed three target–distractor pairs, each
+associated with a distinct context color, while judging which object was
+larger in real life. In the **pre-cue** condition, the target in each pair
+was designated before the size judgment. At test, a color cue indicated
+which target to select from 12 image options.
+
+Here, binding memory $c$ refers to item–color-context associations, rather
+than the item–position associations in simple span. A paired distractor
+shares the tested target's color context; other distractors belong to the
+other pairs. The workshop uses only the pre-cue condition: 45 participants,
+with one aggregated row each. Exclusions and columns are documented in the
+[codebook](../data/README.md).
 
 ```{r}
 #| label: complex-data
 dat_complex <- read.csv(here("data", "m3_complex_span.csv"))
-dat_complex$condition <- factor(dat_complex$condition,
-                                levels = c("control", "pre", "retro"))
 head(dat_complex, 3)
 ```
 
 ### Specify the additional response categories
 
-The complex-span model adds a filtering parameter $f$, which scales
-distractor activation relative to target activation: $f = 0$
-means no activation beyond baseline, while $f = 1$ means distractors receive
-the same activation as targets. Thus, lower $f$ indicates stronger filtering.
-It is an activation multiplier, not the proportion of distractors remembered
-or filtered out. The activation formulas now include five response categories:
+The complex-span model adds **filtering** ($f$): a shared multiplier on
+distractor item and binding activation. $f = 0$ leaves only baseline
+activation; $f = 1$ leaves both contributions unchanged. Lower $f$ therefore
+means stronger filtering under this model, not a smaller proportion of
+distractors remembered. There are now five response categories:
 
-| Response category | Count column | Softmax activation | Option-count column |
+| Response category | Response-count column | Activation per option | Option-count column |
 | --- | --- | --- | --- |
 | Correct item | `corr` | $a+c$ | `n_corr` |
 | Distractor paired with the tested target | `distc` | $f(a+c)$ | `n_distc` |
@@ -372,20 +388,20 @@ model_complex <- m3(
 )
 ```
 
-Specify how the parameters vary across conditions and participants:
+Specify a population intercept and participant deviations for each parameter:
 
 ```{r}
 #| label: complex-formula
 formula_complex <- bmf(
-  c ~ 0 + condition + (0 + condition || participant),
-  a ~ 0 + condition + (0 + condition || participant),
-  f ~ 0 + condition + (0 + condition || participant)
+  c ~ 1 + (1 | participant),
+  a ~ 1 + (1 | participant),
+  f ~ 1 + (1 | participant)
 )
 ```
 
-The formulas estimate condition-specific parameters and uncorrelated
-participant deviations. Control has no distractors, so $f$ cannot be
-estimated in that condition and is fixed in the fitting script.
+The $a$ and $c$ formulas are on the activation scale; the $f$ formula is
+on the logit scale. The fit uses `normal(3, 1)` priors for the $a$ and $c$
+intercepts and the default logit-scale prior for $f$.
 
 ### Load and check the cached fit
 
@@ -399,147 +415,126 @@ complex_nuts <- nuts_params(fit_complex)
 sum(complex_nuts$Value[complex_nuts$Parameter == "divergent__"])
 ```
 
-This fit also has no divergent transitions, and all Rhat values are below 1.01.
+With the same 5,000-iteration settings, this fit has no divergent transitions.
+Maximum Rhat is 1.00; minimum bulk and tail ESS are 2,306 and 4,113.
 
 ### Check the five response categories
 
-Calculate the model-implied response counts:
+Use the same approach to compare observed and predicted proportions in all
+five categories:
 
 ```{r}
 #| label: complex-expected-counts
 set.seed(2026)
-expected_counts_complex <- posterior_epred(fit_complex, ndraws = 200)
-pred_complex <- apply(expected_counts_complex, c(2, 3), mean)
-colnames(pred_complex) <- c("corr", "distc", "other", "disto", "npl")
+expected_complex <- posterior_epred(fit_complex, ndraws = 200)
+predicted_complex <- dat_complex |> select(participant, condition)
+predicted_complex[c('corr', 'distc', 'other', 'disto', 'npl')] <-
+  apply(expected_complex, c(2, 3), mean)
 ```
-
-The predictions are averaged over 200 posterior draws and retain the
-model's response-category order.
-
-Summarise observed and predicted response proportions:
 
 ```{r}
 #| label: complex-participant-summary
 pp_complex <- bind_rows(
-  Observed = dat_complex |>
-    select(participant, condition, corr, distc, other, disto, npl),
-  Predicted = bind_cols(dat_complex |> select(participant, condition),
-                        as_tibble(pred_complex)),
-  .id = "source"
+  Observed = dat_complex |> select(participant, condition, corr, distc, other, disto, npl),
+  Predicted = predicted_complex,
+  .id = 'source'
 ) |>
   mutate(total = corr + distc + other + disto + npl) |>
-  pivot_longer(c(corr, distc, other, disto, npl),
-               names_to = "category", values_to = "count") |>
+  pivot_longer(c(corr, distc, other, disto, npl), names_to = 'category', values_to = 'count') |>
   mutate(proportion = count / total,
-         category = factor(category, levels = c("corr", "other", "distc", "disto", "npl"),
-                           labels = c("Correct", "Other items", "Paired distractor",
-                                      "Other distractors", "NPL"))) |>
+         category = factor(category, levels = c('corr', 'distc', 'other', 'disto', 'npl'),
+                           labels = c('Correct', 'Paired distractor', 'Other targets', 'Other distractors', 'NPL'))) |>
   summarise(se = sd(proportion) / sqrt(n()), proportion = mean(proportion),
             .by = c(source, condition, category))
 ```
 
-The participant summaries use the same mean and SE calculations as for
-simple span.
-
 ```{r}
 #| label: complex-predictive-check
-#| fig-width: 16
-#| fig-height: 6
-#| fig-alt: "Observed and M3-predicted response proportions, with one participant-level standard error, across three conditions and five response categories."
-condition_labels <- c(control = "Control", pre = "Pre-cue", retro = "Retro-cue")
-complex_dodge <- position_dodge(width = 0.2)
-pp_complex |>
-  filter(!(category %in% c("Paired distractor", "Other distractors") &
-             condition == "control")) |>
-  ggplot(aes(condition, proportion, color = source, group = source)) +
-  geom_errorbar(aes(ymin = pmax(0, proportion - se),
-                    ymax = pmin(1, proportion + se)),
-                width = 0.15, position = complex_dodge) +
-  geom_point(size = 2, position = complex_dodge) +
-  facet_wrap(~category, nrow = 1, scales = "free", space = "free_x") +
-  ggh4x::scale_y_facet(category == "Correct",
-                       breaks = seq(0.5, 0.9, by = 0.1), limits = c(0.5, 0.9)) +
-  ggh4x::scale_y_facet(category %in% c("Paired distractor", "Other distractors"),
-                       breaks = seq(0, 0.12, by = 0.03), limits = c(0, 0.12)) +
-  ggh4x::scale_y_facet(category == "NPL",
-                       breaks = seq(0, 0.08, by = 0.02), limits = c(0, 0.08)) +
-  ggh4x::scale_y_facet(category == "Other items",
-                       breaks = seq(0, 0.20, by = 0.05), limits = c(0, 0.20)) +
-  scale_color_manual(values = unname(wk_colors[c("blue", "orange")])) +
-  scale_x_discrete(labels = condition_labels) +
-  labs(x = "Condition", y = "Response proportion", color = NULL) +
-  theme_workshop() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1),
-        legend.position = "bottom")
+#| fig-width: 14
+#| fig-height: 4.8
+#| fig-alt: "Observed and predicted pre-cue responses in Correct and Errors facets, with four error categories on the x axis and the legend on the right."
+complex_predictive <- pp_complex |>
+  mutate(response_type = factor(if_else(category == 'Correct', 'Correct', 'Errors'),
+                                levels = c('Correct', 'Errors'))) |>
+  ggplot(aes(category, proportion, color = source, shape = source, group = source)) +
+  geom_errorbar(aes(ymin = pmax(0, proportion - se), ymax = pmin(1, proportion + se)),
+                width = 0.10, position = dodge) +
+  geom_point(size = 3, position = dodge) +
+  facet_wrap(~response_type, nrow = 1, scales = 'free', space = 'free_x') +
+  ggh4x::scale_y_facet(response_type == 'Correct',
+                       breaks = seq(0.5, 0.9, 0.1), limits = c(0.5, 0.9)) +
+  ggh4x::scale_y_facet(response_type == 'Errors',
+                       breaks = seq(0, 0.20, 0.05), limits = c(0, 0.20)) +
+  scale_color_manual(values = source_colors) +
+  scale_shape_manual(values = source_shapes) +
+  scale_x_discrete(labels = c('Correct' = 'Correct',
+                            'Paired distractor' = 'Paired\ndistractor',
+                            'Other targets' = 'Other\ntargets',
+                            'Other distractors' = 'Other\ndistractors',
+                            'NPL' = 'NPL')) +
+  labs(x = NULL, y = 'Response proportion', color = NULL, shape = NULL) +
+  theme_workshop() + theme(legend.position = 'right', strip.text = element_text(size = 16))
+complex_predictive
 ```
 
-The model underpredicts other-distractor responses in both cue conditions.
-The distractor panels omit control because no distractors were presented;
-y-axis ranges differ between response categories.
+The model underpredicts other-distractor responses. The correct-response
+panel uses a 0.5–0.9 scale; the error panel uses 0–0.20. Error bars again
+show ±1 participant-level SE.
 
 ### Read activation and filtering estimates
 
-`plogis()` transforms logit-scale values to the 0–1 scale.
-Summarise the activation and filtering estimates:
+Before summarising the posterior, use `plogis()` to transform the $f$ draws
+from the logit scale to 0–1; $a$ and $c$ remain on the activation scale:
 
 ```{r}
 #| label: complex-parameters
 complex_parameters <- as.data.frame(fit_complex) |>
-  select(matches("^b_[acf]_condition")) |>
-  pivot_longer(
-    everything(),
-    names_to = c("parameter", "condition"),
-    names_pattern = "^b_([acf])_condition(control|pre|retro)$",
-    values_to = "value"
-  ) |>
-  filter(!(parameter == "f" & condition == "control")) |>
-  mutate(
-    value = if_else(parameter == "f", plogis(value), value),
-    parameter = factor(parameter, levels = c("a", "c", "f")),
-    condition = factor(condition, levels = c("control", "pre", "retro"))
-  ) |>
-  summarise(median_qi(value), .by = c(parameter, condition))
+  select(matches('^b_[acf]_Intercept$')) |>
+  pivot_longer(everything(), names_to = 'parameter',
+               names_pattern = '^b_([acf])_Intercept$', values_to = 'value') |>
+  mutate(value = if_else(parameter == 'f', plogis(value), value),
+         parameter = factor(parameter, levels = c('a', 'c', 'f'))) |>
+  summarise(median_qi(value), .by = parameter)
 complex_parameters |>
-  select(parameter, condition, median = y, lower = ymin, upper = ymax)
+  select(parameter, median = y, lower = ymin, upper = ymax) |>
+  knitr::kable(digits = 2)
 ```
 
-Here, the transformation applies only to $f$; $a$ and $c$ remain on the
-activation scale. The fixed control value is excluded from the filtering
-estimates.
+These summaries use the population-level intercepts. The transformed $f$
+intercept describes a participant with zero participant-level deviation,
+not the average of the individual filtering parameters.
 
 ```{r}
 #| label: complex-parameter-plot
-#| fig-width: 16
-#| fig-height: 8
-#| fig-alt: "Posterior medians and 95 percent credible intervals for item activation, context binding, and filtering by condition. Control filtering is omitted because it was fixed."
-complex_ac_limits <- range(complex_parameters$ymin[complex_parameters$parameter != "f"],
-                            complex_parameters$ymax[complex_parameters$parameter != "f"])
-complex_parameters |>
-  ggplot(aes(condition, y)) +
-  geom_pointrange(aes(ymin = ymin, ymax = ymax), color = wk_colors[["blue"]]) +
-  facet_wrap(~parameter, nrow = 1, scales = "free", labeller = as_labeller(c(
-    a = "Item activation (a)",
-    c = "Context binding (c)",
-    f = "Filtering (f)"
-  ))) +
-  ggh4x::scale_y_facet(parameter %in% c("a", "c"), limits = complex_ac_limits) +
-  ggh4x::scale_y_facet(parameter == "f", limits = c(0, 1)) +
-  scale_x_discrete(labels = condition_labels) +
-  labs(x = "Condition", y = "Parameter value") +
-  theme_workshop() +
-  theme(panel.spacing.x = grid::unit(1.5, "lines"))
+#| fig-width: 6
+#| fig-height: 3.5
+#| fig-alt: "Pre-cue parameter medians and 95 percent credible intervals: a and c on a 0 to 6 scale, f on a 0 to 1 scale, in blue, orange, and green."
+complex_parameter_base <- ggplot(complex_parameters, aes(parameter, y, color = parameter)) +
+  geom_pointrange(aes(ymin = ymin, ymax = ymax), linewidth = 0.7) +
+  scale_color_manual(values = parameter_colors, guide = 'none') +
+  labs(x = NULL) +
+  theme_workshop(base_size = 14) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = '#eceff1', linewidth = 0.3))
+complex_activation <- (complex_parameter_base + filter(complex_parameters, parameter != 'f')) +
+  scale_x_discrete(limits = c('a', 'c'), labels = c(a = 'a', c = 'c')) +
+  scale_y_continuous(limits = c(0, 6), breaks = 0:6, expand = expansion(mult = 0)) +
+  labs(y = 'Activation')
+complex_filtering <- (complex_parameter_base + filter(complex_parameters, parameter == 'f')) +
+  scale_x_discrete(labels = c(f = 'f')) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25), expand = expansion(mult = 0)) +
+  labs(y = NULL)
+complex_posterior <- patchwork::wrap_plots(complex_activation, complex_filtering, nrow = 1, widths = c(2, 1))
+complex_posterior
 ```
 
-Context binding has lower posterior medians in both distractor conditions
-than in control; item activation is also lower, especially in the retro-cue
-condition. The filtering estimates are about 0.66 for pre-cue and 0.63 for
-retro-cue. Both estimates indicate reduced distractor activation relative
-to targets. We have not estimated a posterior contrast between the cue
-conditions.
-
-The $a$ and $c$ panels share an activation scale; $f$ is shown on its 0–1
-scale, with control omitted. Interpret these estimates in light of the
-model's systematic underprediction of other-distractor responses.
+The posterior medians of the population-level parameters are approximately
+3.11 for $a$, 2.12 for $c$, and 0.66 for $f$. The 95% credible interval for
+$f$ is approximately [0.61, 0.70]. Under this model, distractor item and
+binding contributions are scaled to approximately 66% of the corresponding
+target contributions. The logit link restricts $f$ to 0–1, so being below
+1 is not by itself a test for filtering. Interpret the estimates alongside
+the underprediction of other-distractor responses.
 
 ## Further reading
 
