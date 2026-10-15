@@ -103,9 +103,28 @@ $code-block-font-size: 0.65em;
     font-size: 1.6em;
   }
 
-  p {
+  p, li {
     color: rgba(255, 255, 255, 0.9);
   }
+}
+
+.reveal .slide.section-divider.take-home li {
+  color: #ffffff;
+}
+
+.reveal .slide.section-divider.take-home code {
+  color: #0028a5;
+  background-color: #ffffff;
+  padding: 0.08em 0.35em;
+  border-radius: 4px;
+}
+
+.reveal .slide.choice-open .fragment {
+  margin-top: 1.6em;
+}
+
+.reveal .slide.choice-open li + li {
+  margin-top: 0.85em;
 }
 
 // Question slides
@@ -205,6 +224,69 @@ $code-block-font-size: 0.65em;
 
 .reveal table tr:nth-child(even) {
   background-color: $uzh-gray-light;
+}
+
+.reveal .param-map table {
+  border: none;
+  font-size: 0.82em;
+}
+
+.reveal .param-map table th,
+.reveal .param-map table td {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
+}
+
+.reveal .param-map table th:nth-child(2),
+.reveal .param-map table td:nth-child(2) {
+  text-align: center;
+}
+
+.reveal .param-map table th {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.reveal .param-map table td {
+  border-bottom: 1px solid #cbd5e1;
+  padding: 0.75em 0.7em;
+}
+
+// Design-cell table on the blue brightness divider.
+.reveal .slide.section-divider .cell-break {
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+}
+
+.reveal .slide.section-divider .cell-break table {
+  background: white;
+  border: none;
+  font-size: 0.78em;
+}
+
+.reveal .slide.section-divider .cell-break th,
+.reveal .slide.section-divider .cell-break td {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  background: white;
+  color: #1a1a1a;
+}
+
+.reveal .slide.section-divider .cell-break th {
+  color: $uzh-blue;
+  border-bottom: 2px solid $uzh-blue;
+}
+
+.reveal .slide.section-divider .cell-break td {
+  border-bottom: 1px solid #cbd5e1;
+  padding: 0.55em 0.9em;
+}
+
+.reveal .slide.section-divider .cell-break td:nth-child(n + 2),
+.reveal .slide.section-divider .cell-break th:nth-child(n + 2) {
+  text-align: center;
 }
 
 // Path diagram container
@@ -320,4 +402,67 @@ $code-block-font-size: 0.65em;
   padding: 0.8em 1.2em;
   margin: 0.5em 0;
   text-align: center;
+}
+
+.reveal .ez-stack > p,
+.reveal .ez-stack > .formula-box {
+  margin-top: 1.35em;
+  margin-bottom: 1.35em;
+}
+
+.reveal .ez-stack > :first-child {
+  margin-top: 0.2em;
+}
+
+// Title stays at the top; the code block sits on the vertical midline.
+.reveal .slide.code-vcenter {
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
+}
+
+.reveal .slide.code-vcenter > h2 {
+  align-self: start;
+}
+
+// Title at the top, table on the vertical midline, closing sentence two lines below the table.
+.reveal .slide.param-vcenter {
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
+}
+
+.reveal .slide.param-vcenter > h2 {
+  align-self: start;
+}
+
+.reveal .slide.param-vcenter > .param-map {
+  grid-row: 2;
+}
+
+.reveal .slide.param-vcenter > p {
+  grid-row: 3;
+  align-self: start;
+  margin-top: 2lh;
+  margin-bottom: 0;
+}
+
+.reveal .slide.q-reveal .fragment {
+  margin-top: 1.15em;
+}
+
+.reveal .slide.q-reveal .fragment.q-next {
+  margin-top: 2.3em;
+}
+
+.reveal .slide.q-reveal .fragment ul {
+  margin-top: 0.3em;
+}
+
+.reveal .slide.trial-space > h2 {
+  margin-bottom: 0;
+}
+
+.reveal .slide.trial-space > p,
+.reveal .slide.trial-space > .cell {
+  margin-top: 1.8em;
+  margin-bottom: 0;
 }
