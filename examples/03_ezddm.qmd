@@ -44,7 +44,7 @@ The black-to-white proportion is coded as `Xs = ((cond - 1) %% 33 - 16) / 5`, so
 
 ```{r}
 #| label: descriptives
-#| fig-alt: "Accuracy in each cell against the black-to-white proportion, with accuracy and speed instructions in different colors. Each line breaks at the missing even-mix cells."
+#| fig-alt: "Accuracy in each cell against the black-to-white proportion, with accuracy and speed instructions in different colors. Each line breaks at the missing 50/50 cells."
 cell_summary <- dat |>
     mutate(instruction = if_else(cond <= 33, "accuracy", "speed"),
           xs = ((cond - 1) %% 33 - 16) / 5,
@@ -58,7 +58,7 @@ ggplot(cell_summary, aes(xs, accuracy, color = instruction,
       geom_point(size = 2) +
       scale_color_manual(values = c(accuracy = wk_colors[["blue"]],
                                     speed = wk_colors[["orange"]])) +
-      labs(x = "Black-to-white mix (Xs)", y = "Accuracy", color = NULL) +
+      labs(x = "Black-to-white pixel configuration (Xs)", y = "Accuracy", color = NULL) +
       theme_workshop()
 ```
 
@@ -109,21 +109,21 @@ fit_ez <- bmm(formula = bmf(drift ~ 1 + instruction + abs_xs,
               sample_prior = "yes")
 ```
 
-Drift depends on the instruction condition and on how far the black-to-white configuration sits from the 50/50 mix (`abs_xs`). Boundary separation and non-decision time depend on the instruction condition alone. The accuracy instruction condition serves as the reference level:
+Drift depends on the instruction condition and on how far the black-to-white pixel configuration sits from 50/50 (`abs_xs`). Boundary separation and non-decision time depend on the instruction condition alone. The accuracy instruction condition serves as the reference level:
 
 | Coefficient | Meaning |
 | --- | --- |
-| `drift_Intercept` | drift for accuracy instructions with a 50/50 mix (`abs_xs` = 0) |
+| `drift_Intercept` | drift for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
 | `drift_instructionspeed` | **difference in drift** between speed and accuracy instructions |
-| `drift_abs_xs` | change in drift as the black-to-white mix moves away from the 50/50 mix |
-| `bound_Intercept` | log boundary for accuracy instructions with a 50/50 mix (`abs_xs` = 0) |
+| `drift_abs_xs` | change in drift as the pixel configuration moves away from 50/50 |
+| `bound_Intercept` | log boundary for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
 | `bound_instructionspeed` | **difference in log boundary** between speed and accuracy instructions |
-| `ndt_Intercept` | log non-decision time for accuracy instructions with a 50/50 mix (`abs_xs` = 0) |
+| `ndt_Intercept` | log non-decision time for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
 | `ndt_instructionspeed` | **difference in log non-decision time** between speed and accuracy instructions |
 
 : {tbl-colwidths="[34,66]"}
 
-As such, `exp(bound_Intercept)` and `exp(ndt_Intercept)` return the boundary and the non-decision time for the 50/50 mix under accuracy instructions, back on their original scale.
+As such, `exp(bound_Intercept)` and `exp(ndt_Intercept)` return the boundary and the non-decision time for a 50/50 pixel configuration under accuracy instructions, back on their original scale.
 
 ## Fit: load the cached model
 
@@ -183,7 +183,7 @@ ez_pars |>
   group_by(parameter) |> median_qi(value)
 ```
 
-The boundary is in arbitrary units of evidence. The non-decision time is in seconds. Drift is in evidence per second. In the table above, *drift, per unit |Xs|* is the change in drift for a one-unit step away from an even mix, and *drift, speed - accuracy* is the difference between speed and accuracy instructions.
+The boundary is in arbitrary units of evidence. The non-decision time is in seconds. Drift is in evidence per second. In the table above, *drift, per unit |Xs|* is the change in drift for a one-unit step away from a 50/50 pixel configuration, and *drift, speed - accuracy* is the difference between speed and accuracy instructions.
 
 ```{r}
 #| label: posterior-plot
@@ -208,7 +208,7 @@ We can test any coefficient with one line of code using the `hypothesis()` funct
 
 ```{r}
 #| label: hypotheses
-# Does drift increase as the mix moves away from even?
+# Does drift increase as the pixel configuration moves away from 50/50?
 hypothesis(fit_ez, "drift_abs_xs > 0")
 
 # Is the boundary lower under speed instructions?
@@ -221,7 +221,7 @@ How to read the two outputs:
 - **`Evid.Ratio`** is the posterior odds in favour of the inequality. **`Post.Prob`** is the share of draws that satisfy it.
 - **`Star`** marks a hypothesis whose interval excludes zero.
 
-In this fit, drift increases as the black-to-white mix moves away from the 50/50 mix, and the boundary is lower under speed instructions. Both intervals lie entirely on that side of zero. Speed instructions also come with a higher drift and a longer non-decision time.
+In this fit, drift increases as the black-to-white pixel configuration moves away from 50/50, and the boundary is lower under speed instructions. Both intervals lie entirely on that side of zero. Speed instructions also come with a higher drift and a longer non-decision time.
 
 ## Scaling up: trial-level DDM
 
@@ -280,7 +280,7 @@ if(file.exists(here("models", "ddm_trial.rds"))) {
 }
 ```
 
-The two fits agree that drift increases as the mix moves away from even (`drift_abs_xs` is about 1.13 in both) and that the boundary is lower under speed instructions. That boundary difference is smaller in the trial-level fit. Non-decision time does not agree: under speed instructions it is longer in the EZ fit and shorter in the trial-level fit. The trial-level model uses each response time. The EZ model uses the mean, the variance, and the number correct.
+The two fits agree that drift increases as the pixel configuration moves away from 50/50 (`drift_abs_xs` is about 1.13 in both) and that the boundary is lower under speed instructions. That boundary difference is smaller in the trial-level fit. Non-decision time does not agree: under speed instructions it is longer in the EZ fit and shorter in the trial-level fit. The trial-level model uses each response time. The EZ model uses the mean, the variance, and the number correct.
 
 ## Further reading
 
