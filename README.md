@@ -63,7 +63,7 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
 
 ⚠️ Part 1 (signal detection) currently needs the **development** version of
 bmm: `sdt_yn()` and `sdt_rating()` are not in the CRAN release yet. Install it
-with `remotes::install_github("venpopov/bmm")`. This goes away once the
+with `remotes::install_github("popov-lab/bmm@develop")`. This goes away once the
 release lands — see `models/README.md`.
 
 Once you have run the workshop's own notebooks, `examples/00_your_own_data.qmd`
@@ -117,7 +117,7 @@ fully rendered notebooks) — nothing to install, readable on any device.
   numbers.
 
 - **Two interactive beats, both cheap, both with static insurance.**
-  Part 1 uses them at `## Lower accuracy — but why?` (two shows of hands
+  Part 1 uses them at `## Why is accuracy lower?` (two shows of hands
   before the reveal, ~40 s) and at `## Specify: one formula per parameter`
   (live in the IDE, ~2:15). Both are documented in the deck's speaker notes
   with the exact sequence. The rule that makes a live demo safe: **never
@@ -128,7 +128,7 @@ fully rendered notebooks) — nothing to install, readable on any device.
   `hypothesis()` with any new expression (0.02 s), `spread_draws()` (0.03 s),
   `ranef()` (0.08 s), `fixef()`, `posterior_summary()`, `conditional_effects()`
   (0.9 s), and building a derived quantity from draws. Printing a model
-  object or `bmm::parameters()` is instant. Do **not** re-fit live: even a
+  object or `parameter_info()` is instant. Do **not** re-fit live: even a
   fast model prints sampler output and needs cmdstan.
 
 - **QR code.** `slides/images/qr_site.png` encodes the published site URL and
