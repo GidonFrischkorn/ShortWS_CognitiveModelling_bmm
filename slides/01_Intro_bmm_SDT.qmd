@@ -9,28 +9,10 @@ format:
     theme: [default, custom.scss]
 ---
 
-<!--
-Timing (target ~25 min talk; 30 min hard cap; leave room for questions):
-  min 9 — reach SDT divider | min 13 — hands-up beat | min 16 — Specify
-  min 18 — live IDE beat | min 23 — Evaluate | min 25 — FLEX go/no-go
-
-Two interactive beats, both rehearsed, both with static insurance in the deck:
-  - "Lower accuracy — but why?" — two shows of hands before the reveal (~0:40)
-  - "Specify: one formula per parameter" — live in the IDE: type bmf(), break
-    it with `dprime`, fix it with parameters() (~2:15). Next slide carries the
-    same error and fix baked in, so it is safe to abandon mid-demo.
-
-Cut ladder: (1) rating FLEX section -1:40; (2) live IDE beat, keep the static
-            "When it goes wrong" slide -2:15; (3) drop latent_sdt slide -0:45;
-            (4) merge t-test slide into question slide -0:45
-Never cut the hands-up beat — it costs 40 s and it is what makes the
-false-alarm reveal land.
--->
-
 ```{r}
 #| include: false
 library(bmm)
-library(brms)  # fixef(), hypothesis() — not re-exported by bmm
+library(brms)  # fixef(), hypothesis(): not re-exported by bmm
 library(tidyverse)
 library(tidybayes)
 source(here::here("_common.R"))  # wk_colors + theme_workshop()
@@ -38,13 +20,49 @@ source(here::here("_common.R"))  # wk_colors + theme_workshop()
 dat <- read.csv(here::here("data", "sdt_recognition.csv"))
 fit_sdt <- readRDS(here::here("models", "sdt_yn.rds"))
 fit_rating <- readRDS(here::here("models", "sdt_rating.rds"))
+
+# Proportions without the leading zero (APA style): 0.742 -> ".74"
+fmt_prop <- function(x) sub("^0\\.", ".", sprintf("%.2f", x))
+# Three decimals, never rounded up to 1: .9995 -> "> .999"
+fmt_prop3 <- function(x) {
+  if (x > 0.999) "> .999" else sub("^0\\.", ".", sprintf("%.3f", x))
+}
+
+item_colors <- c("new items" = wk_colors[["grey"]],
+                 "old items" = wk_colors[["blue"]])
 ```
 
 ## Why cognitive measurement models? {.section-divider}
 
+<!--
+Timing (target ~25 min talk; 30 min hard cap; leave room for questions):
+  min 9: reach SDT divider | min 13: hands-up beat | min 16: Specify
+  min 18: live IDE beat | min 23: Evaluate (+0:30 for the predictive
+  check) | min 25: FLEX go/no-go
+
+Two interactive beats, both rehearsed, both with static insurance in the deck:
+  - "Why is accuracy lower?": two shows of hands before the reveal (~0:40)
+  - "Specify: one formula per parameter": live in the IDE. Type bmf(), break
+    it with `dprime`, fix it with parameter_info() (~2:15). The next slide shows
+    the same error and fix, so the demo can be dropped at any point.
+
+Cut ladder: (1) rating FLEX section -1:40 (if cut, say one sentence on the
+            take-home slide: with confidence ratings the equal-variance
+            assumption fails and the d' difference becomes uncertain); (2) live IDE beat, keep the static
+            "A common first error" slide -2:15; (3) drop latent_sdt slide -0:45;
+            (4) merge t-test slide into question slide -0:45
+Never cut the hands-up beat. It costs 40 s, and it is what makes the
+false-alarm reveal land.
+
+Figure builds: a figure that builds up in steps is an .r-stack with one chunk
+per step. Every step draws the same plot with fixed coordinates and adds (or
+unhides) layers, so the stacked PNGs line up and only the new elements appear.
+The PNGs are opaque, so each step covers the one below it.
+-->
+
 ## The model you already use {.smaller}
 
-Regression, *t*-test, ANOVA — one model, three names:
+Regression, *t*-test, and ANOVA are the same model:
 
 ::: {.formula-box}
 $$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu = \beta_0 + \beta_1 X$$
@@ -52,7 +70,7 @@ $$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu = \beta_0 + \beta_1 X$$
 
 :::: {.columns}
 
-::: {.column width="50%"}
+::: {.column .fragment width="50%"}
 ```{r}
 #| echo: false
 #| fig-height: 3.6
@@ -70,7 +88,7 @@ ggplot(sim_cont, aes(x, y)) +
 ```
 :::
 
-::: {.column width="50%"}
+::: {.column .fragment width="50%"}
 ```{r}
 #| echo: false
 #| fig-height: 3.6
@@ -92,9 +110,9 @@ ggplot(sim_cat, aes(x, y)) +
 ::::
 
 ::: {.notes}
-You have fitted this model a thousand times without calling it a model. Same
-formula in both panels — only the predictor type changes. Everything in the
-next 30 minutes builds on this one move.
+Most of you fit this model all the time without calling it a model. Both
+panels use the same formula; only the type of predictor differs. The rest of
+the talk builds on this.
 :::
 
 ## Why that works: aggregation and the CLT {.smaller}
@@ -118,7 +136,7 @@ ggplot(trials, aes(rt)) +
 ```
 :::
 
-::: {.column width="50%"}
+::: {.column .fragment width="50%"}
 ```{r}
 #| echo: false
 #| fig-height: 3.6
@@ -137,33 +155,39 @@ ggplot(means, aes(m)) +
        title = "Means: Gaussian") +
   theme_workshop()
 ```
+
+::: {.small}
+Why means turn Gaussian: [3Blue1Brown, *But what is the Central Limit Theorem?*](https://www.youtube.com/watch?v=zeJD6dqJ5lo)
+:::
 :::
 
 ::::
 
-::: {.small}
-Why means turn Gaussian: [3blue1brown — *But what is the Central Limit Theorem?*](https://www.youtube.com/watch?v=zeJD6dqJ5lo)
-:::
-
 ::: {.fragment}
-**The Gaussian describes the summary — it is silent about the single trials
-and the processes that generated them.**
+The Gaussian describes the means. It says **nothing about the single trials**
+or the process that produced them.
 :::
 
 ::: {.notes}
-The CLT licenses the standard model: aggregate enough independent trials and
-the means go Gaussian no matter what the trials look like. That is exactly the
-problem — the model is equally coherent for any process that could have
-produced those means. Silence about the process is the price of aggregation.
+The CLT is what justifies the standard model: average enough independent
+trials and the means become Gaussian, whatever the single trials look like.
+However, that is also the problem. The same Gaussian fits any process that
+could have produced those means, so once we aggregate, the model can no
+longer tell us anything about the process.
+
+Second problem: a mean enters the t-test as if it were measured without
+error. A participant with 20 trials and one with 200 count the same.
+(Keep this for the Specify slide, where we aggregate ourselves.)
 :::
 
 ## Closer to the data: model the trials {.smaller}
 
-Single trials are not Gaussian — match the distribution to the data type:
+Single trials are not Gaussian, so we pick a distribution that fits the data
+type:
 
 :::: {.columns}
 
-::: {.column width="50%"}
+::: {.column .fragment width="50%"}
 ```{r}
 #| echo: false
 #| fig-height: 3
@@ -182,7 +206,7 @@ $$k \sim \text{Binomial}(n, p) \qquad \text{logit}(p) = \beta X$$
 :::
 :::
 
-::: {.column width="50%"}
+::: {.column .fragment width="50%"}
 ```{r}
 #| echo: false
 #| fig-height: 3
@@ -209,17 +233,18 @@ $$rt \sim \text{Lognormal}(\mu, \sigma) \qquad \mu = \beta X$$
 ::::
 
 ::: {.fragment}
-The right distribution for the data — **still silent about the process** that
-produced it.
+A better description of the data. Still, $p$ and $\mu$ say nothing about the
+process behind it.
 :::
 
 ::: {.notes}
-Same move as before: the distribution changed, the right-hand side did not —
-we still predict distribution parameters from predictors. But p and mu name no
-cognitive mechanism. Nothing here says memory, bias, or speed of processing.
+Same move as before: the distribution changed, the right-hand side did not.
+We still predict the parameters of a distribution from predictors. However,
+p and mu do not stand for any cognitive mechanism. Nothing here is memory,
+bias, or processing speed.
 :::
 
-## One principle all the way down
+## From regression to cognitive models
 
 ::: {.formula-box}
 $$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu \sim \text{predictors}$$
@@ -234,14 +259,14 @@ $$y \sim \textbf{cognitive model}(d', c, \ldots) \qquad d' \sim \text{predictors
 :::
 
 ::: {.fragment}
-The distribution changes — the move never does: **predict the parameters.**
+Only the distribution changes. We always **predict its parameters**.
 :::
 
 ::: {.notes}
-The whole pitch on one slide. A cognitive measurement model is a distribution
-whose parameters mean something: d' is memory, c is response bias. If you can
-write mu ~ condition, you can write d ~ condition. The formula work stays
-exactly what everyone already knows.
+This slide is the main argument of the talk. A cognitive measurement model is
+a distribution whose parameters have a psychological meaning: d' is memory
+strength, c is response bias. If you can write mu ~ condition, you can write
+d ~ condition. The formulas work exactly the way everyone already knows.
 :::
 
 ## bmm {.smaller}
@@ -256,23 +281,23 @@ exactly what everyone already knows.
 *Easy and Accessible Bayesian Measurement Models Using brms*
 
 ::: {.incremental}
-- Parameters with **theoretical meaning** — $d'$, capacity, drift rate
+- Parameters with **theoretical meaning**: $d'$, capacity, drift rate
 - Every parameter takes an **R formula**
-- **Hierarchical** estimation built in — participants, groups, items
-- brms + Stan under the hood — **you never write Stan**
+- **Hierarchical** estimation across participants, groups, and items
+- Runs on brms and Stan, but **you don't write Stan code**
 :::
 
-[venpopov.com/bmm](https://venpopov.com/bmm/)
+[popov-lab.github.io/bmm](https://popov-lab.github.io/bmm/)
 :::
 
 ::::
 
 ::: {.notes}
-The hook lives here, spoken: fitting these models used to mean hand-writing
-JAGS or Stan — a translation barrier that kept measurement models locked away
-from most labs. bmm removes it: pick the model, write the formula, brms and
-Stan do the rest. I co-develop the package with Ven Popov. The SDT models land
-on CRAN with the next release; today's fits use the development version.
+Say the motivation here: until recently, fitting these models meant writing
+JAGS or Stan code by hand, and that kept measurement models out of most labs.
+With bmm you pick the model and write the formula; brms and Stan do the rest.
+I develop the package together with Ven Popov. The SDT models come to CRAN
+with the next release; today's fits use the development version.
 :::
 
 ## Today: one workflow, three models
@@ -303,7 +328,7 @@ Adriana
 ::::
 
 ::: {.formula-box .fragment style="border-left: 6px solid #dc6800;"}
-**specify → fit → evaluate** — the same three moves, three times
+Each part follows the same steps: **specify → fit → evaluate**
 :::
 
 :::: {.columns .fragment}
@@ -314,8 +339,8 @@ Adriana
 
 ::: {.column width="80%"}
 ::: {.small}
-Everything is already online — slides, notebooks, data, readings. **Scan it
-now and put your phone away**: nothing today needs you to follow along on a
+Slides, notebooks, data, and readings are already online. **Scan the code
+now, then put your phone away**: nothing today requires following along on a
 screen.
 :::
 :::
@@ -323,14 +348,14 @@ screen.
 ::::
 
 ::: {.notes}
-Roadmap: recognition memory now, the memory measurement model next, response
-times with the diffusion model last. By the third round the workflow should
-feel boring — that is the point.
+Roadmap: recognition memory now, the memory measurement model next, and
+response times with the diffusion model last. By the third round the workflow
+should feel routine, and that is the goal.
 
-Say the phone line out loud and mean it. Give them ten seconds to scan, then
-explicitly tell them to put the phone down — an audience reading the notebook
-on a laptop follows neither the notebook nor you. The same QR comes back on
-the take-home slide, so nobody who misses it here loses anything.
+Say the phone line out loud. Give them ten seconds to scan, then tell them to
+put the phone away. People reading the notebook on a laptop end up following
+neither the notebook nor the talk. The same QR code is on the take-home
+slide, so nobody misses anything.
 :::
 
 ## Signal Detection Theory for recognition memory {.section-divider}
@@ -338,157 +363,301 @@ the take-home slide, so nobody who misses it here loses anything.
 ## Two distributions, one decision
 
 ```{r}
-#| echo: false
-#| fig-height: 4.8
-#| fig-alt: "Two overlapping evidence distributions for new and old items with a criterion line; the areas right of the criterion mark false alarms and hits, and the distance between the distribution means is labeled d-prime."
+#| include: false
 d <- 1.3
-crit   <- 0.15
+crit <- 0.15
 sdt_curves <- expand_grid(
   item = c("new items", "old items"),
   x    = seq(-3.5, 5, length.out = 400)
 ) |>
   mutate(dens = dnorm(x, mean = ifelse(item == "old items", d, 0)))
 
-ggplot(sdt_curves, aes(x, dens)) +
-  geom_area(data = ~ filter(.x, x >= crit), aes(fill = item),
-            alpha = 0.45, position = "identity") +
-  geom_line(aes(color = item), linewidth = 1.5) +
-  geom_vline(xintercept = crit, linewidth = 1.3,
-             color = wk_colors[["orange"]]) +
-  annotate("segment", x = 0, xend = d, y = 0.43, yend = 0.43,
-           linewidth = 1, color = "black",
-           arrow = arrow(ends = "both", length = unit(0.18, "cm"))) +
-  annotate("text", x = d / 2, y = 0.46, label = "d'", size = 7) +
-  annotate("text", x = -1.7, y = 0.31, label = "new items",
-           size = 6, color = wk_colors[["grey"]]) +
-  annotate("text", x = 3.1, y = 0.31, label = "old items",
-           size = 6, color = wk_colors[["blue"]]) +
-  annotate("text", x = crit, y = 0.51, label = "criterion c",
-           size = 6, hjust = -0.1, color = wk_colors[["orange"]]) +
-  annotate("text", x = 0.95, y = 0.04, label = "false alarms",
-           size = 5, color = "grey25") +
-  annotate("text", x = 2.4, y = 0.13, label = "hits",
-           size = 5, color = wk_colors[["blue"]]) +
-  scale_fill_manual(values = c("new items" = wk_colors[["grey"]],
-                               "old items" = wk_colors[["blue"]]),
-                    guide = "none") +
-  scale_color_manual(values = c("new items" = wk_colors[["grey"]],
-                                "old items" = wk_colors[["blue"]]),
-                     guide = "none") +
-  labs(x = "memory-strength evidence", y = NULL) +
-  theme_workshop() +
-  theme(axis.text.y = element_blank())
+# Three build steps of one figure. Fixed coordinates keep the panel identical
+# across steps; the conditional layers keep their original drawing order.
+sdt_plot <- function(show_d = FALSE, show_crit = FALSE) {
+  ggplot(sdt_curves, aes(x, dens)) +
+    (if (show_crit) geom_area(data = ~ filter(.x, x >= crit),
+                              aes(fill = item), alpha = 0.45,
+                              position = "identity")) +
+    geom_line(aes(color = item), linewidth = 1.5) +
+    (if (show_crit) geom_vline(xintercept = crit, linewidth = 1.3,
+                               color = wk_colors[["orange"]])) +
+    (if (show_d) list(
+      annotate("segment", x = 0, xend = d, y = 0.43, yend = 0.43,
+               linewidth = 1, color = "black",
+               arrow = arrow(ends = "both", length = unit(0.18, "cm"))),
+      annotate("text", x = d / 2, y = 0.46, label = "d'", size = 7)
+    )) +
+    annotate("text", x = -1.7, y = 0.31, label = "new items",
+             size = 6, color = wk_colors[["grey"]]) +
+    annotate("text", x = 3.1, y = 0.31, label = "old items",
+             size = 6, color = wk_colors[["blue"]]) +
+    (if (show_crit) list(
+      annotate("text", x = crit, y = 0.51, label = "criterion c",
+               size = 6, hjust = 1.1, color = wk_colors[["orange"]]),
+      annotate("text", x = 0.95, y = 0.04, label = "false alarms",
+               size = 5, color = "grey25"),
+      annotate("text", x = 2.4, y = 0.13, label = "hits",
+               size = 5, color = wk_colors[["blue"]])
+    )) +
+    scale_fill_manual(values = item_colors, guide = "none") +
+    scale_color_manual(values = item_colors, guide = "none") +
+    coord_cartesian(xlim = c(-3.5, 5), ylim = c(0, 0.51)) +
+    labs(x = "memory-strength evidence", y = NULL) +
+    theme_workshop() +
+    theme(axis.text.y = element_blank())
+}
 ```
 
-::: {.small}
-$d'$ — how far the distributions sit apart (memory) · $c$ — how much evidence
-it takes to say "old" (bias)
+:::: {.r-stack}
+
+```{r}
+#| label: sdt-dist
+#| echo: false
+#| fig-height: 4.3
+#| fig-alt: "Two overlapping evidence distributions, one for new items and one for old items shifted to the right."
+sdt_plot()
+```
+
+::: {.fragment fragment-index=1}
+```{r}
+#| label: sdt-dprime
+#| echo: false
+#| fig-height: 4.3
+#| fig-alt: "The same two evidence distributions with a double-headed arrow between their means, labeled d-prime."
+sdt_plot(show_d = TRUE)
+```
+:::
+
+::: {.fragment fragment-index=2}
+```{r}
+#| label: sdt-crit
+#| echo: false
+#| fig-height: 4.3
+#| fig-alt: "The two evidence distributions with d-prime marked and a criterion line; the areas right of the criterion are shaded and labeled false alarms and hits."
+sdt_plot(show_d = TRUE, show_crit = TRUE)
+```
+:::
+
+::::
+
+::: {.fragment fragment-index=1}
+- $d'$: separation of the two distributions
+:::
+
+::: {.fragment fragment-index=2}
+- $c$: how much evidence it takes to say "old"
 :::
 
 ::: {.notes}
-Every response the task records falls out of this picture: old item right of
-the criterion is a hit, new item right of it is a false alarm. Two numbers
-describe the whole observer — separation and threshold. Next slide moves the
+Three steps. First the two distributions: memory strength for new and for
+old items. Click: d', the distance between them. Click: the criterion. Every
+item to the right of it gets an "old" response, so old items right of the
+criterion are hits and new items right of it are false alarms. Two numbers
+describe the observer: separation and threshold. The next slide moves the
 threshold.
 :::
 
-## Move the criterion — accuracy moves, memory doesn't {.smaller}
+## Moving the criterion changes accuracy {.smaller}
 
-Same d' (memory), two criteria. Watch what moves — and what doesn't:
+Assume two people with the same memory strength but different criteria
+($c = 0$: halfway between the distributions; negative: says "old" more
+readily):
 
 ```{r}
-#| echo: false
-#| fig-height: 4.5
-#| fig-alt: "Two panels with identical new-item and old-item evidence distributions but different criterion placements; hit rate, false-alarm rate, and accuracy differ between panels although d-prime is identical."
+#| include: false
 d <- 1.3
-crit_demo <- expand_grid(
-  crit = c(0, -0.7),
-  item = c("new items", "old items"),
-  x    = seq(-3.5, 5, length.out = 400)
+crit_people <- tibble(
+  person = c("A", "B"),
+  bias   = c("neutral", "liberal"),
+  c      = c(0, -0.7)
 ) |>
   mutate(
-    dens = dnorm(x, mean = ifelse(item == "old items", d, 0)),
-    hr   = 1 - pnorm(crit, d, 1),
-    far  = 1 - pnorm(crit, 0, 1),
-    panel = sprintf("c = %.1f:  HR = %.2f, FAR = %.2f, accuracy = %.2f",
-                    crit, hr, far, (hr + (1 - far)) / 2),
-    panel = fct_reorder(panel, -crit)
+    # bmm's criterion is relative to the midpoint between the distributions
+    location = d / 2 + c,
+    hr  = 1 - pnorm(location, mean = d),
+    far = 1 - pnorm(location, mean = 0),
+    acc = (hr + (1 - far)) / 2,
+    title = sprintf("Person %s: %s (c = %s)", person, bias,
+                    sub("-", "−", sprintf("%g", c)))
   )
 
-ggplot(crit_demo, aes(x, dens)) +
-  geom_area(data = ~ filter(.x, x >= crit), aes(fill = item),
-            alpha = 0.4, position = "identity") +
-  geom_line(aes(color = item), linewidth = 1.2) +
-  geom_vline(aes(xintercept = crit), linewidth = 1.2,
-             color = wk_colors[["orange"]]) +
-  facet_wrap(~panel, ncol = 2) +
-  scale_fill_manual(values = c("new items" = wk_colors[["grey"]],
-                               "old items" = wk_colors[["blue"]]),
-                    guide = "none") +
-  scale_color_manual(values = c("new items" = wk_colors[["grey"]],
-                                "old items" = wk_colors[["blue"]]),
-                     guide = "none") +
-  labs(x = "memory-strength evidence", y = NULL) +
-  theme_workshop() +
-  theme(axis.text.y = element_blank())
+crit_plot <- function(who) {
+  p <- filter(crit_people, person == who)
+  ggplot(sdt_curves, aes(x, dens)) +
+    geom_area(data = ~ filter(.x, x >= p$location), aes(fill = item),
+              alpha = 0.4, position = "identity") +
+    geom_line(aes(color = item), linewidth = 1.2) +
+    geom_vline(xintercept = p$location, linewidth = 1.2,
+               color = wk_colors[["orange"]]) +
+    scale_fill_manual(values = item_colors, guide = "none") +
+    scale_color_manual(values = item_colors, guide = "none") +
+    labs(x = "memory-strength evidence", y = NULL, title = p$title) +
+    theme_workshop() +
+    theme(axis.text.y = element_blank())
+}
+
+rate_line <- function(who) {
+  p <- filter(crit_people, person == who)
+  sprintf("Hits %s · False alarms %s · Accuracy **%s**",
+          fmt_prop(p$hr), fmt_prop(p$far), fmt_prop(p$acc))
+}
 ```
 
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.fragment}
+```{r}
+#| label: crit-a
+#| echo: false
+#| fig-width: 5.5
+#| fig-height: 4.4
+#| fig-alt: "New-item and old-item evidence distributions with the criterion halfway between them; the areas right of the criterion are shaded."
+crit_plot("A")
+```
+:::
+
+::: {.fragment style="text-align: center;"}
+`r rate_line("A")`
+:::
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+```{r}
+#| label: crit-b
+#| echo: false
+#| fig-width: 5.5
+#| fig-height: 4.4
+#| fig-alt: "The same two distributions with the criterion shifted left of the midpoint; larger areas right of the criterion are shaded for both item types."
+crit_plot("B")
+```
+:::
+
+::: {.fragment style="text-align: center;"}
+`r rate_line("B")`
+:::
+:::
+
+::::
+
 ::: {.notes}
-d' is fixed at 1.3 — memory never changes on this slide. Left panel: neutral
-criterion. Right panel: liberal criterion — hits AND false alarms rise
-together, accuracy shifts. Everything an accuracy analysis sees just moved
-without any change in memory. Hold that thought for the real data.
+d' is 1.3 for both people, so their memory is identical. Person A has a
+neutral criterion, halfway between the distributions (c = 0). Person B has a
+liberal criterion (c = −0.7): hits and false alarms both go up, and accuracy
+drops. Everything an accuracy analysis sees has changed, although memory has
+not. The real data will show the same pattern.
 :::
 
 ## The data: recognition memory {.smaller}
 
-Koen, Aly, Wang, & Yonelinas (2013) — shipped with the MPTinR package:
+```{r}
+#| include: false
+n_per_cond <- dat |>
+  distinct(pid, condition) |>
+  count(condition) |>
+  pull(n) |>
+  unique()
+stopifnot(length(n_per_cond) == 1)  # the slide says "each"
+```
 
-- Study word lists → old/new recognition test with **6-point confidence
-  ratings** (1 = *sure new* … 6 = *sure old*)
-- Two **between-subjects** test conditions, 48 participants each:
-  - `full_attention` — test under full attention (Exp. 2)
-  - `immediate` — test immediately after study (Exp. 4)
-- 23,902 trials total; codebook in `data/README.md`
+Data from Koen, Aly, Wang, and Yonelinas (2013), available in the MPTinR
+package:
 
+::: {.incremental}
+- Participants studied word lists, then made old/new judgments on a **6-point
+  confidence scale** (1 = *sure new* … 6 = *sure old*)
+- Two **between-subjects** test conditions with `r n_per_cond` participants
+  each:
+  - `full_attention`: test under full attention (Exp. 2)
+  - `immediate`: test immediately after study (Exp. 4)
+- Old/new response: ratings 4 to 6 count as "old"
+- `r format(nrow(dat), big.mark = ",")` trials in total; codebook in
+  `data/README.md`
+:::
+
+::: {.fragment}
 ```{r}
 head(dat, 4)
 ```
+:::
 
 ::: {.notes}
-Same data as the Vuorre (2025) tutorial in resources/01_sdt (he uses the
-full-attention condition only) — attendees can read paper and notebook side
-by side. Binary response say_old = rating >= 4, following Koen et al.'s own
-first analysis.
+Same data as the Vuorre (2025) tutorial in resources/01_sdt, which uses only
+the full-attention condition, so attendees can read the paper and the
+notebook side by side. The binary response is say_old = rating >= 4,
+following Koen et al.'s own first analysis.
+
+If someone asks: the two conditions come from two experiments of the same
+paper, so the contrast is a demonstration, not a clean manipulation.
 :::
 
 ## See the data before any model
 
 ```{r}
+#| include: false
+pp_rates <- dat |>
+  summarise(p_yes = mean(say_old), .by = c(pid, condition, stimulus)) |>
+  pivot_wider(names_from = stimulus, values_from = p_yes)
+
+# Both steps plot all points; step 1 hides the immediate group via alpha, so
+# axes and legend stay identical.
+rates_plot <- function(show_imm = FALSE) {
+  ggplot(pp_rates, aes(new, old, color = condition, alpha = condition)) +
+    geom_abline(linetype = "dashed", color = wk_colors[["grey"]]) +
+    annotate("text", x = 0.86, y = 0.8, label = "chance", angle = 45,
+             size = 5, color = wk_colors[["grey"]]) +
+    geom_point(size = 3) +
+    scale_color_manual(
+      values = c(full_attention = wk_colors[["blue"]],
+                 immediate = wk_colors[["orange"]]),
+      labels = c(full_attention = "full attention", immediate = "immediate")
+    ) +
+    scale_alpha_manual(values = c(full_attention = 0.8,
+                                  immediate = if (show_imm) 0.8 else 0),
+                       guide = "none") +
+    guides(color = guide_legend(override.aes = list(alpha = 0.8))) +
+    coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+    labs(x = "False-alarm rate", y = "Hit rate", color = NULL) +
+    theme_workshop()
+}
+```
+
+:::: {.r-stack}
+
+```{r}
+#| label: rates-full
+#| echo: false
+#| fig-height: 5
+#| fig-alt: "Scatterplot of false-alarm rate against hit rate for participants in the full-attention condition, with the chance diagonal as a dashed line."
+rates_plot()
+```
+
+::: {.fragment}
+```{r}
+#| label: rates-both
 #| echo: false
 #| fig-height: 5
 #| fig-alt: "Scatterplot of false-alarm rate against hit rate per participant, colored by condition, with the chance diagonal as a dashed line."
-dat |>
-  summarise(p_yes = mean(say_old), .by = c(pid, condition, stimulus)) |>
-  pivot_wider(names_from = stimulus, values_from = p_yes) |>
-  ggplot(aes(new, old, color = condition)) +
-  geom_abline(linetype = "dashed", color = wk_colors[["grey"]]) +
-  geom_point(size = 3, alpha = 0.8) +
-  scale_color_manual(values = unname(wk_colors[c("blue", "orange")])) +
-  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-  labs(x = "False-alarm rate", y = "Hit rate", color = NULL) +
-  theme_workshop()
+rates_plot(show_imm = TRUE)
 ```
-
-::: {.notes}
-Everyone is above the diagonal (d' > 0). The orange cloud sits further
-right: more false alarms in the immediate condition. Two questions the
-model answers: how sensitive, and how biased — per person and per group.
 :::
 
-## The analysis you'd run anyway {.smaller}
+::::
 
-Proportion correct per participant — the model from the start of this session:
+::: {.notes}
+On entry: the full-attention group only. One point is one person. Everyone sits above the dashed
+diagonal, so every participant has d' > 0. Click: the immediate group. The
+orange cloud sits further to the right, which means more false alarms. The
+model answers two questions, for each person and each group: how sensitive,
+and how biased.
+:::
+
+## The standard analysis: proportion correct {.smaller}
+
+Proportion correct per participant, tested with the Gaussian model from the
+start of the session:
 
 :::: {.columns}
 
@@ -502,7 +671,7 @@ t.test(pc ~ condition, data = acc)
 ```
 :::
 
-::: {.column width="45%"}
+::: {.column .fragment width="45%"}
 ```{r}
 #| echo: false
 #| fig-height: 4.5
@@ -526,24 +695,16 @@ ggplot(acc, aes(condition, pc, color = condition)) +
 ::::
 
 ::: {.notes}
-Honest analysis, textbook result: about five points of accuracy, t around 4 —
-the exact Gaussian-on-a-summary model from the intro, and perfectly fine as
-far as it goes. Significant. Paper written? The next slide asks what this
-difference actually means.
+A standard analysis with a standard result: about five percentage points
+lower accuracy in the immediate group, t around 4. This is the Gaussian model
+on a summary score from the start of the talk, and it is fine as far as it
+goes. The difference is significant. The next slide asks what it means.
 :::
 
-## Lower accuracy — but *why*? {.question-slide}
+## Why is accuracy lower? {.question-slide}
 
-::: {.fragment}
-**Hands up.** Did the immediate group *remember less* — or were they simply
-*saying "old" more often*?
-:::
-
-::: {.fragment}
 ```{r}
-#| echo: false
-#| fig-height: 4
-#| fig-alt: "Dumbbell chart comparing the two conditions on hit rate and false-alarm rate: the hit-rate points nearly coincide while the false-alarm points sit far apart."
+#| include: false
 rates <- dat |>
   summarise(p_yes = mean(say_old), .by = c(pid, condition, is_old)) |>
   summarise(rate = mean(p_yes), .by = c(condition, is_old)) |>
@@ -554,58 +715,96 @@ rates <- dat |>
   )
 
 fa <- filter(rates, is_old == 0)
+hits <- filter(rates, is_old == 1)
 
-ggplot(rates, aes(rate, measure)) +
-  geom_line(aes(group = measure), linewidth = 1.2,
-            color = wk_colors[["grey"]]) +
-  geom_point(aes(color = condition), size = 6) +
-  geom_text(data = fa,
-            aes(label = condition, color = condition,
-                hjust = ifelse(condition == "immediate", -0.25, 1.25)),
-            size = 5.5, fontface = "bold") +
-  annotate("text", x = mean(fa$rate), y = 0.6,
-           label = "the whole accuracy difference lives here",
-           size = 5, color = wk_colors[["orange"]]) +
-  scale_color_manual(values = unname(wk_colors[c("blue", "orange")]),
-                     guide = "none") +
-  scale_x_continuous(limits = c(0, 1)) +
-  labs(x = "Proportion \"old\" responses", y = NULL) +
-  theme_workshop() +
-  theme(plot.background = element_rect(fill = "white", color = NA))
+# Both steps draw everything; step 1 hides the false-alarm row via alpha, so
+# the axes do not move between steps.
+dumbbell_plot <- function(show_fa = FALSE) {
+  fa_alpha <- if (show_fa) 1 else 0
+  ggplot(rates, aes(rate, measure)) +
+    geom_line(aes(group = measure, alpha = measure), linewidth = 1.2,
+              color = wk_colors[["grey"]]) +
+    geom_point(aes(color = condition, alpha = measure), size = 6) +
+    geom_text(data = hits,
+              aes(label = condition, color = condition,
+                  hjust = ifelse(condition == "immediate", -0.25, 1.25)),
+              size = 5.5, fontface = "bold") +
+    annotate("text", x = mean(fa$rate), y = 0.6,
+             label = "false alarms differ most",
+             size = 5, color = wk_colors[["orange"]], alpha = fa_alpha) +
+    scale_color_manual(values = c("full attention" = wk_colors[["blue"]],
+                                  immediate = wk_colors[["orange"]]),
+                       guide = "none") +
+    scale_alpha_manual(values = c("false-alarm rate" = fa_alpha,
+                                  "hit rate" = 1),
+                       guide = "none") +
+    scale_x_continuous(limits = c(0, 1)) +
+    labs(x = "Proportion \"old\" responses", y = NULL) +
+    theme_workshop() +
+    theme(plot.background = element_rect(fill = "white", color = NA))
+}
+```
+
+::: {.fragment}
+**Hands up:** Did the immediate group *remember less*, or did they *say "old"
+more often*?
+:::
+
+:::: {.r-stack}
+
+::: {.fragment}
+```{r}
+#| label: dumbbell-hits
+#| echo: false
+#| fig-height: 3.4
+#| fig-alt: "Hit rates of the two conditions on one row: the two points nearly coincide."
+dumbbell_plot()
 ```
 :::
 
 ::: {.fragment}
-Worse memory — or a more liberal criterion? **Proportion correct cannot tell
-you.**
+```{r}
+#| label: dumbbell-fa
+#| echo: false
+#| fig-height: 3.4
+#| fig-alt: "Dumbbell chart comparing the two conditions on hit rate and false-alarm rate: the hit-rate points nearly coincide while the false-alarm points sit far apart."
+dumbbell_plot(show_fa = TRUE)
+```
+:::
+
+::::
+
+::: {.fragment}
+Worse memory, a more liberal criterion, or both? **Proportion correct cannot
+tell them apart.**
 :::
 
 ::: {.notes}
-*** PREDICT-BEFORE-REVEAL (~40 s). Reveal fragment 1, then actually ask for
-two shows of hands and WAIT — count them out loud, name the split ("okay,
-mostly memory, a few of you on bias"). Only then reveal the figure. The
-point is that everyone in the room has now committed to an answer, so the
-data lands on a prediction instead of on nothing. Do not skip the waiting;
-the silence is the method. ***
+*** PREDICT-BEFORE-REVEAL (~40 s). Reveal the question, then actually ask for
+two shows of hands and WAIT. Count them out loud and name the split ("okay,
+mostly memory, a few of you on bias"). Only then reveal the hit rates, and
+then the false alarms. Everyone in the room has now committed to an answer,
+so the data meets a prediction. Do not skip the waiting. ***
 
-Hit rates are practically identical — the immediate group even sits a touch
-higher. The entire accuracy drop is false alarms. You saw a criterion shift
-do exactly this two slides ago: bias moves hits and false alarms together,
-and here it masks whatever happened to memory. Neither show of hands was
-wrong, which is the real punchline — proportion correct cannot separate
-them. To do that we need the model, and that is what bmm is for.
+Hit rates are practically identical; the immediate group is even slightly
+higher. The whole accuracy drop comes from false alarms. A criterion shift
+did exactly this on the "Moving the criterion" slide: bias moves hits and
+false alarms together, and here it hides whatever happened to memory.
+Neither show of hands was wrong. Proportion correct simply cannot separate
+the two explanations. For that we need the model, which is what bmm is for.
 :::
 
-## Specify, fit, evaluate — with bmm {.section-divider}
+## Specify, fit, evaluate with bmm {.section-divider}
 
-The same three moves you will see for the M3 and the DDM.
+The same three steps come back for the M3 and the DDM.
 
 ## Specify: choose the model {.smaller}
 
-`sdt_yn()` wants counts per participant × stimulus class — three lines
-of dplyr away from the raw trials:
+`sdt_yn()` needs counts per participant and stimulus type. One `summarise()`
+gets us there:
 
 ```{r}
+#| results: hold
 #| code-line-numbers: "1-5|7-8"
 binary_counts <- dat |>
   summarise(n_old    = sum(say_old),
@@ -618,16 +817,23 @@ sdt_model <- sdt_yn(response = "n_old", stimulus = "is_old",
 ```
 
 ::: {.notes}
-The model object knows its parameters (d, criterion, and sdratio held
-fixed at 0 — that is the equal-variance assumption), its data requirements,
-and its default priors. Printing it in the console shows all three, and the
-next slide but one does exactly that live.
+The model object knows its parameters (d, criterion, and sdratio, which is
+fixed at 0: the equal-variance assumption), its data requirements, and its
+default priors. Printing it in the console shows all three; the live demo on
+the next slide does that.
+
+Say it here, because someone will notice that we just aggregated after
+criticizing aggregation: we keep the number of trials next to every count.
+A proportion correct in a t-test is treated as a noise-free value. The count
+with its n_trials goes into a binomial likelihood, so the model knows that
+88 out of 100 is less certain than 880 out of 1000, and that uncertainty
+travels through to d', c, and every test.
 :::
 
 ## Specify: one formula per parameter {.smaller}
 
-The formula addresses the **model parameters by name** — how does each
-parameter vary over conditions and participants?
+Each formula names a **model parameter** and says how it varies across
+conditions and participants:
 
 ```{r}
 #| eval: false
@@ -638,87 +844,99 @@ fit_sdt <- bmm(
     criterion ~ 1 + condition + (1 | pid)
   ),
   data  = binary_counts,
-  model = sdt_model
+  model = sdt_model,
+  sample_prior = "yes"  # needed for Bayes factors later
 )
 ```
 
-`bmf()` = "bmm formula": one ordinary R formula per parameter. `(1 | pid)`
-is the same random-effect syntax as `lme4` or `brms`.
+`bmf()` collects one ordinary R formula per parameter. `(1 | pid)` is the
+same random-effect syntax as in `lme4` and `brms`.
 
+::: {.fragment}
 | Coefficient | Meaning |
 | --- | --- |
 | `d_Intercept` | $d'$, full-attention group |
-| `d_conditionimmediate` | **difference in $d'$** |
+| `d_conditionimmediate` | **difference in $d'$** (immediate − full) |
 | `criterion_Intercept` | criterion $c$, full-attention group |
-| `criterion_conditionimmediate` | **difference in $c$** |
-
-::: {.notes}
-Punchline: everything attendees know about R formulas transfers —
-interactions, covariates, random effects — but the left-hand side is a
-cognitive parameter, not the raw response. This is the single most
-important slide of the segment.
-
-*** LIVE IDE BEAT (~2 min) — alt-tab to examples/01_sdt.qmd, run from the
-top so the objects exist BEFORE the talk starts. Rehearsed sequence:
-
-  1. Type the bmf() call and print it — the formula is a thing you make.
-  2. Break it on purpose: change `d` to `dprime` and run. Error in 0.1 s:
-     "Unrecognized model parameters: 'dprime'". Read it out loud. Say:
-     this is the error you will get, and it is telling you exactly what
-     is wrong.
-  3. Fix it by asking the package: `parameters(sdt_model)` lists the
-     legal names with descriptions. Change it back. Done.
-
-Do NOT run bmm() for real. If anything at all misbehaves, hit Escape and
-advance — the next slide has the same error and fix baked in. ***
+| `criterion_conditionimmediate` | **difference in $c$** (immediate − full) |
 :::
 
-## When it goes wrong (it will) {.smaller}
+::: {.notes}
+Main point: everything attendees know about R formulas carries over
+(interactions, covariates, random effects), but the left-hand side is a
+cognitive parameter, not the raw response. This is the most important slide
+of the segment. Walk through the code, then show the table.
 
-The formula's left-hand side must name a **parameter of the model** — the
-most common first error, and the message says so:
+*** LIVE IDE BEAT (~2 min). Switch to examples/01_sdt.qmd, which you ran
+from the top BEFORE the talk so the objects exist. Rehearsed sequence:
+
+  1. Type the bmf() call and print it: the formula is an object you create.
+  2. Break it on purpose: change `d` to `dprime` and run. The error appears
+     at once: "Unrecognized model parameters: 'dprime'", followed by the
+     names the model does have. Read it out loud.
+     Say: this is the error you will get, and it tells you exactly what is
+     wrong.
+  3. Point out that the error already lists the valid names. For the
+     descriptions, ask the package: `parameter_info(sdt_model)`. Change it
+     back.
+
+Do NOT run bmm() for real. If anything misbehaves, press Escape and advance;
+the next slide shows the same error and fix. ***
+:::
+
+## A common first error {.smaller}
+
+The left-hand side of each formula must be a **model parameter**. If it is
+not, the error message says so:
 
 ```{r}
 #| eval: false
 bmf(dprime ~ 1 + condition)   # dprime? d? What are the names?
-#> Error: Unrecognized model parameters: 'dprime'
+#> Error: Unrecognized model parameters: 'dprime'. Signal Detection
+#> Theory (Yes/No) has the parameters 'd', 'criterion', 'sdratio'
 ```
 
 ::: {.fragment}
-Ask the model rather than guessing — every bmm model documents itself:
+The error already names the valid parameters. For what each one means, ask
+the model:
 
 ```{r}
 #| eval: false
-bmm::parameters(sdt_model)
+parameter_info(sdt_model)
 ```
 
 ```{r}
 #| echo: false
-bmm::parameters(sdt_model) |>
+# Plain-language gloss of the package descriptions: in the development
+# version, the one for d opens with "d_a", a term this talk only reaches on
+# the rating slide.
+plain <- c(d = "sensitivity d′", criterion = "response bias c",
+           sdratio = "spread of old vs. new items (equal by default)")
+parameter_info(sdt_model) |>
   as.data.frame() |>
   transmute(
     Parameter    = sprintf("`%s`", parameter),
-    `What it is` = sub(":.*", "", description),
-    Estimated    = ifelse(fixed, sprintf("no — fixed at %s", value), "yes")
+    `What it is` = plain[parameter],
+    Estimated    = ifelse(fixed, sprintf("no (fixed at %s)", value), "yes")
   ) |>
   knitr::kable()
 ```
 :::
 
 ::: {.notes}
-The point is not the typo. It is that a bmm error names the thing that is
-wrong, and that parameters() answers it without leaving the console. The
-attendee who watches an expert hit an error and treat it as information is
-the one who does not give up on their own first error at 11pm.
+The typo is not the point. The point is that the bmm error names what is
+wrong and lists the right answer, and parameter_info() explains each name
+without leaving the console. Attendees who see an error treated as
+information are less likely to give up at their own first error.
 
-Why the bmm:: prefix — tidybayes also exports a parameters(), and whichever
-package is attached last wins. Worth one sentence if it comes up: this is an
-ordinary R masking clash, not a bmm quirk, and bmm:: settles it.
+"Estimated: no (fixed at 0)" for sdratio is the equal-variance assumption:
+the old-item and new-item distributions have the same spread. The rating
+model at the end frees it.
 :::
 
 ## Fit: load the cached model {.smaller}
 
-Fitted once, shipped in `models/` — at the workshop we only load:
+We fitted the model once and saved it in `models/`. Here we only load it:
 
 ```{r}
 #| code-line-numbers: "1"
@@ -727,58 +945,158 @@ fixef(fit_sdt) |> round(2)
 ```
 
 ::: {.incremental}
-- Lower $d'$ in the immediate group — the memory difference is **real**
-- **And** a negative criterion shift — more liberal, which is what propped
-  up their hit rate
+- `Q2.5` to `Q97.5`: the range of plausible values (95% interval, next
+  section); `sdratio` is fixed at 0 (equal spread)
+- Lower $d'$ in the immediate group: a **memory** difference
+- **And** a lower criterion: they say "old" more readily, which keeps their
+  hit rate up. **Both**, then.
 :::
 
 ::: {.notes}
-Both at once: accuracy mashed the two effects together, the model pulls them
-apart. Full attention: d' about 1.45, criterion near zero. Immediate: d'
-lower by about 0.3, criterion shifted left by about 0.2. If anyone asks about
-the sdratio row of exact zeros: that is the equal-variance assumption, held
-fixed rather than estimated — the rating model at the end frees it.
+Both effects at once: accuracy mixed them together, the model separates them.
+Full attention: d' about 1.45, criterion near zero. Immediate: d' lower by
+about 0.3, criterion shifted left by about 0.2. If anyone asks about the
+sdratio row of exact zeros: that is the equal-variance assumption, fixed
+rather than estimated. The rating model at the end estimates it.
 :::
 
 ## Evaluate: posteriors and tests {.section-divider}
 
-The posterior draws of the coefficients *are* draws of the SDT parameters.
+Every result from here on summarizes one distribution per parameter.
+
+```{r}
+#| include: false
+# Posterior predictive check: 50 datasets simulated from the fit, as
+# per-participant "old" rates, against the observed rates. Rows of
+# posterior_predict() follow fit_sdt$data.
+set.seed(2026)
+ppc_rows <- fit_sdt$data |>
+  as_tibble() |>
+  mutate(row = row_number(),
+         measure = ifelse(is_old == 1, "hit rate", "false-alarm rate"))
+ppc_sim <- posterior_predict(fit_sdt, ndraws = 50) |>
+  as_tibble(.name_repair = ~ as.character(seq_along(.x))) |>
+  mutate(draw = row_number()) |>
+  pivot_longer(-draw, names_to = "row", values_to = "n_old",
+               names_transform = as.integer) |>
+  left_join(select(ppc_rows, row, n_trials, measure), by = "row") |>
+  mutate(rate = n_old / n_trials)
+ppc_obs <- mutate(ppc_rows, rate = n_old / n_trials)
+```
+
+::: {.fragment}
+```{r}
+#| label: ppc
+#| echo: false
+#| fig-height: 3.2
+#| fig-alt: "Posterior predictive check: densities of per-participant false-alarm and hit rates in 50 datasets simulated from the fitted model, drawn as thin grey lines, closely surround the density of the observed rates, drawn as a thick blue line."
+ggplot(ppc_sim, aes(rate)) +
+  geom_density(aes(group = draw), color = wk_colors[["grey"]],
+               alpha = 0.3, linewidth = 0.4) +
+  geom_density(data = ppc_obs, color = wk_colors[["blue"]], linewidth = 1.6) +
+  facet_wrap(~ measure, scales = "free") +
+  labs(x = "Proportion \"old\" responses per participant", y = NULL) +
+  theme_workshop() +
+  theme(axis.text.y = element_blank(),
+        plot.background = element_rect(fill = "white", color = NA))
+```
+
+First check: data simulated from the fit (grey) look like the real data
+(blue).
+:::
+
+::: {.notes}
+On entry: the line on screen, then click. Before we interpret anything, we
+check that the model describes the data. bmm simulates new datasets from the
+fitted model (grey lines, 50 of them) and we lay the real data on top
+(blue). If the blue line sat outside the grey band, we would stop here. In
+code this is posterior_predict() on the fit; pp_check() gives a quick
+version, and the notebook has both.
+
+Be honest if asked: with two numbers per person (hit rate, false-alarm
+rate) and two parameters per person (d', c), the yes/no model can reproduce
+any person. So this check catches a broken fit (sampler, data coding), not a
+wrong theory. The confidence ratings are where SDT can fail, and the rating
+model at the end tests exactly that.
+:::
 
 ## What a Bayesian fit gives you {.smaller}
 
-No *p*-value to unpack — the fit returns a **distribution of plausible
-values** for every parameter:
+Instead of a point estimate and a *p*-value, the fit gives a **distribution of
+plausible values** for each parameter:
 
 ```{r}
-#| echo: false
-#| fig-height: 4
-#| fig-alt: "Posterior distribution of d-prime in the full-attention group shown as a halfeye plot, with the 95 percent credible interval marked below the density."
+#| include: false
 post_d <- fit_sdt |> spread_draws(b_d_Intercept)
+d_mid <- median(post_d$b_d_Intercept)
 
-ggplot(post_d, aes(b_d_Intercept)) +
-  stat_halfeye(fill = wk_colors[["blue"]], alpha = 0.8, .width = 0.95) +
-  annotate("text", x = median(post_d$b_d_Intercept), y = 0.45,
-           label = "each value: a plausible d'", size = 5.5,
-           color = "white", fontface = "bold") +
-  annotate("text", x = median(post_d$b_d_Intercept), y = -0.12,
-           label = "95% credible interval", size = 5,
-           color = wk_colors[["grey"]]) +
-  coord_cartesian(ylim = c(-0.2, 1.05)) +
-  labs(x = "d' (full attention)", y = NULL) +
-  theme_workshop() +
-  theme(axis.text.y = element_blank())
+# stat_halfeye() split into its slab and interval, so the interval can come
+# second; fixed coordinates keep both steps aligned.
+post_plot <- function(show_ci = FALSE) {
+  ggplot(post_d, aes(b_d_Intercept)) +
+    stat_slab(fill = wk_colors[["blue"]], alpha = 0.8) +
+    (if (show_ci) stat_pointinterval(.width = 0.95, alpha = 0.8)) +
+    annotate("text", x = d_mid, y = 0.45,
+             label = "each value: a plausible d'", size = 5.5,
+             color = "white", fontface = "bold") +
+    (if (show_ci) annotate("text", x = d_mid, y = -0.12,
+                           label = "95% credible interval", size = 5,
+                           color = wk_colors[["grey"]])) +
+    coord_cartesian(ylim = c(-0.2, 1.05)) +
+    labs(x = "d' (full attention)", y = NULL) +
+    theme_workshop() +
+    theme(axis.text.y = element_blank())
+}
 ```
 
+:::: {.r-stack}
+
+```{r}
+#| label: post-slab
+#| echo: false
+#| fig-height: 4
+#| fig-alt: "Posterior distribution of d-prime in the full-attention group shown as a density."
+post_plot()
+```
+
+::: {.fragment}
+```{r}
+#| label: post-interval
+#| echo: false
+#| fig-height: 4
+#| fig-alt: "Posterior distribution of d-prime in the full-attention group with the 95 percent credible interval marked below the density."
+post_plot(show_ci = TRUE)
+```
+:::
+
+::::
+
 ::: {.notes}
-Forty-five seconds of Bayes, all we need today: wider = less certain; the bar
-below the density is the 95% credible interval. Every plot and test that
-follows is a summary of this object — no p-values, no sampler talk.
+Forty-five seconds of Bayes is all we need today. First the distribution:
+every value under the curve is a plausible d', and a wider curve means more
+uncertainty. The fit stores these as 4,000 draws, each one plausible set
+of parameter values. Click: the bar below is the 95% credible interval: the
+95% most plausible values, read the way you wish a confidence interval
+could be read. Priors: bmm sets default priors for every parameter, and you
+can see and change them; the notebook shows how. Every plot
+and test that follows summarizes this object, with no p-values and no
+sampler details.
 :::
 
 ## Condition-specific parameters {.smaller}
 
+::: {.fragment .semi-fade-out fragment-index=1}
+1. Extract the posterior draws and compute $d'$ and $c$ for each condition
+:::
+
+::: {.fragment .semi-fade-in fragment-index=1}
+2. Plot these draws with ggplot
+:::
+
 ```{r}
 #| output-location: slide
+#| code-line-numbers: "1-9|11-21"
+#| class-source: code-small
 #| fig-height: 4.5
 #| fig-alt: "Posterior distributions of d-prime and criterion for the full-attention and immediate conditions, shown as halfeye plots."
 sdt_pars <- fit_sdt |>
@@ -804,31 +1122,94 @@ sdt_pars |>
   theme_workshop()
 ```
 
+```{=html}
+<script>
+// Quarto's line-highlight plugin reads data-fragment-index only from the
+// <code> element (attributes set in markdown land on the wrapper div). Setting
+// it here, before reveal.js starts, puts the second highlight step on the same
+// click as step 2 of the numbered list.
+document
+  .querySelectorAll("#condition-specific-parameters div.sourceCode code")
+  .forEach((code) => code.setAttribute("data-fragment-index", "1"));
+</script>
+```
+
+::: {.notes}
+Say it out loud: nobody needs to follow every line now; the notebook has the
+same code. Step 1 pulls the posterior draws and turns the coefficients into
+d' and c per condition. Click: step 2 plots those draws.
+:::
+
 ## Testing differences is one line {.smaller}
 
-Condition differences are *coefficients on the parameters*:
+Condition differences are coefficients on the parameters, so we can test them
+directly:
 
 ```{r}
-hypothesis(fit_sdt, "d_conditionimmediate = 0")
+#| results: hide
+hyp <- hypothesis(fit_sdt, c("d_conditionimmediate = 0",
+                             "criterion_conditionimmediate < 0"))
 ```
 
 ```{r}
-hypothesis(fit_sdt, "criterion_conditionimmediate < 0")
+#| include: false
+# The slide shows a readable digest of hyp$hypothesis. Estimates and 95%
+# intervals come from fixef() (hypothesis() gives a one-sided interval for
+# "< 0"). For "= 0", Evid.Ratio is the Bayes factor FOR the null, so the
+# evidence for a difference is its inverse.
+fe <- fixef(fit_sdt)
+hyp_tab <- tibble(
+  Question = c("Does $d'$ differ?", "Is $c$ lower (more liberal)?"),
+  Estimate = sprintf("%.2f", fe[c("d_conditionimmediate",
+                                  "criterion_conditionimmediate"), "Estimate"]),
+  `95% interval` = sprintf("[%.2f, %.2f]",
+    fe[c("d_conditionimmediate", "criterion_conditionimmediate"), "Q2.5"],
+    fe[c("d_conditionimmediate", "criterion_conditionimmediate"), "Q97.5"]),
+  Evidence = c(
+    sprintf("Bayes factor %.0f : 1 for a difference",
+            1 / hyp$hypothesis$Evid.Ratio[1]),
+    sprintf("probability %s that it is lower",
+            fmt_prop3(hyp$hypothesis$Post.Prob[2]))
+  )
+) |>
+  mutate(across(Estimate:`95% interval`, ~ gsub("-", "−", .x)))
 ```
+
+::: {.fragment}
+```{r}
+#| echo: false
+knitr::kable(hyp_tab, align = "lccl")
+```
+:::
 
 ::: {.fragment .small}
-The liberal criterion is *why* hit rates looked identical — bias masked the
+The liberal criterion explains why hit rates looked the same: the bias hid the
 memory difference.
 :::
 
 ::: {.notes}
-Punchline: testing "does the model parameter differ between groups" is the
-same move as testing a regression slope. The immediate group is less
-sensitive AND more liberal — two psychologically distinct effects the
-model separates, where raw accuracy confounds them.
+Main point: testing whether a model parameter differs between groups works
+exactly like testing a regression slope. The immediate group is less
+sensitive and more liberal. These are two psychologically distinct effects;
+the model separates them, whereas raw accuracy mixes them.
+
+How to read the table: "= 0" asks whether there is a difference at all; the
+Bayes factor says how much more likely the data are with a difference than
+without one. "< 0" asks about a direction; the probability is the share of
+plausible values below zero. The raw hypothesis() output has the same
+numbers under the names Evid.Ratio and Post.Prob. For the "= 0" row,
+Evid.Ratio is the Bayes factor for NO difference, so invert it. The notebook
+shows the raw output. The Bayes factor needs prior draws, which is what
+sample_prior = "yes" in the bmm() call was for.
+
+If someone asks "why not compute d' per person by hand and run a t-test?":
+for these data you would get a similar answer. The model adds three things:
+no ad-hoc fixes when a hit or false-alarm rate is 0 or 1, uncertainty that
+carries into everything computed from the parameters, and the same workflow
+for models without a hand formula, which is what the next two parts show.
 :::
 
-## The model draws its own textbook figure {.smaller}
+## Latent distributions from the fit {.smaller}
 
 ```{r}
 #| fig-height: 4.5
@@ -837,22 +1218,23 @@ plot(latent_sdt(fit_sdt))
 ```
 
 ::: {.notes}
-latent_sdt() reconstructs the latent decision-variable view from the
-posterior — the figure every SDT lecture draws by hand, now with credible
-bands. roc_sdt()/auc_sdt() give the ROC version; both are in the notebook.
+latent_sdt() rebuilds the latent evidence distributions from the posterior.
+This is the figure every SDT lecture draws by hand, here with credible bands.
+roc_sdt() and auc_sdt() give the ROC version; both are in the notebook.
 :::
 
 ## Extension: rating-scale SDT {.section-divider}
 
-Same workflow, richer data — the 6-point ratings, not the binary split.
+Same workflow, richer data: the full 6-point ratings instead of the old/new
+split.
 
 <!-- FLEX MATERIAL: designated cut if the segment runs long (go/no-go at min 22). -->
 
 ## Ratings: more criteria, same axis {.smaller}
 
-`sdt_rating()` places 5 confidence thresholds on the latent evidence axis
-— and the ratings let us free the signal-SD ratio (**unequal-variance
-SDT**, the very phenomenon Koen et al. studied):
+`sdt_rating()` places 5 confidence thresholds on the latent evidence axis.
+The ratings also let us estimate the ratio of signal to noise SD
+(**unequal-variance SDT**), which is what Koen et al. studied:
 
 ```{r}
 #| eval: false
@@ -869,19 +1251,23 @@ fit_rating <- bmm(
 )
 ```
 
+::: {.fragment}
 ```{r}
 fixef(fit_rating) |> round(2)
 ```
+:::
 
 ::: {.notes}
-Same formula language, two more parameter lines. sdratio is on the log
-scale, so exp(0.35) ≈ 1.4: the old-item distribution is wider — the classic
-asymmetric recognition ROC. Two nuances worth saying out loud. Once sdratio
-is free, bmm's d is d_a rather than d' — they coincide only under equal
-variance, which is what the yes/no model assumed for us. And the sensitivity
-difference points the same way but its CI now touches zero — estimates
-depend on the measurement
-model, which is why you state the model explicitly.
+Same formula language, two more parameter lines. sdratio is on the log scale,
+so exp(0.35) ≈ 1.4: the old-item distribution is wider, which produces the
+classic asymmetric recognition ROC. Two points worth saying out loud. First,
+once sdratio is estimated, bmm's d is d_a rather than d'. The two coincide
+only under equal variance, which the yes/no model assumed. summary() of
+this fit prints that note itself, and sdt_sensitivity() converts d_a to d'
+(both in the notebook). Second, the
+sensitivity difference points the same way, but its credible interval now
+includes zero. Estimates depend on the measurement model, which is why you
+state the model explicitly.
 :::
 
 ## Take-home {.section-divider .smaller}
@@ -889,15 +1275,18 @@ model, which is why you state the model explicitly.
 :::: {.columns}
 
 ::: {.column width="64%"}
-- **Raw accuracy confounds** sensitivity and bias — the model separates them
-- **The thread:** the model defines the parameters; the formula says how they
-  vary; the posterior answers your question
-- `examples/01_sdt.qmd` — this analysis start to finish, plus `roc_sdt()`
+::: {.incremental}
+- **Accuracy mixes** sensitivity and bias; the model separates them
+- **The workflow:** the model defines the parameters, the formula says how
+  they vary, and the posterior answers your question
+- `examples/01_sdt.qmd`: this analysis from start to finish, plus `roc_sdt()`
   and `auc_sdt()`
-- **`examples/00_your_own_data.qmd` — which model fits *your* paradigm, what
-  shape your data needs, and what breaks first**
-- Data, codebook and readings: all on the site
-- Next: the same three moves with the M3 (Chenyu)
+- **`examples/00_your_own_data.qmd`**: which model fits your paradigm, what
+  shape your data needs, and what usually goes wrong first
+- **Your own fits** need bmm from GitHub and a Stan toolchain: step by step
+  in `00_your_own_data.qmd`
+- Next: the same three steps with the M3 (Chenyu)
+:::
 :::
 
 ::: {.column width="36%"}
@@ -913,8 +1302,9 @@ Slides · notebooks · data · readings\
 ::::
 
 ::: {.notes}
-Leave this slide up through the questions — it is the one people photograph.
-Say the your-own-data notebook out loud: it is the bridge from "nice demo"
-to "my dataset", and it is the only thing here that answers "is my paradigm
-even covered".
+Reveal all points before the questions start, then leave the slide up; people
+photograph it. Mention the
+your-own-data notebook explicitly. It connects the demo to the attendees' own
+datasets, and it is the only material here that answers "is my paradigm
+covered?".
 :::
