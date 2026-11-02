@@ -23,6 +23,14 @@ for (p in pkgs) {
   }
 }
 
+# The SDT models of Part 1 (and their post-processing) arrived in bmm 1.4.1.
+if (requireNamespace("bmm", quietly = TRUE) &&
+    utils::packageVersion("bmm") < "1.4.1") {
+  cat(sprintf("  %s bmm %s is too old -- the workshop needs 1.4.1 or newer: install.packages(\"bmm\")\n",
+              fail, as.character(utils::packageVersion("bmm"))))
+  problems <- problems + 1L
+}
+
 cat("\n== Checking pre-fitted models ==\n")
 if (!dir.exists("models")) {
   cat(sprintf("  %s models/ folder not found -- are you in the workshop folder?\n", fail),

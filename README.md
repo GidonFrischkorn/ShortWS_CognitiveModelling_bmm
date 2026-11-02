@@ -61,10 +61,8 @@ no prior exposure to Bayesian modeling, Stan, or brms is assumed.
    pre-fitted models load and tells you that you're ready.
 5. Start with the notebooks in `examples/`.
 
-⚠️ Part 1 (signal detection) currently needs the **development** version of
-bmm: `sdt_yn()` and `sdt_rating()` are not in the CRAN release yet. Install it
-with `remotes::install_github("popov-lab/bmm@develop")`. This goes away once the
-release lands — see `models/README.md`.
+All three parts run on the CRAN release of bmm (version 1.4.1 or newer, on
+CRAN since October 2026); no development version is needed.
 
 Once you have run the workshop's own notebooks, `examples/00_your_own_data.qmd`
 is the one to read next: which bmm model fits your paradigm, what shape your
@@ -83,6 +81,9 @@ fully rendered notebooks) — nothing to install, readable on any device.
 - **Follow the shared skeleton.** Every segment uses the same section order —
   model intuition → see the data → specify → fit → evaluate → extension →
   take-home — so attendees see the identical workflow three times. The
+  slides of the three bmm steps carry the shared *specify · fit · evaluate*
+  marker above their title (one line per slide; pattern and rules in
+  `slides/00_template.qmd`, "Workflow markers"). The
   *extension* section is the designated flex material: the schedule has no
   buffer, so draft it to be cuttable live without breaking the storyline.
 - **Use the shared plot style.** `source(here::here("_common.R"))` in a

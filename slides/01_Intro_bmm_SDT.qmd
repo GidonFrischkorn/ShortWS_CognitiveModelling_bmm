@@ -294,8 +294,8 @@ d ~ condition. The formulas work exactly the way everyone already knows.
 Say the motivation here: until recently, fitting these models meant writing
 JAGS or Stan code by hand, and that kept measurement models out of most labs.
 With bmm you pick the model and write the formula; brms and Stan do the rest.
-I develop the package together with Ven Popov. The SDT models come to CRAN
-with the next release; today's fits use the development version.
+I develop the package together with Ven Popov. The SDT models are on CRAN
+since bmm 1.4.1 (October 2026); everything today runs on that release.
 :::
 
 ## Today: one workflow, three models
@@ -326,7 +326,8 @@ Adriana
 ::::
 
 ::: {.formula-box .fragment style="border-left: 6px solid #dc6800;"}
-Each part follows the same steps: **specify → fit → evaluate**
+Each part follows the same steps: **specify → fit → evaluate**\
+Look for this marker above the slide titles: [[specify]{.on} · fit · evaluate]{.track .inline}
 :::
 
 :::: {.columns .fragment}
@@ -444,7 +445,7 @@ sdt_plot(show_d = TRUE, show_crit = TRUE)
 :::
 
 ::: {.fragment fragment-index=2}
-- $c$: how much evidence it takes to say "old"
+- $c$: how much evidence it takes to say "old", counted from the new-item mean
 :::
 
 ::: {.notes}
@@ -452,15 +453,17 @@ Three steps. First the two distributions: memory strength for new and for
 old items. Click: d', the distance between them. Click: the criterion. Every
 item to the right of it gets an "old" response, so old items right of the
 criterion are hits and new items right of it are false alarms. Two numbers
-describe the observer: separation and threshold. The next slide moves the
+describe the observer: separation and threshold. The threshold is measured
+from the mean of the new-item distribution, which is where bmm puts it too:
+c = 0 is a criterion right at the new-item mean. The next slide moves the
 threshold.
 :::
 
 ## Moving the criterion changes accuracy {.smaller}
 
-Assume two people with the same memory strength but different criteria
-($c = 0$: halfway between the distributions; negative: says "old" more
-readily):
+Assume two people with the same memory strength ($d' = 1.3$) but different
+criteria. $c$ counts from the new-item mean, so $c = d'/2 = 0.65$ sits halfway
+between the distributions; a lower $c$ says "old" more readily:
 
 ```{r}
 #| include: false
@@ -468,11 +471,11 @@ d <- 1.3
 crit_people <- tibble(
   person = c("A", "B"),
   bias   = c("neutral", "liberal"),
-  c      = c(0, -0.7)
+  c      = c(0.65, -0.05)
 ) |>
   mutate(
-    # bmm's criterion is relative to the midpoint between the distributions
-    location = d / 2 + c,
+    # bmm's criterion is measured from the mean of the new-item distribution
+    location = c,
     hr  = 1 - pnorm(location, mean = d),
     far = 1 - pnorm(location, mean = 0),
     acc = (hr + (1 - far)) / 2,
@@ -528,7 +531,7 @@ crit_plot("A")
 #| echo: false
 #| fig-width: 5.5
 #| fig-height: 4.4
-#| fig-alt: "The same two distributions with the criterion shifted left of the midpoint; larger areas right of the criterion are shaded for both item types."
+#| fig-alt: "The same two distributions with the criterion shifted left to the new-item mean; larger areas right of the criterion are shaded for both item types."
 crit_plot("B")
 ```
 :::
@@ -542,9 +545,9 @@ crit_plot("B")
 
 ::: {.notes}
 d' is 1.3 for both people, so their memory is identical. Person A has a
-neutral criterion, halfway between the distributions (c = 0). Person B has a
-liberal criterion (c = −0.7): hits and false alarms both go up, and accuracy
-drops. Everything an accuracy analysis sees has changed, although memory has
+neutral criterion, halfway between the distributions (c = 0.65, half of d').
+Person B has a liberal criterion (c = −0.05, right at the new-item mean):
+hits and false alarms both go up, and accuracy drops. Everything an accuracy analysis sees has changed, although memory has
 not. The real data will show the same pattern.
 :::
 
@@ -793,10 +796,12 @@ the two explanations. For that we need the model, which is what bmm is for.
 :::
 
 ## Specify, fit, evaluate with bmm {.section-divider}
+[[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
 The same three steps come back for the M3 and the DDM.
 
-## Specify: choose the model {.smaller}
+## Choose the model {.smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 `sdt_yn()` needs counts per participant and stimulus type. One `summarise()`
 gets us there:
@@ -828,7 +833,8 @@ with its n_trials goes into a binomial likelihood, so the model knows that
 travels through to d', c, and every test.
 :::
 
-## Specify: one formula per parameter {.smaller}
+## One formula per parameter {.smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 Each formula names a **model parameter** and says how it varies across
 conditions and participants:
@@ -855,7 +861,7 @@ same random-effect syntax as in `lme4` and `brms`.
 | --- | --- |
 | `d_Intercept` | $d'$, full-attention group |
 | `d_conditionimmediate` | **difference in $d'$** (immediate − full) |
-| `criterion_Intercept` | criterion $c$, full-attention group |
+| `criterion_Intercept` | criterion $c$, full-attention group (from the new-item mean) |
 | `criterion_conditionimmediate` | **difference in $c$** (immediate − full) |
 :::
 
@@ -865,11 +871,19 @@ Main point: everything attendees know about R formulas carries over
 cognitive parameter, not the raw response. This is the most important slide
 of the segment. Walk through the code, then show the table.
 
+If someone asks about `bias` (it shows up in the parameter list on the next
+slide): same boundary, measured from the midpoint between the distributions
+instead of the new-item mean, so 0 means neutral. Write one of the two in
+the formula, never both. We use `criterion`, the one the false-alarm rate
+depends on alone.
+
 *** LIVE IDE BEAT (~2 min). Switch to examples/01_sdt.qmd, which you ran
 from the top BEFORE the talk so the objects exist. Rehearsed sequence:
 
   1. Type the bmf() call and print it: the formula is an object you create.
-  2. Break it on purpose: change `d` to `dprime` and run. The error appears
+  2. Break it on purpose: change `d` to `dprime` and run
+     bmm_data_check(formula, data = binary_counts, model = sdt_model). It
+     runs bmm's checks without compiling anything, and the hard check fails
      at once: "Unrecognized model parameters: 'dprime'", followed by the
      names the model does have. Read it out loud.
      Say: this is the error you will get, and it tells you exactly what is
@@ -883,15 +897,19 @@ the next slide shows the same error and fix. ***
 :::
 
 ## A common first error {.smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
-The left-hand side of each formula must be a **model parameter**. If it is
-not, the error message says so:
+The left-hand side of each formula must be a **model parameter**.
+`bmm_data_check()` runs bmm's checks on formula and data without compiling
+anything, and if a name is wrong, it says so:
 
 ```{r}
 #| eval: false
-bmf(dprime ~ 1 + condition)   # dprime? d? What are the names?
-#> Error: Unrecognized model parameters: 'dprime'. Signal Detection
-#> Theory (Yes/No) has the parameters 'd', 'criterion', 'sdratio'
+bmm_data_check(bmf(dprime ~ 1 + condition),   # dprime? d? What are the names?
+               data = binary_counts, model = sdt_model)
+#> Hard checks:
+#>   ! FAILED: Unrecognized model parameters: 'dprime'. Signal Detection
+#>     Theory (Yes/No) has the parameters 'd', 'criterion', 'bias', 'sdratio'
 ```
 
 ::: {.fragment}
@@ -905,10 +923,11 @@ parameter_info(sdt_model)
 
 ```{r}
 #| echo: false
-# Plain-language gloss of the package descriptions: in the development
-# version, the one for d opens with "d_a", a term this talk only reaches on
-# the rating slide.
-plain <- c(d = "sensitivity d′", criterion = "response bias c",
+# Plain-language gloss of the package descriptions: in bmm 1.4.1 the one
+# for d opens with "d_a", a term this talk only reaches on the rating slide.
+plain <- c(d = "sensitivity d′",
+           criterion = "criterion c, counted from the new-item mean",
+           bias = "the same boundary, counted from the midpoint; use one of the two",
            sdratio = "spread of old vs. new items (equal by default)")
 parameter_info(sdt_model) |>
   as.data.frame() |>
@@ -926,13 +945,16 @@ The typo is not the point. The point is that the bmm error names what is
 wrong and lists the right answer, and parameter_info() explains each name
 without leaving the console. Attendees who see an error treated as
 information are less likely to give up at their own first error.
+bmm_data_check() is also the first thing to run on your own data: it reports
+how the model reads the response and the predictors before anything compiles.
 
 "Estimated: no (fixed at 0)" for sdratio is the equal-variance assumption:
 the old-item and new-item distributions have the same spread. The rating
 model at the end frees it.
 :::
 
-## Fit: load the cached model {.smaller}
+## Load the cached fit {.smaller}
+[specify · [fit]{.on} · evaluate]{.track}
 
 We fitted the model once and saved it in `models/`. Here we only load it:
 
@@ -945,20 +967,26 @@ fixef(fit_sdt) |> round(2)
 ::: {.incremental}
 - `Q2.5` to `Q97.5`: the range of plausible values (95% interval, next
   section); `sdratio` is fixed at 0 (equal spread)
+- Full attention: $c \approx d'/2$, the criterion sits halfway, **unbiased**
 - Lower $d'$ in the immediate group: a **memory** difference
-- **And** a lower criterion: they say "old" more readily, which keeps their
-  hit rate up. **Both**, then.
+- **And** a lower criterion: more false alarms. $d'$ and $c$ drop together,
+  so the hit rate hardly moves. **Both**, then.
 :::
 
 ::: {.notes}
 Both effects at once: accuracy mixed them together, the model separates them.
-Full attention: d' about 1.45, criterion near zero. Immediate: d' lower by
-about 0.3, criterion shifted left by about 0.2. If anyone asks about the
-sdratio row of exact zeros: that is the equal-variance assumption, fixed
-rather than estimated. The rating model at the end estimates it.
+Full attention: d' 1.45, criterion 0.70, close to d'/2 = 0.73: these people
+sit about halfway between the distributions, near unbiased. Immediate: d'
+lower by 0.28, criterion lower by 0.34. The criterion drop is larger than the
+d' drop, so the boundary moved closer to the new-item mean: more false alarms,
+and a hit rate that stays put because d' − c hardly changed (0.75 vs 0.81).
+If anyone asks about the sdratio row of exact zeros: that is the
+equal-variance assumption, fixed rather than estimated. The rating model at
+the end estimates it.
 :::
 
-## Evaluate: posteriors and tests {.section-divider}
+## Posteriors and tests {.section-divider}
+[specify · fit · [evaluate]{.on}]{.track}
 
 Every result from here on summarizes one distribution per parameter.
 
@@ -1019,6 +1047,7 @@ model at the end tests exactly that.
 :::
 
 ## What a Bayesian fit gives you {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
 
 Instead of a point estimate and a *p*-value, the fit gives a **distribution of
 plausible values** for each parameter:
@@ -1082,6 +1111,7 @@ sampler details.
 :::
 
 ## Condition-specific parameters {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ::: {.fragment .semi-fade-out fragment-index=1}
 1. Extract the posterior draws and compute $d'$ and $c$ for each condition
@@ -1139,6 +1169,7 @@ d' and c per condition. Click: step 2 plots those draws.
 :::
 
 ## Testing differences is one line {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
 
 Condition differences are coefficients on the parameters, so we can test them
 directly:
@@ -1208,6 +1239,7 @@ for models without a hand formula, which is what the next two parts show.
 :::
 
 ## Latent distributions from the fit {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| fig-height: 4.5
@@ -1222,6 +1254,7 @@ roc_sdt() and auc_sdt() give the ROC version; both are in the notebook.
 :::
 
 ## Extension: rating-scale SDT {.section-divider}
+[[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
 Same workflow, richer data: the full 6-point ratings instead of the old/new
 split.
@@ -1229,6 +1262,7 @@ split.
 <!-- FLEX MATERIAL: designated cut if the segment runs long (go/no-go at min 22). -->
 
 ## Ratings: more criteria, same axis {.smaller}
+[[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
 `sdt_rating()` places 5 confidence thresholds on the latent evidence axis.
 The ratings also let us estimate the ratio of signal to noise SD
@@ -1257,8 +1291,9 @@ fixef(fit_rating) |> round(2)
 
 ::: {.notes}
 Same formula language, two more parameter lines. sdratio is on the log scale,
-so exp(0.35) ≈ 1.4: the old-item distribution is wider, which produces the
-classic asymmetric recognition ROC. Two points worth saying out loud. First,
+so exp(0.36) ≈ 1.4: the old-item distribution is wider, which produces the
+classic asymmetric recognition ROC. The criterion is now the middle one of
+the five thresholds, still counted from the new-item mean. Two points worth saying out loud. First,
 once sdratio is estimated, bmm's d is d_a rather than d'. The two coincide
 only under equal variance, which the yes/no model assumed. summary() of
 this fit prints that note itself, and sdt_sensitivity() converts d_a to d'
@@ -1268,7 +1303,7 @@ includes zero. Estimates depend on the measurement model, which is why you
 state the model explicitly.
 :::
 
-## Take-home {.section-divider .smaller}
+## Take-home {.section-divider .take-home .smaller}
 
 :::: {.columns}
 
@@ -1281,8 +1316,8 @@ state the model explicitly.
   and `auc_sdt()`
 - **`examples/00_your_own_data.qmd`**: which model fits your paradigm, what
   shape your data needs, and what usually goes wrong first
-- **Your own fits** need bmm from GitHub and a Stan toolchain: step by step
-  in `00_your_own_data.qmd`
+- **Your own fits** need bmm ≥ 1.4.1 from CRAN and a Stan toolchain:
+  `bmm_setup()` checks your machine, `00_your_own_data.qmd` walks you through
 - Next: the same three steps with the M3 (Chenyu)
 :::
 :::

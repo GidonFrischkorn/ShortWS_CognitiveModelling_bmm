@@ -255,6 +255,72 @@ $code-block-font-size: 0.65em;
   font-size: 0.7em;
 }
 
+// Workflow track: SPECIFY · FIT · EVALUATE above the slide title, the active
+// step(s) in blue and the rest grey, so attendees always know which of the
+// three bmm steps a slide belongs to. Markup, one line right after the
+// heading (any number of steps can be .on):
+//   ## Choose the model {.smaller}
+//   [[specify]{.on} · fit · evaluate]{.track}
+// Pattern reference: slides/00_template.qmd ("Workflow markers").
+.reveal .slides section > p:has(> .track) {
+  margin: 0;
+  height: 0;
+}
+
+.reveal .slides section:has(> p > .track) > h2 {
+  padding-top: 0.55em;
+}
+
+.reveal .slides section .track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $uzh-gray;
+  line-height: 1;
+
+  .on {
+    color: $uzh-blue;
+  }
+}
+
+// White variant on the blue divider and question slides.
+.reveal .slides section.section-divider .track,
+.reveal .slides section.question-slide .track {
+  color: rgba(255, 255, 255, 0.5);
+
+  .on {
+    color: $uzh-white;
+  }
+}
+
+// Inline code on a blue take-home divider (`{.section-divider .take-home}`):
+// blue on white, so file names and function names stay legible.
+.reveal .slide.section-divider.take-home code {
+  color: $uzh-blue;
+  background-color: $uzh-white;
+  padding: 0.08em 0.35em;
+  border-radius: 4px;
+}
+
+// Inline variant: the same marker shown in running text (the roadmap slide
+// that introduces it), not positioned.
+.reveal .slides section .track.inline {
+  position: static;
+  display: inline-block;
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+
+.reveal .slides section > p:has(> .track.inline) {
+  height: auto;
+  margin: 0.5em 0;
+}
+
 .smaller {
   font-size: 0.55em;
 }

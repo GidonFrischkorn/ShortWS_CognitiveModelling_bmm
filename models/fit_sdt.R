@@ -1,12 +1,16 @@
 # Fit the two Part-1 SDT models with bmm and cache them in models/
 # (naming contract in models/README.md).
 #
-# The SDT models (sdt_yn, sdt_rating + post-processing toolkit) are new in
-# bmm and not in the CRAN version yet (1.3.1 has no SDT models), so this
-# script needs the development version (develop branch of popov-lab/bmm;
-# fits last refreshed 2026-10-05 against 1.3.2.9000 at origin/develop
-# 1625e860). Once the release is out, install bmm from CRAN instead and
-# re-fit (version contract in models/README.md).
+# Needs bmm >= 1.4.1 from CRAN (released 2026-10-16): that release carries
+# sdt_yn(), sdt_rating() and the SDT post-processing toolkit. Fits refreshed
+# 2026-11-02 against bmm 1.4.1 / brms 2.23.0 (version contract in
+# models/README.md).
+#
+# Two names for the decision criterion since bmm 1.4.1: `criterion` is
+# measured from the mean of the noise (new-item) distribution, so the
+# false-alarm rate depends on it alone; `bias` is the same boundary measured
+# from the midpoint between the two means (0 = neutral). The workshop uses
+# `criterion`. Write one of the two in the formula, never both.
 #
 # Run from the repo root: Rscript models/fit_sdt.R
 #
@@ -15,12 +19,8 @@
 # in the model changed, e.g. a bmm release that leaves the Stan code as it
 # is, delete models/sdt_*.rds or set file_refit = "always".
 
-# parameter_info() and the default random-effect SD priors arrived in the
-# same develop cycle as the reviewed SDT models; an older dev build has
-# sdt_yn() but neither.
-if (!"parameter_info" %in% getNamespaceExports("bmm")) {
-  remotes::install_github("popov-lab/bmm@develop", upgrade = "never")
-}
+stopifnot("bmm >= 1.4.1 from CRAN is required (install.packages('bmm'))" =
+            packageVersion("bmm") >= "1.4.1")
 
 library(bmm)
 library(tidyverse)
