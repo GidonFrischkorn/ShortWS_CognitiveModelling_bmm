@@ -1,10 +1,13 @@
 ---
 title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
-subtitle: "Part 1: The bmm Workflow & Signal Detection Theory"
-author: "Gidon T. Frischkorn"
-institute: "University of Zurich"
+subtitle: "Psychonomic Society Annual Meeting 2026, San Diego"
+author: "Gidon T. Frischkorn, Chenyu Li & Adriana F. Chávez De la Peña"
 date: "November 2026"
-format: revealjs
+date-format: "MMMM YYYY"
+format:
+  revealjs:
+    template-partials:
+      - partials/title-slide.html
 ---
 
 ```{r}
@@ -28,14 +31,25 @@ fmt_prop3 <- function(x) {
 
 item_colors <- c("new items" = wk_colors[["grey"]],
                  "old items" = wk_colors[["blue"]])
+
+# Evidence-axis plots: no grid, no y axis, just the x axis (slides 10, 11, 26)
+theme_sdt_axis <- function() {
+  theme(panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        axis.line.x = element_line(colour = "grey40"))
+}
 ```
 
-## Why cognitive measurement models? {.section-divider}
+## Part 1: The bmm Workflow & Signal Detection Theory {.section-divider}
+
+Gidon T. Frischkorn · University of Zurich
+
+First: why model the cognitive process at all?
 
 <!--
 Timing (target ~25 min talk; 30 min hard cap; leave room for questions):
-  min 9: reach SDT divider | min 13: hands-up beat | min 16: Specify
-  min 18: live IDE beat | min 23: Evaluate (+0:30 for the predictive
+  min 8: reach SDT divider | min 12: hands-up beat | min 15: Specify
+  min 17: live IDE beat | min 22: Evaluate (+0:30 for the predictive
   check) | min 25: FLEX go/no-go
 
 Two interactive beats, both rehearsed, both with static insurance in the deck:
@@ -44,7 +58,7 @@ Two interactive beats, both rehearsed, both with static insurance in the deck:
     it with `dprime`, fix it with parameter_info() (~2:15). The next slide shows
     the same error and fix, so the demo can be dropped at any point.
 
-Cut ladder: (1) rating FLEX section -1:40 (if cut, say one sentence on the
+Cut ladder: (1) rating FLEX section -1:00 (if cut, say one sentence on the
             take-home slide: with confidence ratings the equal-variance
             assumption fails and the d' difference becomes uncertain); (2) live IDE beat, keep the static
             "A common first error" slide -2:15; (3) drop latent_sdt slide -0:45;
@@ -113,75 +127,10 @@ panels use the same formula; only the type of predictor differs. The rest of
 the talk builds on this.
 :::
 
-## Why that works: aggregation and the CLT {.smaller}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-```{r}
-#| echo: false
-#| fig-height: 3.6
-#| fig-alt: "Right-skewed histogram of single-trial response times with the mean marked by a dashed line."
-set.seed(42)
-trials <- tibble(rt = rlnorm(200, log(0.7), 0.5))
-
-ggplot(trials, aes(rt)) +
-  geom_histogram(bins = 30, fill = wk_colors[["grey"]], color = "white") +
-  geom_vline(xintercept = mean(trials$rt), linetype = "dashed",
-             linewidth = 1.2, color = wk_colors[["orange"]]) +
-  labs(x = "RT (s)", y = NULL, title = "Single trials: skewed") +
-  theme_workshop()
-```
-:::
-
-::: {.column .fragment width="50%"}
-```{r}
-#| echo: false
-#| fig-height: 3.6
-#| fig-alt: "Approximately normal histogram of per-participant mean response times with a normal density curve overlaid."
-set.seed(42)
-means <- tibble(m = replicate(500, mean(rlnorm(50, log(0.7), 0.5))))
-norm_curve <- tibble(m = seq(min(means$m), max(means$m), length.out = 200)) |>
-  mutate(dens = dnorm(m, mean(means$m), sd(means$m)))
-
-ggplot(means, aes(m)) +
-  geom_histogram(aes(y = after_stat(density)), bins = 30,
-                 fill = wk_colors[["blue"]], color = "white") +
-  geom_line(data = norm_curve, aes(m, dens), linewidth = 1.3,
-            color = wk_colors[["orange"]]) +
-  labs(x = "Mean RT over 50 trials (s)", y = NULL,
-       title = "Means: Gaussian") +
-  theme_workshop()
-```
-
-::: {.small}
-Why means turn Gaussian: [3Blue1Brown, *But what is the Central Limit Theorem?*](https://www.youtube.com/watch?v=zeJD6dqJ5lo)
-:::
-:::
-
-::::
-
-::: {.fragment}
-The Gaussian describes the means. It says **nothing about the single trials**
-or the process that produced them.
-:::
-
-::: {.notes}
-The CLT is what justifies the standard model: average enough independent
-trials and the means become Gaussian, whatever the single trials look like.
-However, that is also the problem. The same Gaussian fits any process that
-could have produced those means, so once we aggregate, the model can no
-longer tell us anything about the process.
-
-Second problem: a mean enters the t-test as if it were measured without
-error. A participant with 20 trials and one with 200 count the same.
-(Keep this for the Specify slide, where we aggregate ourselves.)
-:::
-
 ## Closer to the data: model the trials {.smaller}
 
-Single trials are not Gaussian, so we pick a distribution that fits the data
-type:
+Means look Gaussian. Single trials do not, so we pick a distribution that fits
+the data type:
 
 :::: {.columns}
 
@@ -200,7 +149,7 @@ ggplot(binom_pmf, aes(k, p)) +
 ```
 
 ::: {.formula-box}
-$$k \sim \text{Binomial}(n, p) \qquad \text{logit}(p) = \beta X$$
+**Binomial** · `probability correct ~ condition`
 :::
 :::
 
@@ -224,36 +173,39 @@ ggplot(rt_trials, aes(rt)) +
 ```
 
 ::: {.formula-box}
-$$rt \sim \text{Lognormal}(\mu, \sigma) \qquad \mu = \beta X$$
+**Lognormal** · `typical RT ~ condition`
 :::
 :::
 
 ::::
 
 ::: {.fragment}
-A better description of the data. Still, $p$ and $\mu$ say nothing about the
-process behind it.
+A better description of the data. Still, a probability and a typical RT say
+nothing about the process behind them.
 :::
 
 ::: {.notes}
-Same move as before: the distribution changed, the right-hand side did not.
-We still predict the parameters of a distribution from predictors. However,
-p and mu do not stand for any cognitive mechanism. Nothing here is memory,
-bias, or processing speed.
+Why not stay with the t-test on means? Because the Gaussian describes the
+means and nothing else: the same bell curve fits any process that could have
+produced those means. Same move as before: the distribution changed, the
+right-hand side did not. We still predict the parameters of a distribution
+from predictors, in the formula language everyone knows. However, a
+probability and a typical RT do not stand for any cognitive mechanism.
+Nothing here is memory, bias, or processing speed.
 :::
 
 ## From regression to cognitive models
 
 ::: {.formula-box}
-$$y \sim \text{Normal}(\mu, \sigma) \qquad\qquad \mu \sim \text{predictors}$$
+**Normal** · `mean ~ condition`
 :::
 
 ::: {.formula-box .fragment}
-$$y \sim \text{Binomial}(p) \qquad\qquad \text{logit}(p) \sim \text{predictors}$$
+**Binomial** · `probability ~ condition`
 :::
 
 ::: {.formula-box .fragment style="border-left: 6px solid #dc6800;"}
-$$y \sim \textbf{cognitive model}(d', c, \ldots) \qquad d' \sim \text{predictors} \qquad c \sim \text{predictors}$$
+**Cognitive model** · `d' ~ condition` · `c ~ condition`
 :::
 
 ::: {.fragment}
@@ -300,26 +252,29 @@ since bmm 1.4.1 (October 2026); everything today runs on that release.
 
 ## Today: one workflow, three models
 
-:::: {.columns}
+:::: {.columns .model-boxes}
 
 ::: {.column width="33%"}
 ::: {.formula-box}
 **Signal Detection**\
-Gidon
+old/new responses\
+[Gidon]{.speaker}
 :::
 :::
 
 ::: {.column width="33%"}
 ::: {.formula-box}
 **M3**\
-Chenyu
+which option is chosen\
+[Chenyu]{.speaker}
 :::
 :::
 
 ::: {.column width="33%"}
 ::: {.formula-box}
 **EZ-DDM**\
-Adriana
+choices and response times\
+[Adriana]{.speaker}
 :::
 :::
 
@@ -333,7 +288,7 @@ Look for this marker above the slide titles: [[specify]{.on} · fit · evaluate]
 :::: {.columns .fragment}
 
 ::: {.column width="20%"}
-![](images/qr_site.png){fig-alt="QR code linking to the workshop website" width="76%"}
+![](images/qr_site.png){fig-alt="QR code linking to the workshop website" width="60%"}
 :::
 
 ::: {.column width="80%"}
@@ -363,21 +318,22 @@ slide, so nobody misses anything.
 
 ```{r}
 #| include: false
-d <- 1.3
-crit <- 0.15
+d <- 2
+crit <- 1
 sdt_curves <- expand_grid(
   item = c("new items", "old items"),
-  x    = seq(-3.5, 5, length.out = 400)
+  x    = seq(-3.5, 5.5, length.out = 400)
 ) |>
   mutate(dens = dnorm(x, mean = ifelse(item == "old items", d, 0)))
 
-# Three build steps of one figure. Fixed coordinates keep the panel identical
+# Four build steps of one figure. Fixed coordinates keep the panel identical
 # across steps; the conditional layers keep their original drawing order.
-sdt_plot <- function(show_d = FALSE, show_crit = FALSE) {
+sdt_plot <- function(show_d = FALSE, show_crit = FALSE, show_hits = FALSE) {
+  shaded <- c(if (show_crit) "new items", if (show_hits) "old items")
   ggplot(sdt_curves, aes(x, dens)) +
-    (if (show_crit) geom_area(data = ~ filter(.x, x >= crit),
-                              aes(fill = item), alpha = 0.45,
-                              position = "identity")) +
+    (if (length(shaded)) geom_area(data = ~ filter(.x, x >= crit, item %in% shaded),
+                                   aes(fill = item), alpha = 0.45,
+                                   position = "identity")) +
     geom_line(aes(color = item), linewidth = 1.5) +
     (if (show_crit) geom_vline(xintercept = crit, linewidth = 1.3,
                                color = wk_colors[["orange"]])) +
@@ -387,24 +343,24 @@ sdt_plot <- function(show_d = FALSE, show_crit = FALSE) {
                arrow = arrow(ends = "both", length = unit(0.18, "cm"))),
       annotate("text", x = d / 2, y = 0.46, label = "d'", size = 7)
     )) +
-    annotate("text", x = -1.7, y = 0.31, label = "new items",
+    annotate("text", x = -1.6, y = 0.31, label = "new items",
              size = 6, color = wk_colors[["grey"]]) +
-    annotate("text", x = 3.1, y = 0.31, label = "old items",
+    annotate("text", x = 3.6, y = 0.31, label = "old items",
              size = 6, color = wk_colors[["blue"]]) +
     (if (show_crit) list(
       annotate("text", x = crit, y = 0.51, label = "criterion c",
                size = 6, hjust = 1.1, color = wk_colors[["orange"]]),
-      annotate("text", x = 0.95, y = 0.04, label = "false alarms",
-               size = 5, color = "grey25"),
-      annotate("text", x = 2.4, y = 0.13, label = "hits",
-               size = 5, color = wk_colors[["blue"]])
+      annotate("text", x = 1.75, y = 0.035, label = "false alarms",
+               size = 5, color = "grey25")
     )) +
+    (if (show_hits) annotate("text", x = 2.75, y = 0.15, label = "hits",
+                             size = 5, color = wk_colors[["blue"]])) +
     scale_fill_manual(values = item_colors, guide = "none") +
     scale_color_manual(values = item_colors, guide = "none") +
-    coord_cartesian(xlim = c(-3.5, 5), ylim = c(0, 0.51)) +
+    coord_cartesian(xlim = c(-3.5, 5.5), ylim = c(0, 0.51)) +
     labs(x = "memory-strength evidence", y = NULL) +
     theme_workshop() +
-    theme(axis.text.y = element_blank())
+    theme_sdt_axis()
 }
 ```
 
@@ -433,8 +389,18 @@ sdt_plot(show_d = TRUE)
 #| label: sdt-crit
 #| echo: false
 #| fig-height: 4.3
-#| fig-alt: "The two evidence distributions with d-prime marked and a criterion line; the areas right of the criterion are shaded and labeled false alarms and hits."
+#| fig-alt: "The two evidence distributions with d-prime marked and a criterion line; the new-item area right of the criterion is shaded and labeled false alarms."
 sdt_plot(show_d = TRUE, show_crit = TRUE)
+```
+:::
+
+::: {.fragment fragment-index=3}
+```{r}
+#| label: sdt-hits
+#| echo: false
+#| fig-height: 4.3
+#| fig-alt: "The same figure with the old-item area right of the criterion shaded as well and labeled hits."
+sdt_plot(show_d = TRUE, show_crit = TRUE, show_hits = TRUE)
 ```
 :::
 
@@ -449,10 +415,10 @@ sdt_plot(show_d = TRUE, show_crit = TRUE)
 :::
 
 ::: {.notes}
-Three steps. First the two distributions: memory strength for new and for
+Four steps. First the two distributions: memory strength for new and for
 old items. Click: d', the distance between them. Click: the criterion. Every
-item to the right of it gets an "old" response, so old items right of the
-criterion are hits and new items right of it are false alarms. Two numbers
+item to the right of it gets an "old" response, so the new items right of it
+are false alarms. Click: the old items right of it are hits. Two numbers
 describe the observer: separation and threshold. The threshold is measured
 from the mean of the new-item distribution, which is where bmm puts it too:
 c = 0 is a criterion right at the new-item mean. The next slide moves the
@@ -461,17 +427,17 @@ threshold.
 
 ## Moving the criterion changes accuracy {.smaller}
 
-Assume two people with the same memory strength ($d' = 1.3$) but different
-criteria. $c$ counts from the new-item mean, so $c = d'/2 = 0.65$ sits halfway
+Assume two people with the same memory strength ($d' = 2$) but different
+criteria. $c$ counts from the new-item mean, so $c = d'/2 = 1$ sits halfway
 between the distributions; a lower $c$ says "old" more readily:
 
 ```{r}
 #| include: false
-d <- 1.3
+d <- 2
 crit_people <- tibble(
   person = c("A", "B"),
   bias   = c("neutral", "liberal"),
-  c      = c(0.65, -0.05)
+  c      = c(1, 0)
 ) |>
   mutate(
     # bmm's criterion is measured from the mean of the new-item distribution
@@ -495,7 +461,7 @@ crit_plot <- function(who) {
     scale_color_manual(values = item_colors, guide = "none") +
     labs(x = "memory-strength evidence", y = NULL, title = p$title) +
     theme_workshop() +
-    theme(axis.text.y = element_blank())
+    theme_sdt_axis()
 }
 
 rate_line <- function(who) {
@@ -544,11 +510,12 @@ crit_plot("B")
 ::::
 
 ::: {.notes}
-d' is 1.3 for both people, so their memory is identical. Person A has a
-neutral criterion, halfway between the distributions (c = 0.65, half of d').
-Person B has a liberal criterion (c = −0.05, right at the new-item mean):
-hits and false alarms both go up, and accuracy drops. Everything an accuracy analysis sees has changed, although memory has
-not. The real data will show the same pattern.
+d' is 2 for both people, so their memory is identical. Person A has a
+neutral criterion, halfway between the distributions (c = 1, half of d').
+Person B has a liberal criterion (c = 0, right at the new-item mean): hits
+and false alarms both go up, and accuracy drops. Everything an accuracy
+analysis sees has changed, although memory has not. The real data will show
+the same pattern.
 :::
 
 ## The data: recognition memory {.smaller}
@@ -563,32 +530,89 @@ n_per_cond <- dat |>
 stopifnot(length(n_per_cond) == 1)  # the slide says "each"
 ```
 
-Data from Koen, Aly, Wang, and Yonelinas (2013), available in the MPTinR
-package:
+Data from Koen, Aly, Wang, and Yonelinas (2013):
+
+```{r}
+#| label: task-schematic
+#| echo: false
+#| fig-width: 11
+#| fig-height: 2.3
+#| fig-alt: "Task schematic. Study: a list of words. Test: one word at a time, old or new? Rate confidence from 1, sure new, to 6, sure old; ratings 4 to 6 count as old."
+card <- function(x, y, word, w = 1.5, h = 0.6, fill = "white") {
+  list(
+    annotate("rect", xmin = x - w / 2, xmax = x + w / 2,
+             ymin = y - h / 2, ymax = y + h / 2,
+             fill = fill, colour = "grey40", linewidth = 0.6),
+    annotate("text", x = x, y = y, label = word, size = 6, fontface = "bold")
+  )
+}
+arrow_at <- function(x0, x1, y = 1.1) {
+  annotate("segment", x = x0, xend = x1, y = y, yend = y,
+           linewidth = 1, colour = wk_colors[["grey"]],
+           arrow = arrow(length = unit(0.25, "cm"), type = "closed"))
+}
+scale_x <- 6.6 + 0:5 * 0.85
+ggplot() +
+  # 1. study: one card listing the words
+  annotate("rect", xmin = 0.6, xmax = 2.2, ymin = 0.55, ymax = 1.95,
+           fill = "white", colour = "grey40", linewidth = 0.6) +
+  annotate("text", x = 1.4, y = c(1.6, 1.25, 0.9),
+           label = c("table", "river", "candle"), size = 6,
+           fontface = "bold") +
+  # 2. test: one word, old or new?
+  arrow_at(2.5, 3.2) +
+  card(4.2, 1.1, "river", fill = wk_colors[["grey"]] |> alpha(0.15)) +
+  # 3. confidence rating 1-6
+  arrow_at(5.2, 5.9) +
+  annotate("tile", x = scale_x, y = 1.1, width = 0.75, height = 0.6,
+           fill = rep(c(wk_colors[["grey"]], wk_colors[["blue"]]), each = 3),
+           alpha = 0.85) +
+  annotate("text", x = scale_x, y = 1.1, label = 1:6, size = 6,
+           colour = "white", fontface = "bold") +
+  annotate("text", x = scale_x[c(1, 6)], y = 0.55,
+           label = c("sure new", "sure old"), size = 5,
+           colour = "grey30", fontface = "italic") +
+  annotate("segment", x = scale_x[4] - 0.35, xend = scale_x[6] + 0.35,
+           y = 1.6, yend = 1.6, linewidth = 1, colour = wk_colors[["blue"]]) +
+  annotate("text", x = mean(scale_x[4:6]), y = 1.85,
+           label = "4 to 6 counts as \"old\"", size = 5,
+           colour = wk_colors[["blue"]], fontface = "bold") +
+  # step headers
+  annotate("text", x = c(1.4, 4.2, mean(scale_x)), y = 2.35,
+           label = c("1  Study a word list", "2  Test: old or new?",
+                     "3  How sure?"),
+           size = 6, fontface = "bold", colour = "grey20") +
+  coord_cartesian(xlim = c(0, 11.3), ylim = c(0.35, 2.5), expand = FALSE) +
+  theme_void()
+```
 
 ::: {.incremental}
-- Participants studied word lists, then made old/new judgments on a **6-point
-  confidence scale** (1 = *sure new* … 6 = *sure old*)
-- Two **between-subjects** test conditions with `r n_per_cond` participants
-  each:
-  - `full_attention`: test under full attention (Exp. 2)
-  - `immediate`: test immediately after study (Exp. 4)
-- Old/new response: ratings 4 to 6 count as "old"
-- `r format(nrow(dat), big.mark = ",")` trials in total; codebook in
-  `data/README.md`
+- **Two groups** of `r n_per_cond` people, tested differently:
+  **full attention** (no second task during the test) and **immediate** (test
+  right after study)
+- **One row per trial:** who, which group, old or new word, the response
 :::
 
 ::: {.fragment}
 ```{r}
-head(dat, 4)
+#| echo: false
+head(dat, 3) |> knitr::kable()
 ```
 :::
 
 ::: {.notes}
-Same data as the Vuorre (2025) tutorial in resources/01_sdt, which uses only
-the full-attention condition, so attendees can read the paper and the
-notebook side by side. The binary response is say_old = rating >= 4,
-following Koen et al.'s own first analysis.
+Walk the drawing left to right: study a list, then one test word at a time,
+old or new, with a confidence rating; 4 to 6 counts as "old". The three
+words are made up for the drawing, not items from the study.
+
+The data are the `roc6` dataset of the MPTinR package: the control groups of
+two experiments of the paper, Exp. 2 (full attention at test) and Exp. 4
+(immediate test), 48 people each, `r format(nrow(dat), big.mark = ",")`
+trials in total. The codebook is data/README.md. Same data as the Vuorre
+(2025) tutorial in resources/01_sdt, which uses only the full-attention
+condition, so attendees can read the paper and the notebook side by side. The
+binary response is say_old = rating >= 4, following Koen et al.'s own first
+analysis.
 
 If someone asks: the two conditions come from two experiments of the same
 paper, so the contrast is a demonstration, not a clean manipulation.
@@ -664,12 +688,27 @@ start of the session:
 
 ::: {.column width="55%"}
 ```{r}
-#| code-line-numbers: "1-2|4"
+#| code-line-numbers: "1-3|5"
+#| results: hide
 acc <- dat |>
-  summarise(pc = mean(say_old == is_old), .by = c(pid, condition))
+  summarise(pc  = mean(say_old == is_old),
+            .by = c(pid, condition))
 
 t.test(pc ~ condition, data = acc)
 ```
+
+```{r}
+#| include: false
+tt <- t.test(pc ~ condition, data = acc)
+tt_p <- if (tt$p.value < .001) "< .001" else sub("^0", "", sprintf("= %.3f", tt$p.value))
+tt_diff <- 100 * abs(diff(tt$estimate))
+```
+
+::: {.fragment}
+**Result:** *t*(`r sprintf("%.1f", tt$parameter)`) =
+`r sprintf("%.2f", tt$statistic)`, *p* `r tt_p`. The immediate group scores
+`r sprintf("%.0f", tt_diff)` percentage points lower.
+:::
 :::
 
 ::: {.column .fragment width="45%"}
@@ -847,8 +886,7 @@ fit_sdt <- bmm(
     d         ~ 1 + condition + (1 | pid),
     criterion ~ 1 + condition + (1 | pid)
   ),
-  data  = binary_counts,
-  model = sdt_model,
+  data = binary_counts, model = sdt_model,
   sample_prior = "yes"  # needed for Bayes factors later
 )
 ```
@@ -861,7 +899,7 @@ same random-effect syntax as in `lme4` and `brms`.
 | --- | --- |
 | `d_Intercept` | $d'$, full-attention group |
 | `d_conditionimmediate` | **difference in $d'$** (immediate − full) |
-| `criterion_Intercept` | criterion $c$, full-attention group (from the new-item mean) |
+| `criterion_Intercept` | criterion $c$, full-attention group |
 | `criterion_conditionimmediate` | **difference in $c$** (immediate − full) |
 :::
 
@@ -1064,7 +1102,8 @@ post_plot <- function(show_ci = FALSE) {
     stat_slab(fill = wk_colors[["blue"]], alpha = 0.8) +
     (if (show_ci) stat_pointinterval(.width = 0.95, alpha = 0.8)) +
     annotate("text", x = d_mid, y = 0.45,
-             label = "each value: a plausible d'", size = 5.5,
+             label = "each value:\na plausible d'", size = 5.5,
+             lineheight = 0.9,
              color = "white", fontface = "bold") +
     (if (show_ci) annotate("text", x = d_mid, y = -0.12,
                            label = "95% credible interval", size = 5,
@@ -1123,31 +1162,24 @@ sampler details.
 
 ```{r}
 #| output-location: slide
-#| code-line-numbers: "1-9|11-21"
+#| code-line-numbers: "1-6|7-14"
 #| class-source: code-small
 #| fig-height: 4.5
 #| fig-alt: "Posterior distributions of d-prime and criterion for the full-attention and immediate conditions, shown as halfeye plots."
 sdt_pars <- fit_sdt |>
   spread_draws(b_d_Intercept, b_d_conditionimmediate,
                b_criterion_Intercept, b_criterion_conditionimmediate) |>
-  mutate(
-    d_full = b_d_Intercept,
-    d_imm  = b_d_Intercept + b_d_conditionimmediate,
-    c_full = b_criterion_Intercept,
-    c_imm  = b_criterion_Intercept + b_criterion_conditionimmediate
-  )
-
+  mutate(d_full = b_d_Intercept, d_imm = b_d_Intercept + b_d_conditionimmediate,
+         c_full = b_criterion_Intercept,
+         c_imm  = b_criterion_Intercept + b_criterion_conditionimmediate)
 sdt_pars |>
-  pivot_longer(d_full:c_imm,
-               names_to = c("parameter", "condition"), names_sep = "_") |>
+  pivot_longer(d_full:c_imm, names_to = c("parameter", "condition"), names_sep = "_") |>
   mutate(parameter = recode(parameter, d = "d'", c = "criterion c"),
          condition = recode(condition, full = "full attention", imm = "immediate")) |>
-  ggplot(aes(x = value, y = condition, fill = condition)) +
-  stat_halfeye(alpha = 0.8) +
+  ggplot(aes(x = value, y = condition, fill = condition)) + stat_halfeye(alpha = 0.8) +
   facet_wrap(~parameter, scales = "free_x") +
   scale_fill_manual(values = unname(wk_colors[c("blue", "orange")]), guide = "none") +
-  labs(x = "Posterior value", y = NULL) +
-  theme_workshop()
+  labs(x = "Posterior value", y = NULL) + theme_workshop()
 ```
 
 ```{=html}
@@ -1241,15 +1273,63 @@ for models without a hand formula, which is what the next two parts show.
 ## Latent distributions from the fit {.smaller}
 [specify · fit · [evaluate]{.on}]{.track}
 
+`latent_sdt()` rebuilds the evidence distributions from the posterior, one
+pair per condition (`plot()` draws a default version; the notebook has it):
+
 ```{r}
-#| fig-height: 4.5
-#| fig-alt: "Model-implied noise and signal evidence distributions with the estimated criterion, reconstructed from the posterior."
-plot(latent_sdt(fit_sdt))
+lat <- latent_sdt(fit_sdt)
+```
+
+```{r}
+#| label: latent-plot
+#| echo: false
+#| fig-height: 3.9
+#| fig-alt: "Model-implied new-item and old-item evidence distributions per condition with the estimated criterion as an orange line and its credible band; in the immediate panel the full-attention criterion is repeated as a dashed reference line, and each panel prints its fitted d-prime and criterion."
+cond_labels <- c(full_attention = "full attention", immediate = "immediate")
+fe <- fixef(fit_sdt)
+lat_pars <- tibble(
+  condition = names(cond_labels),
+  d = fe["d_Intercept", "Estimate"] +
+      c(0, fe["d_conditionimmediate", "Estimate"]),
+  c = fe["criterion_Intercept", "Estimate"] +
+      c(0, fe["criterion_conditionimmediate", "Estimate"])
+) |>
+  mutate(label = sprintf("d' = %.2f\nc = %.2f", d, c))
+lat_lines <- attr(lat, "lines")
+ref_line <- tibble(condition = "immediate",
+                   x = filter(lat_pars, condition == "full_attention")$c)
+
+lat |>
+  as_tibble() |>
+  mutate(item = ifelse(distribution == "noise", "new items", "old items")) |>
+  ggplot(aes(x, density)) +
+  geom_rect(data = lat_lines, inherit.aes = FALSE,
+            aes(xmin = lower, xmax = upper, ymin = -Inf, ymax = Inf),
+            fill = wk_colors[["orange"]], alpha = 0.2) +
+  geom_area(aes(fill = item), alpha = 0.3, position = "identity") +
+  geom_line(aes(color = item), linewidth = 1.3) +
+  geom_vline(data = ref_line, aes(xintercept = x), linetype = "dashed",
+             linewidth = 0.8, color = wk_colors[["orange"]], alpha = 0.6) +
+  geom_vline(data = lat_lines, aes(xintercept = position), linewidth = 1.2,
+             color = wk_colors[["orange"]]) +
+  geom_text(data = lat_pars, aes(x = 3.9, y = 0.3, label = label),
+            size = 5, lineheight = 0.9, hjust = 0.5) +
+  facet_wrap(~ condition, labeller = as_labeller(cond_labels)) +
+  scale_fill_manual(values = item_colors, guide = "none") +
+  scale_color_manual(values = item_colors, guide = "none") +
+  coord_cartesian(xlim = c(-3.5, 5.5)) +
+  labs(x = "memory-strength evidence", y = NULL) +
+  theme_workshop() +
+  theme_sdt_axis() +
+  theme(strip.text = element_text(size = 16, face = "bold"))
 ```
 
 ::: {.notes}
-latent_sdt() rebuilds the latent evidence distributions from the posterior.
-This is the figure every SDT lecture draws by hand, here with credible bands.
+Same picture as the sketch at the start, now estimated from the data, with a
+credible band around each criterion. Two things to point at: the old-item
+curve sits closer to the new-item curve in the immediate group (smaller d'),
+and the criterion has moved toward the new-item mean (dashed line: where the
+full-attention group's criterion sits), which is the extra false alarms.
 roc_sdt() and auc_sdt() give the ROC version; both are in the notebook.
 :::
 
@@ -1259,18 +1339,17 @@ roc_sdt() and auc_sdt() give the ROC version; both are in the notebook.
 Same workflow, richer data: the full 6-point ratings instead of the old/new
 split.
 
-<!-- FLEX MATERIAL: designated cut if the segment runs long (go/no-go at min 22). -->
+<!-- FLEX MATERIAL: designated cut if the segment runs long (go/no-go at min 25). -->
 
 ## Ratings: more criteria, same axis {.smaller}
 [[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
-`sdt_rating()` places 5 confidence thresholds on the latent evidence axis.
-The ratings also let us estimate the ratio of signal to noise SD
-(**unequal-variance SDT**), which is what Koen et al. studied:
+`sdt_rating()` places 5 confidence thresholds on the same evidence axis. Two
+new parameter lines; the rest of the call is unchanged:
 
 ```{r}
 #| eval: false
-#| code-line-numbers: "3-4|5-6"
+#| code-line-numbers: "5-6|9"
 fit_rating <- bmm(
   formula = bmf(
     d         ~ 1 + condition + (1 | pid),
@@ -1283,14 +1362,26 @@ fit_rating <- bmm(
 )
 ```
 
-::: {.fragment}
 ```{r}
-fixef(fit_rating) |> round(2)
+#| include: false
+fe_r <- fixef(fit_rating)
+sd_ratio <- exp(fe_r["sdratio_Intercept", "Estimate"])
+d_diff <- gsub("-", "−", sprintf("%.2f", fe_r["d_conditionimmediate",
+                                             c("Estimate", "Q2.5", "Q97.5")]))
 ```
+
+::: {.fragment}
+- **Old items are more spread out** than new ones: SD ratio
+  `r sprintf("%.1f", sd_ratio)` (unequal-variance SDT, the pattern Koen et al.
+  studied)
+- **The $d'$ difference** still points the same way (`r d_diff[1]`), but its
+  95% CrI [`r d_diff[2]`, `r d_diff[3]`] now includes 0: estimates depend on
+  the model you state
 :::
 
 ::: {.notes}
-Same formula language, two more parameter lines. sdratio is on the log scale,
+Same formula language, two more parameter lines. Full fixef() output and
+sdt_sensitivity() are in the notebook. sdratio is on the log scale,
 so exp(0.36) ≈ 1.4: the old-item distribution is wider, which produces the
 classic asymmetric recognition ROC. The criterion is now the middle one of
 the five thresholds, still counted from the new-item mean. Two points worth saying out loud. First,
