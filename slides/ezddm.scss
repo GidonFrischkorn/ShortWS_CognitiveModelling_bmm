@@ -124,6 +124,14 @@
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+}
+
+// 18-line code block on "One row per cell": one step below the 0.85em that
+// custom.scss on the Part 1 branch gives code on `.smaller` slides, so the
+// block still fits above the footer.
+.reveal .slide.code-tight pre {
+  font-size: 0.7em;
 }
 
 // Title at the top, table on the vertical midline, closing sentence two lines below the table.

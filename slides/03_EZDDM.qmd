@@ -159,7 +159,8 @@ Negative Xs is more black pixels; positive Xs is more white pixels.
 Accuracy is high at the extremes and lower near the middle, under both instructions. 
 :::
 
-## One row per cell {.smaller}
+## One row per cell {.smaller .code-tight}
+[[specify]{.on} · fit · evaluate]{.track}
 
 `ezdm()` reads summaries, not trials. 
 
@@ -194,6 +195,7 @@ n_upper is the number of correct responses.
 :::
 
 ## One formula per parameter {.smaller .code-vcenter}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ```{r}
 #| label: formula
@@ -217,6 +219,7 @@ drift carries abs_xs, bound and ndt do not.
 :::
 
 ## Load the cached fit {.smaller}
+[specify · [fit]{.on} · evaluate]{.track}
 
 ```{r}
 #| label: load-fit
@@ -233,6 +236,7 @@ s is fixed, which sets the scale of drift and boundary.
 :::
 
 ## Boundary and non-decision time {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
 
 Exponentiate the log-scale draws to get the original scale.
 
@@ -271,6 +275,7 @@ Speed instructions pull the boundary down, as illustrated in the intro slides.
 :::
 
 ## Two questions {.q-reveal}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| label: tests
@@ -306,6 +311,7 @@ If time is short, end here. The next section is the cut.
 :::
 
 ## Trial-level DDM {.trial-space}
+[[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
 `ddm()` reads one row per trial: (N = 7,373 trials).
 
