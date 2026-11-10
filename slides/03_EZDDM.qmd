@@ -4,7 +4,9 @@ subtitle: "Part 3: The EZ-Drift Diffusion Model"
 author: "Adriana F. Chávez De la Peña"
 institute: "University of California, Irvine | Now at Stanford University"
 date: "November 2026"
-format: revealjs
+format:
+  revealjs:
+    theme: [ezddm.scss]
 ---
 
 ```{r}
