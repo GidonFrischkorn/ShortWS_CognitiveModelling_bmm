@@ -545,6 +545,7 @@ $$
 ```
 
 ## Specifying the simple-span model {#specify-categories-and-their-option-counts .smaller .m3-model-slide}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ::::: {.m3-model-content}
 
@@ -714,6 +715,7 @@ need regression formulas. Do not present b as a third estimable parameter.
 :::
 
 ## Specifying parameter formulas {#specify-how-do-a-and-c-vary .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ```{r}
 #| label: formula-simple
@@ -737,6 +739,7 @@ participant's deviations at different set sizes.
 :::
 
 ## Setting priors: simple {#setting-priors-simple .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 **Log link:** priors on the log-activation scale.
 
@@ -778,6 +781,7 @@ ggplot(prior_simple_density, aes(value, density, color = parameter, linetype = p
 ```
 
 ## Setting priors: softmax {#setting-priors-softmax .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 **Identity link:** priors on the activation scale.
 
@@ -816,6 +820,7 @@ ggplot(prior_softmax_density, aes(value, density, color = parameter, linetype = 
 ```
 
 ## Fitting M3 with bmm {#fit-once-load-the-result-for-the-workshop .smaller .m3-model-slide}
+[specify · [fit]{.on} · evaluate]{.track}
 
 ::::: {.m3-model-content}
 
@@ -842,6 +847,7 @@ The sampling arguments work the same way as in the SDT model.
 :::::
 
 ## Model fit: Observed and predicted responses {#evaluate-does-m3-reproduce-the-responses .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 `posterior_epred(fit_simple)` predicts counts in **all three categories**.
 
@@ -860,6 +866,7 @@ Close mean curves do not establish that every aspect of fit is adequate.
 :::
 
 ## Parameter estimates: Item and binding memory {#interpret-item-memory-and-binding-memory .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| label: posterior-plot
@@ -1104,6 +1111,7 @@ bmm complex-span model.
 :::
 
 ## Specifying the complex-span model {#extend-the-model-keep-the-workflow .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ```{r}
 #| eval: false
@@ -1121,6 +1129,7 @@ formula_complex <- bmf(
 ```
 
 ## Model fit: Observed and predicted responses {#evaluate-complex-span-fit .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| label: complex-predictive-check
@@ -1137,6 +1146,7 @@ Acknowledge this discrepancy before interpreting the filtering parameter.
 :::
 
 ## Parameter estimates: Item, binding, and filtering {#interpret-the-extension-alongside-model-fit .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| label: complex-parameter-plot
