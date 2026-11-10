@@ -4,9 +4,7 @@ subtitle: "Part 3: The EZ-Drift Diffusion Model"
 author: "Adriana F. Chávez De la Peña"
 institute: "University of California, Irvine"
 date: "November 2026"
-format:
-  revealjs:
-    theme: [default, custom.scss]
+format: revealjs
 ---
 
 ## Choice and RT as evidence accumulation {.section-divider}
