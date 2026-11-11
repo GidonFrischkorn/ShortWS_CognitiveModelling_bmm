@@ -29,8 +29,8 @@ dependency in this repo is the SDT exception below.
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.3.2.9000 (develop `1625e860`, 2026-10-05) / 2.23.0 | done (re-fit at release) |
 | `m3_simple.rds` | M3, simple span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
 | `m3_complex.rds` | M3, complex span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
-| `ezddm_summary.rds` | EZ-DDM from summary statistics — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
-| `ddm_trial.rds` | Trial-level DDM — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
+| `ezddm_summary.rds` | EZ-DDM, 3 parameters (`ezdm(version = "3par")`; drift ~ instruction + abs(Xs), bound and ndt ~ instruction; one participant, 64 cells) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
+| `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,373 trials) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
 
 As with the datasets, these file names were contracted before the kickoff and
 **not re-discussed** on 2026-08-18. They stand by default and are checked for
