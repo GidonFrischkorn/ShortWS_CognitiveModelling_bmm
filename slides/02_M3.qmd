@@ -12,7 +12,7 @@ resources:
   - formula-callouts.js
 format:
   revealjs:
-    theme: [default, m3.scss]
+    theme: [m3.scss]
     auto-stretch: false
     transition-speed: slow
     auto-animate-duration: 0.6
