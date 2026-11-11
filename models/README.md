@@ -27,10 +27,16 @@ dependency in this repo is the SDT exception below.
 | --- | --- | --- | --- | --- |
 | `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1 (CRAN, 2026-11-02) / 2.23.0 | done, final |
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1 (CRAN, 2026-11-02) / 2.23.0 | done, final |
-| `m3_simple.rds` | M3, simple span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
-| `m3_complex.rds` | M3, complex span — TODO: bmm model function + parameterization | Chenyu | — | TODO — by 2026-09-30 |
-| `ezddm_summary.rds` | EZ-DDM from summary statistics — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
-| `ddm_trial.rds` | Trial-level DDM — TODO: model function + parameterization | Adriana | — | TODO — by 2026-09-30 |
+| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.3.1 / 2.23.0 | done |
+| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.3.1 / 2.23.0 | done |
+| `ezddm_summary.rds` | EZ-DDM, 3 parameters (`ezdm(version = "3par")`; drift ~ instruction + abs(Xs), bound and ndt ~ instruction; one participant, 64 cells) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
+| `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,373 trials) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
+
+M3 sampling uses four chains, 5,000 iterations per chain, 2,000 warmup,
+`adapt_delta = 0.95`, and seed 2026. Rhat is reported to two decimals: 1.01 for open set and 1.00 for pre-cue.
+The unrounded open-set maximum remains slightly above 1.01. Both have zero
+divergences. Review figures and numerical diagnostics are in `data/figures/`;
+regenerate figures with `Rscript data/plot_m3.R`.
 
 As with the datasets, these file names were contracted before the kickoff and
 **not re-discussed** on 2026-08-18. They stand by default and are checked for

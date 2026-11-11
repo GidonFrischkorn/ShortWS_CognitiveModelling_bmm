@@ -1,0 +1,169 @@
+/*
+  Part 3 (EZ-DDM) additions to the shared theme. Layered after custom.scss
+  (the deck sets `theme: [ezddm.scss]`, Quarto appends it to the shared
+  `[default, custom.scss]`), so the UZH variables are available here.
+  Shared rules belong in custom.scss; only rules for classes used in
+  03_EZDDM.qmd live here.
+*/
+
+/*-- scss:rules --*/
+
+// Bullets on blue dividers read like the paragraph text.
+.reveal .slide.section-divider li {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.reveal .slide.section-divider.take-home li {
+  color: $uzh-white;
+}
+
+.reveal .slide.choice-open .fragment {
+  margin-top: 1.6em;
+}
+
+.reveal .slide.choice-open li + li {
+  margin-top: 0.85em;
+}
+
+// Parameter table on "What each parameter tracks".
+.reveal .param-map table {
+  border: none;
+  font-size: 0.82em;
+}
+
+.reveal .param-map table th,
+.reveal .param-map table td {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
+}
+
+.reveal .param-map table th:nth-child(2),
+.reveal .param-map table td:nth-child(2) {
+  text-align: center;
+}
+
+.reveal .param-map table th {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.reveal .param-map table td {
+  border-bottom: 1px solid #cbd5e1;
+  padding: 0.75em 0.7em;
+}
+
+// Design-cell table on the blue brightness divider.
+.reveal .slide.section-divider .cell-break {
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+}
+
+.reveal .slide.section-divider .cell-break table {
+  background: white;
+  border: none;
+  font-size: 0.78em;
+}
+
+.reveal .slide.section-divider .cell-break th,
+.reveal .slide.section-divider .cell-break td {
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  background: white;
+  color: #1a1a1a;
+}
+
+.reveal .slide.section-divider .cell-break th {
+  color: $uzh-blue;
+  border-bottom: 2px solid $uzh-blue;
+}
+
+.reveal .slide.section-divider .cell-break td {
+  border-bottom: 1px solid #cbd5e1;
+  padding: 0.55em 0.9em;
+}
+
+.reveal .slide.section-divider .cell-break td:nth-child(n + 2),
+.reveal .slide.section-divider .cell-break th:nth-child(n + 2) {
+  text-align: center;
+}
+
+.reveal .ez-stack > p,
+.reveal .ez-stack > .formula-box {
+  margin-top: 1.35em;
+  margin-bottom: 1.35em;
+}
+
+.reveal .ez-stack > :first-child {
+  margin-top: 0.2em;
+}
+
+// Title stays at the top; the code block sits on the vertical midline.
+.reveal .slide.code-vcenter {
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
+}
+
+.reveal .slide.code-vcenter > h2 {
+  align-self: start;
+}
+
+// The workflow track paragraph would otherwise take a grid row and push the
+// code block off the midline; out of the flow it sits where custom.scss puts it.
+.reveal .slide.code-vcenter > p:has(> .track) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+// 18-line code block on "One row per cell": one step below the 0.85em that
+// custom.scss on the Part 1 branch gives code on `.smaller` slides, so the
+// block still fits above the footer.
+.reveal .slide.code-tight pre {
+  font-size: 0.7em;
+}
+
+// Title at the top, table on the vertical midline, closing sentence two lines below the table.
+.reveal .slide.param-vcenter {
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
+}
+
+.reveal .slide.param-vcenter > h2 {
+  align-self: start;
+}
+
+.reveal .slide.param-vcenter > .param-map {
+  grid-row: 2;
+}
+
+.reveal .slide.param-vcenter > p {
+  grid-row: 3;
+  align-self: start;
+  margin-top: 2lh;
+  margin-bottom: 0;
+}
+
+.reveal .slide.q-reveal .fragment {
+  margin-top: 1.15em;
+}
+
+.reveal .slide.q-reveal .fragment.q-next {
+  margin-top: 2.3em;
+}
+
+.reveal .slide.q-reveal .fragment ul {
+  margin-top: 0.3em;
+}
+
+.reveal .slide.trial-space > h2 {
+  margin-bottom: 0;
+}
+
+.reveal .slide.trial-space > p,
+.reveal .slide.trial-space > .cell {
+  margin-top: 1.8em;
+  margin-bottom: 0;
+}
