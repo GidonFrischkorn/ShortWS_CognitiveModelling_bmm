@@ -26,76 +26,262 @@ source(here("_common.R"))  # shared workshop colors + ggplot theme
 
 ## Data
 
-<!-- TODO (Adriana): add the perceptual decision-making dataset. Document
-     every column in data/README.md — that file is the single source for all
-     codebooks; do not duplicate column descriptions here. -->
+Brightness judgments from Experiment 1 of Ratcliff & Rouder (1998), participant N.H., as reanalyzed in Chávez De la Peña & Vandekerckhove (2025). On each trial the participant decided whether a pixel array was "high" or "low" in brightness (i.e., a binary choice task). Brightness was controlled by the proportion of black-to-white pixels, varied in 32 steps, under accuracy or speed instructions ($32 \times 2 = 64$ design cells).
 
-All columns are documented in the codebook: `data/README.md`.
+All columns are documented in the codebook: `data/README.md`. Each row is a different trial.
 
 ```{r}
 #| label: data
-#| eval: false
 dat <- read.csv(here("data", "ezddm_perceptual.csv"))
 glimpse(dat)
 ```
 
-## Load the fitted model
+Before any model: We inspect accuracy in each of the 64 design cells. 
 
-All workshop models ship pre-fitted in `models/` — nothing to compile,
-nothing to wait for:
+We start by coding the response as correct or incorrect. Response 1 ("Brightness is Low") is correct on the "more-black" conditions and response 2 ("Brightness is High") is correct on the "more-white" conditions. We then compute the accuracy rate for each cell and plot it against the black-to-white proportion, using different lines for accuracy and speed instructions.
 
-<!-- TODO (Adriana): once ezddm_summary.rds is committed, remove `eval: false`
-     here and in the chunks below so the rendered notebook shows the full
-     worked analysis. -->
+The black-to-white proportion is coded as `Xs = ((cond - 1) %% 33 - 16) / 5`, so that negative values indicate more black pixels (low brightness), and positive values indicate more white pixels (high brightness). The lines break around zero, which corresponds to the 50/50 black-to-white cells not included in the analysis.
+
+```{r}
+#| label: descriptives
+#| fig-alt: "Accuracy in each cell against the black-to-white proportion, with accuracy and speed instructions in different colors. Each line breaks at the missing 50/50 cells."
+cell_summary <- dat |>
+    mutate(instruction = if_else(cond <= 33, "accuracy", "speed"),
+          xs = ((cond - 1) %% 33 - 16) / 5,
+          majority = if_else(xs < 0, "more black", "more white"),
+          correct = as.integer((response == 1 & majority == "more black") |
+                              (response == 2 & majority == "more white"))) |> 
+    summarise(accuracy = mean(correct), .by = c(instruction, majority, xs))
+
+ggplot(cell_summary, aes(xs, accuracy, color = instruction,
+                          group = interaction(instruction, majority))) + geom_line() +
+      geom_point(size = 2) +
+      scale_color_manual(values = c(accuracy = wk_colors[["blue"]],
+                                    speed = wk_colors[["orange"]])) +
+      labs(x = "Black-to-white pixel configuration (Xs)", y = "Accuracy", color = NULL) +
+      theme_workshop()
+```
+
+## Specify: the model and its formula
+
+We will use the three-parameter EZ-DDM to estimate a drift rate (how quickly evidence accumulates), a boundary separation (how much evidence is required before a choice is made), and a non-decision time (time elapsed outside the accumulation process) for each design cell. The starting point is fixed halfway between the boundaries for each cell.
+
+`ezdm()` expects one row per design cell containing the required summary statistics from the choice and response time (RT) data. Mean RT and RT variance are in seconds and use every trial in the cell. `n_upper` is the number of correct responses, and `n_trials` is the number of trials behind those summaries. **This data shape is a contract.** Check it against `head()` before fitting:
+
+```{r}
+#| label: aggregate-ez
+ez_summary <- dat |>
+      mutate(instruction = factor(if_else(cond <= 33, "accuracy", "speed"),
+                            levels = c("accuracy", "speed")),
+            xs = ((cond - 1) %% 33 - 16) / 5,
+            abs_xs = abs(xs),
+            majority = if_else(xs < 0, "more black", "more white"),
+            correct = as.integer((response == 1 & majority == "more black") |
+                                 (response == 2 & majority == "more white")),
+            rt_s = rt_ms / 1000) |> summarise(mean_rt = mean(rt_s),
+                                              var_rt = var(rt_s),
+                                              n_upper = sum(correct),
+                                              n_trials = n(),
+                                              .by = c(cond, instruction, abs_xs))
+head(ez_summary, 4)
+```
+
+```{r}
+#| label: model-object
+ez_model <- ezdm(mean_rt = "mean_rt",
+                 var_rt = "var_rt",
+                 n_upper = "n_upper",
+                 n_trials = "n_trials",
+                 version = "3par")
+ez_model
+```
+
+Printing the model object shows the parameters while identifying the link function applied to each one, and which are fixed. In this example, drift uses an identity link, boundary separation and non-decision time use a log link.
+
+```{r}
+#| label: formula
+#| eval: false
+fit_ez <- bmm(formula = bmf(drift ~ 1 + instruction + abs_xs,
+                            bound ~ 1 + instruction,
+                            ndt   ~ 1 + instruction),
+              data  = ez_summary,
+              model = ez_model,
+              sample_prior = "yes")
+```
+
+Drift depends on the instruction condition and on how far the black-to-white pixel configuration sits from 50/50 (`abs_xs`). Boundary separation and non-decision time depend on the instruction condition alone. The accuracy instruction condition serves as the reference level:
+
+| Coefficient | Meaning |
+| --- | --- |
+| `drift_Intercept` | drift for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
+| `drift_instructionspeed` | **difference in drift** between speed and accuracy instructions |
+| `drift_abs_xs` | change in drift as the pixel configuration moves away from 50/50 |
+| `bound_Intercept` | log boundary for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
+| `bound_instructionspeed` | **difference in log boundary** between speed and accuracy instructions |
+| `ndt_Intercept` | log non-decision time for accuracy instructions when the pixel configuration is 50/50 (`abs_xs` = 0) |
+| `ndt_instructionspeed` | **difference in log non-decision time** between speed and accuracy instructions |
+
+: {tbl-colwidths="[34,66]"}
+
+As such, `exp(bound_Intercept)` and `exp(ndt_Intercept)` return the boundary and the non-decision time for a 50/50 pixel configuration under accuracy instructions, back on their original scale.
+
+## Fit: load the cached model
+
+All workshop models ship pre-fitted in `models/`. Nothing to compile, nothing to wait for:
 
 ```{r}
 #| label: load-fit
-#| eval: false
 fit_ez <- readRDS(here("models", "ezddm_summary.rds"))
+summary(fit_ez)
+```
+
+Three things to read in that output before trusting the estimates:
+
+- **`Rhat`** should be 1.00. Anything above about 1.01 means the chains have not converged, and the estimates are not ready to be used.
+- **`Bulk_ESS` / `Tail_ESS`** are effective sample sizes. A few hundred is enough for a point estimate. Aim for more than 1000 before quoting the tails of an interval.
+- **`s_Intercept` is exactly 0 with no uncertainty** because `ezdm()` fixes the diffusion coefficient there. That choice sets the scale of the drift rate and the boundary.
+
+### Which priors were used?
+
+`prior_info()` lists the priors on the scale the model samples on:
+
+```{r}
+#| label: prior-info
+prior_info(fit_ez)
 ```
 
 ### Optional: re-fit the model yourself
 
-You do **not** need this to follow the workshop. Re-fitting requires the
-Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes.
+You do **not** need this to follow the workshop. Re-fitting requires the Stan toolchain (`Install_Packages.R`, Part 2) and takes a few minutes. The fitting script is `models/fit_ezddm.R`.
 
-```{r}
-#| label: refit
-#| eval: false
-# TODO (Adriana): real model specification
-# model <- ...
-# fit_ez <- bmm(model, data = dat, cores = 4)
-# saveRDS(fit_ez, here("models", "ezddm_summary.rds"))
-```
+## Evaluate: posteriors and hypotheses
 
-## Interpret drift rate, boundary separation, non-decision time
+Boundary separation and non-decision time were sampled on the log scale. Exponentiating the draws puts them back in seconds of evidence and seconds of time. Drift was already on its original scale.
 
 ```{r}
 #| label: posterior
-#| eval: false
-summary(fit_ez)
+ez_pars <- fit_ez |>
+  spread_draws(b_drift_Intercept, b_drift_instructionspeed, b_drift_abs_xs,
+               b_bound_Intercept, b_bound_instructionspeed,
+               b_ndt_Intercept, b_ndt_instructionspeed) |>
+      mutate(bound_accuracy = exp(b_bound_Intercept),
+            bound_speed = exp(b_bound_Intercept + b_bound_instructionspeed),
+            ndt_accuracy = exp(b_ndt_Intercept),
+            ndt_speed = exp(b_ndt_Intercept + b_ndt_instructionspeed))
 
-# TODO (Adriana): posterior plots + parameter interpretation
+ez_pars |>
+  pivot_longer(c(bound_accuracy, bound_speed, ndt_accuracy, ndt_speed,
+                 b_drift_abs_xs, b_drift_instructionspeed),
+               names_to = "parameter") |>
+  mutate(parameter = recode(parameter,
+         bound_accuracy = "boundary, accuracy",
+         bound_speed = "boundary, speed",
+         ndt_accuracy = "non-decision time, accuracy",
+         ndt_speed = "non-decision time, speed",
+         b_drift_abs_xs = "drift, per unit |Xs|",
+         b_drift_instructionspeed = "drift, speed - accuracy")) |>
+  group_by(parameter) |> median_qi(value)
 ```
+
+The boundary is in arbitrary units of evidence. The non-decision time is in seconds. Drift is in evidence per second. In the table above, *drift, per unit |Xs|* is the change in drift for a one-unit step away from a 50/50 pixel configuration, and *drift, speed - accuracy* is the difference between speed and accuracy instructions.
+
+```{r}
+#| label: posterior-plot
+#| fig-alt: "Posterior distributions of boundary separation and non-decision time under accuracy and speed instructions."
+ez_pars |>
+  pivot_longer(c(bound_accuracy, bound_speed, ndt_accuracy, ndt_speed),
+               names_to = c("parameter", "instruction"),
+               names_sep = "_") |>
+  mutate(parameter = recode(parameter, bound = "boundary separation",
+                            ndt = "non-decision time")) |>
+  ggplot(aes(x = value, y = instruction, fill = instruction)) +
+  stat_halfeye(alpha = 0.8) +
+  facet_wrap(~ parameter, scales = "free_x") +
+  scale_fill_manual(values = c(accuracy = wk_colors[["blue"]],
+                                speed = wk_colors[["orange"]]),
+                     guide = "none") +
+  labs(x = "Posterior value", y = NULL) +
+  theme_workshop()
+```
+
+We can test any coefficient with one line of code using the `hypothesis()` function.
+
+```{r}
+#| label: hypotheses
+# Does drift increase as the pixel configuration moves away from 50/50?
+hypothesis(fit_ez, "drift_abs_xs > 0")
+
+# Is the boundary lower under speed instructions?
+hypothesis(fit_ez, "bound_instructionspeed < 0")
+```
+
+How to read the two outputs:
+
+- **`Estimate`**, **`CI.Lower`**, **`CI.Upper`**: the posterior mean of the tested coefficient and its credible interval. These tests are directional, so the interval is one-sided and differs slightly from the 95% interval in `summary()`.
+- **`Evid.Ratio`** is the posterior odds in favour of the inequality. **`Post.Prob`** is the share of draws that satisfy it.
+- **`Star`** marks a hypothesis whose interval excludes zero.
+
+In this fit, drift increases as the black-to-white pixel configuration moves away from 50/50, and the boundary is lower under speed instructions. Both intervals lie entirely on that side of zero. Speed instructions also come with a higher drift and a longer non-decision time.
 
 ## Scaling up: trial-level DDM
 
-Same workflow at the trial level — the fitted model again ships in `models/`:
+The same three parameters can be estimated from the trials themselves, with a Wiener likelihood, when the study needs the whole RT distribution rather than the cell summaries. `ddm()` expects one row per trial: `rt` in seconds, and `response` coded 1 for a correct judgment and 0 for an error. The starting point stays at its default, halfway between the boundaries.
+
+```{r}
+#| label: trial-data
+trial_data <- dat |>
+  mutate(
+    instruction = factor(if_else(cond <= 33, "accuracy", "speed"),
+                         levels = c("accuracy", "speed")),
+    xs = ((cond - 1) %% 33 - 16) / 5,
+    abs_xs = abs(xs),
+    majority = if_else(xs < 0, "more black", "more white"),
+    response = as.integer(
+      (response == 1 & majority == "more black") |
+        (response == 2 & majority == "more white")
+    ),
+    rt = rt_ms / 1000
+  ) |>
+  select(rt, response, instruction, abs_xs)
+head(trial_data, 4)
+```
+
+```{r}
+#| label: trial-model
+trial_model <- ddm(rt = "rt", response = "response")
+trial_model
+```
+
+The formulas are the ones used for the EZ model. The fitted object ships in `models/`:
 
 ```{r}
 #| label: load-fit-trial
-#| eval: false
+#| eval: !expr file.exists(here::here("models", "ddm_trial.rds"))
 fit_trial <- readRDS(here("models", "ddm_trial.rds"))
+summary(fit_trial)
 ```
 
 ```{r}
 #| label: refit-trial
 #| eval: false
-# Optional re-fit (Stan toolchain required):
-# TODO (Adriana): trial-level DDM (Wiener likelihood) + saveRDS()
+# Safety lock: a saved fit is loaded. Delete models/ddm_trial.rds to compile again.
+if(file.exists(here("models", "ddm_trial.rds"))) {
+  fit_trial <- readRDS(here("models", "ddm_trial.rds"))
+}else{
+  fit_trial <- bmm(formula = bmf(drift ~ 1 + instruction + abs_xs,
+                                 bound ~ 1 + instruction,
+                                 ndt   ~ 1 + instruction),
+              data  = trial_data,
+              model = trial_model,
+              sample_prior = "yes",
+              file  = here("models", "ddm_trial"),
+              file_refit = "on_change",
+              cores = 4)
+}
 ```
+
+The two fits agree that drift increases as the pixel configuration moves away from 50/50 (`drift_abs_xs` is about 1.13 in both) and that the boundary is lower under speed instructions. That boundary difference is smaller in the trial-level fit. Non-decision time does not agree: under speed instructions it is longer in the EZ fit and shorter in the trial-level fit. The trial-level model uses each response time. The EZ model uses the mean, the variance, and the number correct.
 
 ## Further reading
 
-See `resources/03_ezddm/` for PDFs and `resources/README.md` for the full
-reading list with DOIs.
+Wagenmakers, van der Maas, and Grasman (2007) derive the EZ summary equations. Chávez De la Peña and Vandekerckhove (2025) place that model in a Bayesian hierarchical regression. DOIs and PDFs are listed in `resources/README.md`.
