@@ -4,9 +4,7 @@ subtitle: "Copy these patterns into your own deck"
 author: "Gidon T. Frischkorn, Chenyu Li & Adriana F. Chávez De la Peña"
 institute: "Psychonomic Society Annual Meeting 2026, San Diego"
 date: "November 2026"
-format:
-  revealjs:
-    theme: [default, custom.scss]
+format: revealjs
 ---
 
 ```{r}
