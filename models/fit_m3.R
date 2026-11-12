@@ -75,7 +75,8 @@ formula_complex <- bmf(
 # Intercept is class b for these nonlinear parameter formulas.
 priors_complex <- c(
   prior(normal(3, 1), class = "b", nlpar = "a", coef = "Intercept"),
-  prior(normal(3, 1), class = "b", nlpar = "c", coef = "Intercept")
+  prior(normal(3, 1), class = "b", nlpar = "c", coef = "Intercept"),
+  prior(logistic(0, 1), class = "b", nlpar = "f", coef = "Intercept")
 )
 
 ## 3.5 Fit
