@@ -230,8 +230,6 @@ fit_simple <- bmm(
   model = model_simple,
   data = dat_simple,
   prior = priors_simple,
-  file = here("models", "m3_simple"),
-  file_refit = "on_change",
   chains = 4,
   cores = 4,
   iter = 5000,
@@ -239,7 +237,9 @@ fit_simple <- bmm(
   control = list(adapt_delta = 0.95),
   sample_prior = "yes",
   backend = "cmdstanr",
-  seed = 2026
+  seed = 2026,
+  file = here("models", "m3_simple"),
+  file_refit = "on_change"
 )
 ```
 
