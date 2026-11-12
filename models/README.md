@@ -27,8 +27,8 @@ dependency in this repo is the SDT exception below.
 | --- | --- | --- | --- | --- |
 | `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.3.2.9000 (develop `1625e860`, 2026-10-05) / 2.23.0 | done (re-fit at release) |
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.3.2.9000 (develop `1625e860`, 2026-10-05) / 2.23.0 | done (re-fit at release) |
-| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.3.1 / 2.23.0 | done |
-| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.3.1 / 2.23.0 | done |
+| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.4.2 / 2.23.0 | done |
+| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.4.2 / 2.23.0 | done |
 | `ezddm_summary.rds` | EZ-DDM, 3 parameters (`ezdm(version = "3par")`; drift ~ instruction + abs(Xs), bound and ndt ~ instruction; one participant, 64 cells) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
 | `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,373 trials) | Adriana | 1.3.2.9000 (develop, same install as Part 1) / 2.23.0 | done (re-fit on CRAN bmm before the workshop) |
 
