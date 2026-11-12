@@ -1,8 +1,8 @@
 # Fit the open-set and pre-cue M3 subsets from Frischkorn & Li (2026).
 # Run from the repository root: Rscript models/fit_m3.R
 # Fits are cached at models/m3_simple.rds and models/m3_complex.rds.
-# CRAN bmm 1.3.1 does not support
-# brms's on_change mode; remove the file or use file_refit = "always" to refit.
+# With file_refit = "on_change", a cached fit is loaded unless the model, data,
+# or priors have changed; use file_refit = "always" to force a refit.
 
 # 1. Setup
 
@@ -48,7 +48,7 @@ fit_simple <- bmm(
   chains = 4, cores = 4, iter = 5000, warmup = 2000,
   control = list(adapt_delta = 0.95),
   sample_prior = "yes", backend = "cmdstanr", seed = 2026,
-  file = file.path("models", "m3_simple"), file_refit = "never"
+  file = file.path("models", "m3_simple"), file_refit = "on_change"
 )
 
 # 3. Complex span
@@ -85,5 +85,5 @@ fit_complex <- bmm(
   chains = 4, cores = 4, iter = 5000, warmup = 2000,
   control = list(adapt_delta = 0.95),
   sample_prior = "yes", backend = "cmdstanr", seed = 2026,
-  file = file.path("models", "m3_complex"), file_refit = "never"
+  file = file.path("models", "m3_complex"), file_refit = "on_change"
 )
