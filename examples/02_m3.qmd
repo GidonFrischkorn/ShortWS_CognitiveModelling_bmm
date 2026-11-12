@@ -541,13 +541,16 @@ formula_complex <- bmf(
 ```
 
 $a$ and $c$ get the same `normal(3, 1)` prior as in simple span (see
-[Priors](#priors)); $f$ keeps bmm's default prior:
+[Priors](#priors)). $f$ is estimated on the logit scale, where a
+`logistic(0, 1)` prior makes every value of $f$ between 0 and 1 equally
+plausible:
 
 ```{r}
 #| label: complex-priors
 priors_complex <- c(
   prior(normal(3, 1), class = "b", nlpar = "a", coef = "Intercept"),
-  prior(normal(3, 1), class = "b", nlpar = "c", coef = "Intercept")
+  prior(normal(3, 1), class = "b", nlpar = "c", coef = "Intercept"),
+  prior(logistic(0, 1), class = "b", nlpar = "f", coef = "Intercept")
 )
 ```
 
@@ -591,7 +594,7 @@ sum(complex_nuts$Value[complex_nuts$Parameter == "divergent__"])
 ```
 
 This fit has no divergent transitions. Maximum Rhat is 1.00; minimum bulk and
-tail ESS are 3,737 and 3,932.
+tail ESS are 3,013 and 2,937.
 
 ### Evaluate
 
