@@ -35,7 +35,9 @@
   justify-content: center;
 }
 
-.reveal .slide.section-divider.present {
+// Keep the flex layout while a slide fades out, not only while it is present;
+// Reveal hides undisplayed slides with an inline display: none.
+.reveal .slide.section-divider:not([style*="display: none"]) {
   display: flex !important;
 }
 
@@ -59,7 +61,7 @@
   box-sizing: border-box;
   flex-direction: column;
 
-  &.present {
+  &:not([style*="display: none"]) {
     display: flex !important;
   }
 
@@ -757,4 +759,32 @@
   margin: 0;
   max-width: 90%;
   text-align: center;
+}
+
+// Formulas revealed one at a time within a formula block.
+.reveal .m3-binding-formula > .fragment > p {
+  margin: 0;
+}
+
+.reveal .m3-binding-formula > .fragment + .fragment {
+  margin-top: 32px;
+}
+
+// Jump link to another slide, at the bottom right, outside the slide's layout.
+.reveal .m3-slide-link {
+  position: absolute;
+  right: 0;
+  bottom: 1em;
+  margin: 0;
+}
+
+.reveal .m3-slide-link a {
+  display: inline-block;
+  padding: 0.2em 0.4em;
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.reveal .m3-slide-link svg {
+  display: block;
 }
