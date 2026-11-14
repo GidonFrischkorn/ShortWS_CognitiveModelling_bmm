@@ -6,8 +6,9 @@
 # (demos/applications/brightness_perception/data/nh.tsv).
 # The source has no header and one row per trial.
 #
-# The cuts match the 2025 brightness demo: drop the even-mix cells, where
-# accuracy is undefined, and drop trials slower than 3000 ms.
+# The cuts match the 2025 brightness demo, plus a fast-trial cut: drop the
+# 50/50 cells, where accuracy is undefined, drop trials faster than 200 ms,
+# and drop trials slower than 3000 ms.
 #
 # Run from the repo root: Rscript data/prepare_ezddm_perceptual.R
 library(here)
@@ -33,16 +34,16 @@ stopifnot(nrow(raw_data) == 7890,
 # Drop the 50/50 cells (cond 17 and 50; no correct answer).
 clean_data <- raw_data[!(raw_data$cond %in% c(17, 50)), ]
 
-# Drop trials slower than 3000 ms.
-clean_data <- clean_data[clean_data$rt_ms <= 3000, ]
+# Drop trials faster than 200 ms or slower than 3000 ms.
+clean_data <- clean_data[clean_data$rt_ms >= 200 & clean_data$rt_ms <= 3000, ]
 
-# Confirm the cleaned file: 64 cells, no even-mix rows, no slow trials.
-stopifnot(nrow(clean_data) == 7373,
+# Confirm the cleaned file: 64 cells, no 50/50 rows, no fast or slow trials.
+stopifnot(nrow(clean_data) == 7369,
           all(clean_data$index == 1),
           length(unique(clean_data$cond)) == 64,
           !any(clean_data$cond %in% c(17, 50)),
           all(clean_data$response %in% c(1, 2)),
-          min(clean_data$rt_ms) == 173,
+          min(clean_data$rt_ms) == 202,
           max(clean_data$rt_ms) == 2981)
 
 # Write the contracted workshop file.

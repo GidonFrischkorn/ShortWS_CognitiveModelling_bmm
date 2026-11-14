@@ -161,7 +161,7 @@ The participant decided whether the overall brightness of a pixel array was high
 - **Instruction:** accuracy or speed.
 - **Stimulus configuration:** the black-to-white proportion, changed in graded steps. Within each instruction there are 16 steps with more black pixels than white, then 16 steps with more white pixels than black. The judgment is harder when the mix is closer to half and half, and easier as the proportion moves away from an even mix.
 
-The source file also contains two 50/50 cells (`cond` 17 and 50), where the display is half black and half white and accuracy is undefined. The prepare script drops those cells, and drops trials with `rt_ms` above 3000 (too slow). The CSV has the remaining 7,373 trials in 64 cells. One row per trial.
+The source file also contains two 50/50 cells (`cond` 17 and 50), where the display is half black and half white and accuracy is undefined. The prepare script drops those cells, drops trials with `rt_ms` below 200 (too fast), and drops trials with `rt_ms` above 3000 (too slow). The CSV has the remaining 7,369 trials in 64 cells. One row per trial.
 
 - `cond` 1–16: more black than white, accuracy instructions.
 - `cond` 18–33: more white than black, accuracy instructions.
@@ -175,4 +175,4 @@ Response `1` is correct on mostly-black displays and response `2` is correct on 
 | `index` | int | 1 | Present on every row. This file is participant N.H. only. |
 | `cond` | int | 1–16, 18–33, 34–49, 51–66 | Stimulus and instruction cell (see above). |
 | `response` | int | 1, 2 | Brightness judgment: 1 = low, 2 = high. |
-| `rt_ms` | int | 173–2981 | Response time in milliseconds. |
+| `rt_ms` | int | 202–2981 | Response time in milliseconds. |
