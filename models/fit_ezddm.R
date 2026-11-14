@@ -1,9 +1,8 @@
 # Fit the Part-3 diffusion models with bmm and cache them in models/
 # (naming contract in models/README.md).
 #
-# EZ-DDM and the trial-level DDM are in the CRAN release of bmm. This script
-# was run with the development build already installed for Part 1
-# (1.3.2.9000). Re-fit from CRAN when that release is what participants have.
+# Refit on 2026-11-14 with CRAN bmm 1.4.2 and backend cmdstanr.
+# From 1.4.1 the EZ likelihood no longer treats response times as normal.
 #
 # Run from the repo root:
 #   Rscript models/fit_ezddm.R          # EZ summary model only
@@ -21,7 +20,7 @@ if(length(which_fit) == 0){  which_fit <- "ez"   }
 
 dat <- read.csv(file.path("data", "ezddm_perceptual.csv"))
 
-options(mc.cores = 4, brms.backend = "rstan")
+options(mc.cores = 4, brms.backend = "cmdstanr")
 
 # Shared cell covariates. Accuracy is the reference instruction condition.
 # Xs places the black-to-white mix; abs_xs is the distance from a 50/50 mix.
