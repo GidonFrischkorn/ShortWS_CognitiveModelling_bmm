@@ -30,7 +30,7 @@ dependency in this repo is the SDT exception below.
 | `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.3.1 / 2.23.0 | done |
 | `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.3.1 / 2.23.0 | done |
 | `ezddm_summary.rds` | EZ-DDM, 3 parameters (`ezdm(version = "3par")`; drift ~ instruction + abs(Xs), bound and ndt ~ instruction; one participant, 64 cells) | Adriana | 1.4.2 (CRAN) / 2.23.0 | done (refit 2026-11-14, cmdstanr) |
-| `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,373 trials) | Adriana | 1.4.2 (CRAN) / 2.23.0 | done (refit 2026-11-14, cmdstanr) |
+| `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,369 trials) | Adriana | 1.4.2 (CRAN) / 2.23.0 | done (refit 2026-11-14, cmdstanr) |
 
 M3 sampling uses four chains, 5,000 iterations per chain, 2,000 warmup,
 `adapt_delta = 0.95`, and seed 2026. Rhat is reported to two decimals: 1.01 for open set and 1.00 for pre-cue.
