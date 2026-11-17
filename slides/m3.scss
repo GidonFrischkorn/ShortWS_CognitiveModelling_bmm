@@ -788,3 +788,10 @@
 .reveal .m3-slide-link svg {
   display: block;
 }
+
+// The shared theme shows code on .smaller slides at 0.85em. At that size the
+// 16-line bmm() call on the fit slide is a few pixels taller than the
+// code-block height limit, and its closing line was cut off.
+.reveal #fit-once-load-the-result-for-the-workshop pre code {
+  max-height: none;
+}
