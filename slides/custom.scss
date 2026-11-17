@@ -255,8 +255,89 @@ $code-block-font-size: 0.65em;
   font-size: 0.7em;
 }
 
+// Workflow track: SPECIFY · FIT · EVALUATE above the slide title, the active
+// step(s) in blue and the rest grey, so attendees always know which of the
+// three bmm steps a slide belongs to. Markup, one line right after the
+// heading (any number of steps can be .on):
+//   ## Choose the model {.smaller}
+//   [[specify]{.on} · fit · evaluate]{.track}
+// Pattern reference: slides/00_template.qmd ("Workflow markers").
+.reveal .slides section > p:has(> .track) {
+  margin: 0;
+  height: 0;
+}
+
+.reveal .slides section:has(> p > .track) > h2 {
+  padding-top: 0.55em;
+}
+
+.reveal .slides section .track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $uzh-gray;
+  line-height: 1;
+
+  .on {
+    color: $uzh-blue;
+  }
+}
+
+// White variant on the blue divider and question slides.
+.reveal .slides section.section-divider .track,
+.reveal .slides section.question-slide .track {
+  color: rgba(255, 255, 255, 0.5);
+
+  .on {
+    color: $uzh-white;
+  }
+}
+
+// Inline code on a blue take-home divider (`{.section-divider .take-home}`):
+// blue on white, so file names and function names stay legible.
+.reveal .slide.section-divider.take-home code {
+  color: $uzh-blue;
+  background-color: $uzh-white;
+  padding: 0.08em 0.35em;
+  border-radius: 4px;
+}
+
+// Inline variant: the same marker shown in running text (the roadmap slide
+// that introduces it), not positioned.
+.reveal .slides section .track.inline {
+  position: static;
+  display: inline-block;
+  font-size: 0.6em;
+  vertical-align: middle;
+}
+
+.reveal .slides section > p:has(> .track.inline) {
+  height: auto;
+  margin: 0.5em 0;
+}
+
 .smaller {
   font-size: 0.55em;
+}
+
+// Code and tables on `.smaller` slides: without this they inherit the 0.55em
+// twice over (0.65em code of a 0.55em slide ≈ 13px at 1280×720), which is
+// unreadable from the back of the room.
+.reveal .slide.smaller pre {
+  font-size: 0.85em;
+}
+
+.reveal .slide.smaller table {
+  font-size: 0.85em;
+
+  th, td {
+    padding: 0.3em 0.8em;
+  }
 }
 
 // Counterpart to reveal.js's built-in `semi-fade-out`: dimmed until its
@@ -320,4 +401,52 @@ $code-block-font-size: 0.65em;
   padding: 0.8em 1.2em;
   margin: 0.5em 0;
   text-align: center;
+}
+
+// Side-by-side boxes of equal height (roadmap slide): each column is a flex
+// container, so its box stretches to the tallest one in the row. The row is
+// set to flex here too: Quarto's `div.columns { display: initial }` outranks
+// the plain `.columns` rule above.
+.reveal .columns.model-boxes {
+  display: flex;
+  gap: 0;
+}
+
+.reveal .columns.model-boxes > .column {
+  display: flex;
+
+  > .formula-box {
+    flex: 1;
+    margin-top: 0;
+    margin-bottom: 0.4em;
+    padding: 0.4em 1em;
+  }
+}
+
+// Presenter name inside a box: set off from the box's content.
+.reveal .speaker {
+  font-style: italic;
+  font-size: 0.85em;
+  color: $uzh-gray-dark;
+}
+
+// QR code on the title slide (partial slides/partials/title-slide.html, used by
+// 01_Intro_bmm_SDT only): bottom right, clear of the logo and footer.
+#title-slide .title-qr {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+  width: 170px;
+  text-align: center;
+
+  img {
+    width: 170px;
+    margin: 0;
+  }
+
+  p {
+    margin: 0.2em 0 0;
+    font-size: 0.5em;
+    color: $uzh-gray-dark;
+  }
 }
