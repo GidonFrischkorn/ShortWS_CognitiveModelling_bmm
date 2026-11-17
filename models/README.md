@@ -18,7 +18,11 @@ Development versions (`Install_Packages.R`, Part 3) are for prototyping only;
 re-fit with CRAN versions before committing.
 
 All six fits come from CRAN releases of bmm (1.4.1 or 1.4.2, see the
-table); nothing in this repo needs a development version.
+table); nothing in this repo needs a development version. Checked on
+2026-11-17 under bmm 1.4.2: rerunning the three fitting scripts reloads all
+six cached fits without refitting (`file_refit = "on_change"`), so 1.4.2
+builds the same Stan code and data the fits were made with, the 1.4.1 SDT
+fits included.
 
 ## Naming contract
 
