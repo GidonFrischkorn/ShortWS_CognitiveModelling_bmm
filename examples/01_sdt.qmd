@@ -126,7 +126,7 @@ bmm_data_check(
 )
 ```
 
-Read the findings for what they are: the "fewer than 10 observations" note counts *rows* per participant, and two rows per participant (old items, new items) is exactly the shape `sdt_yn()` wants; the trial counts live inside `n_trials`. The line that matters is the last one: the hard checks passed.
+Read the findings for what they are. `condition` is a character column, so bmm codes it as a factor in alphabetical order, which makes `full_attention` the reference level. The 96 empty cells are the design: each participant took part in one condition only. The trial counts come from `n_trials`, here 154 to 300 per participant. The line that matters is the last one: the hard checks passed.
 
 ## Fit: load the cached model
 
