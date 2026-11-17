@@ -280,7 +280,14 @@ if(file.exists(here("models", "ddm_trial.rds"))) {
 }
 ```
 
-The two fits agree that drift increases as the pixel configuration moves away from 50/50 (`drift_abs_xs` is about 1.13 in both) and that the boundary is lower under speed instructions. That boundary difference is smaller in the trial-level fit. Non-decision time does not agree: under speed instructions it is longer in the EZ fit and shorter in the trial-level fit. The trial-level model uses each response time. The EZ model uses the mean, the variance, and the number correct.
+```{r}
+#| label: drift-compare
+# Posterior mean of drift per unit |Xs|, from each saved fit.
+drift_ez <- sprintf("%.2f", fixef(fit_ez)["drift_abs_xs", "Estimate"])
+drift_trial <- sprintf("%.2f", fixef(fit_trial)["drift_abs_xs", "Estimate"])
+```
+
+The two fits agree that drift increases as the pixel configuration moves away from 50/50 (`drift_abs_xs` is `r drift_ez` in the EZ fit and `r drift_trial` in the trial-level fit) and that the boundary is lower under speed instructions. That boundary difference is smaller in the trial-level fit. Non-decision time does not agree: under speed instructions it is longer in the EZ fit and shorter in the trial-level fit. The trial-level model uses each response time. The EZ model uses the mean, the variance, and the number correct.
 
 ## Further reading
 
