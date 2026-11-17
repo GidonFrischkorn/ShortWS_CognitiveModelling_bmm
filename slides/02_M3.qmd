@@ -542,18 +542,22 @@ $$
 ::: {.m3-preparation-content}
 
 ```{.r}
-simple_span <- trials |>
-  summarise(corr = sum(response_type == "correct"),
-            other = sum(response_type == "other"),
-            npl = sum(response_type == "npl"),
-            .by = c(id, exp, setsize, n_corr, n_other, n_npl))
+dat_simple <- trials_simple |>
+  summarise(corr = sum(rcat == 1),
+            other = sum(rcat == 2),
+            npl = sum(rcat == 3),
+            .by = c(id, setsize, rsizeList, rsizeNPL)) |>
+  mutate(n_corr = 1L,
+         n_other = rsizeList - 1,
+         n_npl = rsizeNPL,
+         ss_fac = factor(setsize))
 ```
 
 ```{.text}
-          id     exp setsize n_corr n_other n_npl corr other npl
-1 10_openset openset       2      1       0     1   23     0   0
-2 10_openset openset       2      1       1     0   23     0   0
-3 10_openset openset       2      1       1     2   23     0   0
+          id setsize rsizeList rsizeNPL corr other npl n_corr n_other n_npl ss_fac
+1 10_openset       2         1        1   23     0   0      1       0     1      2
+2 10_openset       2         2        0   23     0   0      1       1     0      2
+3 10_openset       2         2        2   23     0   0      1       1     2      2
 ```
 
 :::
