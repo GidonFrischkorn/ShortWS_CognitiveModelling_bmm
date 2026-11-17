@@ -3,8 +3,8 @@ title: "Analyzing Behavioral Data at the Cognitive Process Level with bmm in R"
 subtitle: "Part 2: The Memory Measurement Model (M3)"
 author: "Chenyu Li"
 institute: "The University of Chicago"
-date: "November 26, 2026"
-date-format: "MMMM D, YYYY"
+date: "November 2026"
+date-format: "MMMM YYYY"
 filters:
   - math-layout.lua
 resources:
