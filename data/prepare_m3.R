@@ -26,23 +26,38 @@ read_experiment <- function(file, experiment) {
     mutate(exp = experiment, id = paste(id, experiment, sep = "_"))
 }
 
-## 2.2 Aggregate responses
-simple_span <- bind_rows(
+## 2.2 Choice trials
+choice_trials <- bind_rows(
   read_experiment(raw_files[1], "openset"),
   read_experiment(raw_files[2], "closedset")
 ) |>
+  # Drop the recall trials (typed answers, no response options): M3 needs option counts
   filter(rsizeList + rsizeNPL > 0) |>
-  group_by(id, exp, setsize, rsizeList, rsizeNPL) |>
+  # Sort so the aggregated rows keep the order of the cached fits
+  arrange(id, exp, setsize, rsizeList, rsizeNPL)
+
+# Save the open-set choice trials for the notebook's aggregation step
+choice_trials |>
+  filter(exp == "openset") |>
+  select(id, setsize, rsizeList, rsizeNPL, rcat) |>
+  write_csv(file.path("data", "m3_simple_trials.csv"))
+
+## 2.3 Aggregate responses
+simple_span <- choice_trials |>
   summarise(corr = sum(rcat == 1),
             other = sum(rcat == 2),
-            npl = sum(rcat == 3), .groups = "drop") |>
-  mutate(n_corr = 1, n_other = rsizeList - 1, n_npl = rsizeNPL,
-         ss_fac = factor(setsize), ss_lin = setsize - mean(setsize),
+            npl = sum(rcat == 3),
+            .by = c(id, exp, setsize, rsizeList, rsizeNPL)) |>
+  mutate(n_corr = 1,
+         n_other = rsizeList - 1,
+         n_npl = rsizeNPL,
+         ss_fac = factor(setsize),
+         ss_lin = setsize - mean(setsize),
          exp = factor(exp)) |>
   select(id, exp, setsize, ss_fac, ss_lin, corr, other, npl,
          n_corr, n_other, n_npl)
 
-## 2.3 Save the open-set teaching subset
+## 2.4 Save the open-set teaching subset
 simple_span <- simple_span |> filter(exp == "openset")
 write_csv(simple_span, file.path("data", "m3_simple_span.csv"))
 

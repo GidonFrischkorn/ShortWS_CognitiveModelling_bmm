@@ -20,7 +20,7 @@ assert len(words) == len(frames) == 6
 target = words[next(i for i, frame in enumerate(frames) if frame.text == "?")]
 groups = list(page("response-categories").find(".//*[@class='m3-response-categories']"))
 switch = page("response-categories").find(".//*[@class='m3-category-stages']/div")
-assert switch.get("data-fragment-index") == "3" and "fade-out" in switch.get("class")
+assert switch.get("data-fragment-index") == "4" and "fade-out" in switch.get("class")
 group_words = [g.find(".//*[@class='m3-category-items']").text.split(", ") for g in groups]
 assert group_words[0] == [target]
 assert set(group_words[1]) == set(words) - {target}
@@ -34,24 +34,27 @@ with (root / "data/m3_simple_span.csv").open() as f:
     rows = list(csv.DictReader(f))
 data = next(r for r in rows if r["id"] == "20_openset"
             and r["setsize"] == "6" and r["n_other"] == "5" and r["n_npl"] == "4")
-overview = page("test-option-composition")
-combination_group = overview.find(".//*[@class='m3-response-set-combinations fragment current-visible']")
-assert combination_group.get("data-fragment-index") == "0"
-for panel, combinations, size in zip(overview.find(".//*[@class='m3-real-tests']"), combination_group, (2, 4, 6, 8)):
-    displayed = {tuple(int(re.search(r"\d+", item.text)[0]) for item in row)
-                 for row in combinations}
-    expected = {tuple(int(r[k]) for k in ("n_corr", "n_other", "n_npl"))
-                for r in rows if int(r["setsize"]) == size}
-    assert displayed == expected
-    screen = panel.find(".//*[@class='m3-real-test-screen']")
-    assert screen.get("data-fragment-index") is None
-    options = list(screen.find(".//*[@class='m3-real-options']"))
-    composition = tuple(sum(o.get("class") == "m3-test-" + cat for o in options)
-                        for cat in ("correct", "other", "npl"))
-    assert composition in expected
-assert overview.find(".//*[@class='m3-data-example fragment']").get("data-fragment-index") == "1"
+overview = page("response-categories")
+combinations = overview.find(".//*[@class='m3-test-combinations']")
+displayed = {tuple(int(re.search(r"\d+", item.text)[0]) for item in row)
+             for row in combinations}
+expected = {tuple(int(r[k]) for k in ("n_corr", "n_other", "n_npl"))
+            for r in rows if int(r["setsize"]) == 6}
+assert displayed == expected
+colored = overview.find(".//*[@class='m3-real-options']")
+for item in colored:
+    category = item.get("class").removeprefix("m3-test-")
+    index = {"correct": 0, "other": 1, "npl": 2}[category]
+    assert item.text in group_words[index]
+assert overview.find(".//*[@class='m3-data-example fragment']").get("data-fragment-index") == "6"
+assert '## From responses to data {#test-option-composition' not in source
 for entry in overview.iter("div"):
     code, value = entry.find("code"), entry.find("strong")
     if code is not None and value is not None and code.text in ("setsize", "corr", "other", "npl", "n_corr", "n_other", "n_npl"):
         assert value.text == data[code.text]
+prepared = next(s for s in re.split(r"(?=^## )", source, flags=re.M)
+                if "{#preparing-simple-span-data " in s.splitlines()[0])
+assert 'summarise(corr = sum(response_type == "correct")' in prepared
+for row in rows[:3]:
+    assert all(str(row[k]) in prepared for k in ("id", "exp", "setsize", "corr", "other", "npl", "n_corr", "n_other", "n_npl"))
 print("Study, cue, category membership, timing, and displayed data are consistent.")
