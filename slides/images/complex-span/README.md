@@ -8,8 +8,9 @@ PNG transparency defines the object silhouette; retain the grey image background
 and set the element background color to tint the object, as in the experiment.
 The demonstration uses pairs image1/image5, image2/image8, image24/image4.
 
-Colored SVG variants embed the unmodified PNG and invert its alpha mask, then
-fill the silhouette directly. They have transparent backgrounds and do not
+Colored SVG variants embed a PNG whose alpha is the inverse of the original
+PNG's alpha and whose color is the variant color, so the silhouette is filled
+directly. They have transparent backgrounds and do not
 use colored rectangle layers in the slides.
 
 Remembered objects: avocado (image1), flamingo (image8), croissant (image4).

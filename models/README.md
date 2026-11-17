@@ -17,9 +17,8 @@ used in the table below (`packageVersion("bmm")`, `packageVersion("brms")`).
 Development versions (`Install_Packages.R`, Part 3) are for prototyping only;
 re-fit with CRAN versions before committing.
 
-Confirmed on 2026-08-18: **M3 and EZ-DDM need no development-version
-features** — both segments fit with CRAN bmm, so the only dev-version
-dependency in this repo is the SDT exception below.
+All six fits come from CRAN releases of bmm (1.4.1 or 1.4.2, see the
+table); nothing in this repo needs a development version.
 
 ## Naming contract
 
@@ -27,8 +26,8 @@ dependency in this repo is the SDT exception below.
 | --- | --- | --- | --- | --- |
 | `sdt_yn.rds` | Hierarchical yes/no SDT (`sdt_yn()`, EVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1 (CRAN, 2026-11-02) / 2.23.0 | done, final |
 | `sdt_rating.rds` | Rating-scale SDT (`sdt_rating()`, UVSDT, condition on `d` + `criterion`) | Gidon | 1.4.1 (CRAN, 2026-11-02) / 2.23.0 | done, final |
-| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.3.1 / 2.23.0 | done |
-| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.3.1 / 2.23.0 | done |
+| `m3_simple.rds` | M3 for simple span (`m3()`, softmax, open set; set size on `a` + `c`) | Chenyu | 1.4.2 (CRAN) / 2.23.0 | done |
+| `m3_complex.rds` | M3 for complex span (`m3()`, softmax, pre-cue; intercepts on `a` + `c` + `f`) | Chenyu | 1.4.2 (CRAN) / 2.23.0 | done |
 | `ezddm_summary.rds` | EZ-DDM, 3 parameters (`ezdm(version = "3par")`; drift ~ instruction + abs(Xs), bound and ndt ~ instruction; one participant, 64 cells) | Adriana | 1.4.2 (CRAN) / 2.23.0 | done (refit 2026-11-14, cmdstanr) |
 | `ddm_trial.rds` | Trial-level DDM (`ddm()`, Wiener likelihood; same formulas as `ezddm_summary.rds`; `zr` fixed at the midpoint; 7,369 trials) | Adriana | 1.4.2 (CRAN) / 2.23.0 | done (refit 2026-11-14, cmdstanr) |
 

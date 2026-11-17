@@ -10,6 +10,7 @@ filters:
 resources:
   - images/complex-span/*.svg
   - formula-callouts.js
+  - fragment-autoslide.js
 format:
   revealjs:
     theme: [m3.scss]
@@ -36,7 +37,47 @@ fit_simple <- readRDS(here::here("models", "m3_simple.rds"))
 
 
 
-## Follow along with the workshop {.smaller}
+## Concept: the memory measurement model (M3) {#m3-applications .no-title}
+
+```{=html}
+<svg viewBox="0 0 1000 470" width="100%" role="img" aria-labelledby="m3-tasks-title m3-tasks-desc">
+  <title id="m3-tasks-title">Memory tasks M3 applies to</title>
+  <desc id="m3-tasks-desc">M3, a measurement model for memory tasks with categorical responses, branches into working memory tasks (simple span, complex span, memory updating, change detection, and n-AFC) and long-term memory tasks (old/new, 2-AFC, and n-AFC).</desc>
+  <rect x="220" y="10" width="560" height="100" rx="12" fill="#0028a5"/>
+  <text x="500" y="52" text-anchor="middle" font-size="34" font-weight="bold" fill="white">M3</text>
+  <text x="500" y="90" text-anchor="middle" font-size="24" fill="white">Memory tasks with categorical responses</text>
+  <g class="fragment fade-in" data-fragment-index="0">
+    <path d="M 500 110 V 150 H 250 V 190" fill="none" stroke="#4a5568" stroke-width="2"/>
+    <rect x="60" y="190" width="380" height="60" rx="10" fill="white" stroke="#0028a5" stroke-width="2"/>
+    <text x="250" y="230" text-anchor="middle" font-size="28" fill="#0028a5">Working memory</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="1" font-size="22" text-anchor="middle" fill="#2d3748">
+    <g fill="white" stroke="#a3adb7" stroke-width="2">
+      <rect x="60" y="280" width="185" height="50" rx="8"/><rect x="255" y="280" width="185" height="50" rx="8"/>
+      <rect x="60" y="345" width="185" height="50" rx="8"/><rect x="255" y="345" width="185" height="50" rx="8"/>
+      <rect x="60" y="410" width="185" height="50" rx="8"/>
+    </g>
+    <text x="152.5" y="313">Simple span</text><text x="347.5" y="313">Complex span</text>
+    <text x="152.5" y="378">Memory updating</text><text x="347.5" y="378">Change detection</text>
+    <text x="152.5" y="443">n-AFC</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="2">
+    <path d="M 500 150 H 750 V 190" fill="none" stroke="#4a5568" stroke-width="2"/>
+    <rect x="560" y="190" width="380" height="60" rx="10" fill="white" stroke="#0028a5" stroke-width="2"/>
+    <text x="750" y="230" text-anchor="middle" font-size="28" fill="#0028a5">Long-term memory</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="3" font-size="22" text-anchor="middle" fill="#2d3748">
+    <g fill="white" stroke="#a3adb7" stroke-width="2">
+      <rect x="560" y="280" width="185" height="50" rx="8"/><rect x="755" y="280" width="185" height="50" rx="8"/>
+      <rect x="560" y="345" width="185" height="50" rx="8"/>
+    </g>
+    <text x="652.5" y="313">Old/new</text><text x="847.5" y="313">2-AFC</text>
+    <text x="652.5" y="378">n-AFC</text>
+  </g>
+</svg>
+```
+
+## Resources: workshop materials {.smaller}
 
 :::: {.columns}
 ::: {.column width="65%"}
@@ -56,7 +97,7 @@ In this session, we will:
 :::
 ::::
 
-## From memory activation to choice probabilities {.section-divider}
+## Concept: memory activation and choice {.section-divider}
 
 <!-- Draft: the object emoji are schematic picture stimuli, not experimental assets.
 The first two tasks are teaching examples, animated with native Reveal
@@ -71,17 +112,13 @@ Suggested pacing: logic 10–12 min; application 10–12 min; extension 3–4 mi
 
 How does memory activation determine choice probabilities?
 
-## Example of a recognition task {#recognition-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: recognition memory {#recognition-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen" aria-label="Instructions before the object sequence."><p class="m3-screen-instruction">Remember the objects for the test.</p></div></div>
 ```
 
-::: {.notes}
-Press next to start the automatic picture sequence.
-:::
-
-## Example of a recognition task {#remember-three-pictures .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
+## Task: recognition memory {#remember-three-pictures .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <style>
@@ -94,21 +131,17 @@ Press next to start the automatic picture sequence.
 .m3-stim { display: inline-block; font-size: 100px; line-height: 1.3; }
 .m3-stage { position: relative; }
 .m3-stage > .m3-stim { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.m3-stage.m3-spatial > .m3-left { left: 20%; }
-.m3-stage.m3-spatial > .m3-right { left: 80%; }
 .m3-location { width: 100px; height: 100px; border: 2px solid #a3adb7; display: flex; align-items: center; justify-content: center; font-size: 48px; }
 .m3-location.m3-cue { border: 5px solid #dc6800; }
+.m3-spatial-test { position: relative; }
 .m3-spatial-test .m3-cue-row,
 .m3-spatial-test .m3-option-row { position: absolute; left: 5%; width: 90%; display: grid; grid-template-columns: repeat(3, 1fr); justify-items: center; align-items: center; transform: translateY(-50%); }
 .m3-spatial-test .m3-cue-row { top: 50%; }
 .m3-spatial-test .m3-location { box-sizing: border-box; }
 .m3-spatial-test .m3-option-row { top: 82%; left: 20%; width: 60%; }
 .m3-spatial-test .m3-option-row .m3-stim { font-size: 64px; }
+.m3-spatial-test .m3-location .m3-stim { font-size: 64px; line-height: 1; }
 
-.reveal .slides section .columns.m3-choice-layout { display: flex; align-items: center; }
-.m3-choice-layout .column { text-align: center; }
-.reveal .slides section .m3-choice-layout .column.m3-choice-formulas { min-height: 440px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
-.m3-choice-formulas > .fragment > p { margin: 0; }
 .reveal .slides section > .cell img,
 .reveal .slides section > p > img,
 .reveal .slides section > svg { display: block; margin-inline: auto; }
@@ -125,15 +158,7 @@ Press next to start the automatic picture sequence.
 </div>
 ```
 
-::: {.notes}
-Apple, chair, and car appear automatically for one second each, then the
-response slide opens. Each image appears at the same screen location.
-These presentation intervals are for this teaching demonstration. The picture
-identities are illustrative.
-No spatial or serial-position report is required in this first task.
-:::
-
-## Example of a recognition task {#which-picture-did-you-see data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: recognition memory {#which-picture-did-you-see data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-response" aria-label="Two response options: a studied chair and a new bicycle.">
@@ -143,52 +168,68 @@ No spatial or serial-position report is required in this first task.
 </div></div>
 ```
 
-::: {.notes}
-Pause for a choice before identifying old and new. Introduce this as a
-teaching example of competitive selection, rather than a published task.
-:::
+## Concept: baseline and memory activation {#each-option-receives-activation .m3-binding-slide data-autoslide="0" auto-animate=true}
 
-## Baseline and memory activation {#each-option-receives-activation auto-animate=true}
+:::: {.m3-binding-layout}
+
+::: {.m3-binding-diagram}
 
 ```{=html}
-<svg data-id="m3-activation-plot" viewBox="0 0 1000 440" width="100%" height="440" role="img" aria-labelledby="m3-activation-title m3-activation-desc">
+<div class="m3-activation-figure" data-id="m3-activation-plot"><svg viewBox="0 0 1000 440" width="100%" role="img" aria-labelledby="m3-activation-title m3-activation-desc">
   <title id="m3-activation-title">Baseline and memory activation for old and new objects</title>
   <desc id="m3-activation-desc">Initially only axes and options are visible. The first click shows baseline b for both options; the second adds memory activation a above the old object's baseline; the new object remains at b. Heights are illustrative.</desc>
   <line x1="150" y1="320" x2="880" y2="320" stroke="#4a5568" stroke-width="2"/>
   <line x1="150" y1="320" x2="150" y2="45" stroke="#4a5568" stroke-width="2"/>
   <text x="95" y="185" transform="rotate(-90 95 185)" text-anchor="middle" font-size="28" fill="#4a5568">Activation</text>
   <g>
-  <rect data-fragment-index="0" class="fragment m3-grow-bar" x="300" y="270" width="130" height="50" fill="#7f7f7f"/>
+  <rect data-fragment-index="0" data-autoslide="550" class="fragment m3-grow-bar" x="300" y="270" width="130" height="50" fill="#7f7f7f"/>
   <rect data-fragment-index="0" class="fragment m3-grow-bar" x="650" y="270" width="130" height="50" fill="#7f7f7f"/>
   <g font-size="34" fill="white" text-anchor="middle" font-style="italic">
     <text data-fragment-index="0" class="fragment fade-in" x="365" y="307">b</text><text data-fragment-index="0" class="fragment fade-in" x="715" y="307">b</text>
   </g>
   </g>
+  <g class="fragment fade-in" data-fragment-index="1" data-autoslide="0">
+    <path d="M 802 205 H 933 Q 945 205 945 217 V 253 Q 945 265 933 265 H 820 L 780 290 L 800 265 Q 790 263 790 253 V 217 Q 790 205 802 205 Z" fill="white" stroke="#7f7f7f" stroke-width="2" stroke-linejoin="round"/>
+    <text x="867.5" y="235" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">baseline</text>
+  </g>
   <g>
-    <rect data-fragment-index="1" class="fragment m3-grow-bar" x="300" y="130" width="130" height="140" fill="#0028a5"/>
-    <text data-fragment-index="1" class="fragment fade-in" x="365" y="212" font-size="34" text-anchor="middle" font-style="italic" fill="white">a</text>
+    <rect data-fragment-index="2" data-autoslide="550" class="fragment m3-grow-bar" x="300" y="130" width="130" height="140" fill="#0028a5"/>
+    <text data-fragment-index="2" class="fragment fade-in" x="365" y="212" font-size="34" text-anchor="middle" font-style="italic" fill="white">a</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="3" data-autoslide="0">
+    <path d="M 452 75 H 651 Q 663 75 663 87 V 123 Q 663 135 651 135 H 470 L 430 170 L 450 135 Q 440 133 440 123 V 87 Q 440 75 452 75 Z" fill="white" stroke="#0028a5" stroke-width="2" stroke-linejoin="round"/>
+    <text x="551.5" y="105" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#0028a5">item memory</text>
   </g>
   <g text-anchor="middle">
     <text x="365" y="375" font-size="42">🪑</text><text x="715" y="375" font-size="42">🚲</text>
     <text x="365" y="420" font-size="28" fill="#4a5568">Old object</text><text x="715" y="420" font-size="28" fill="#4a5568">New object</text>
   </g>
-</svg>
+</svg></div>
 ```
 
-::: {.notes}
-Start with axes and options only. The first click shows both grey baseline
-bars and b labels; the second adds the blue memory segment only to old. Bar heights are schematic, not parameter
-estimates. Activation supports a choice; a is not a storage probability.
 :::
 
-## Choice probabilities: Luce’s choice rule {#simple-choice-rule auto-animate=true}
+::: {.m3-binding-formula .fragment fragment-index=4}
 
-:::: {.columns .m3-choice-layout}
+$$
+\begin{aligned}
+A(\mathrm{old}) &= b + a \\
+A(\mathrm{new}) &= b
+\end{aligned}
+$$
 
-::: {.column width="45%"}
+:::
+
+::::
+
+## Concept: Luce’s choice rule {#simple-choice-rule .m3-binding-slide}
+
+:::: {.m3-binding-layout}
+
+::: {.m3-binding-diagram}
 
 ```{=html}
-<svg data-id="m3-activation-plot" viewBox="0 0 1000 440" width="100%" height="440" role="img" aria-labelledby="m3-simple-activation-title m3-simple-activation-desc">
+<div class="m3-activation-figure" data-id="m3-activation-plot"><svg viewBox="0 0 1000 440" width="100%" role="img" aria-labelledby="m3-simple-activation-title m3-simple-activation-desc">
   <title id="m3-simple-activation-title">Baseline and memory activation for old and new objects</title>
   <desc id="m3-simple-activation-desc">Old has baseline b plus memory activation a; new has baseline b. Bar heights are illustrative.</desc>
   <line x1="150" y1="320" x2="880" y2="320" stroke="#4a5568" stroke-width="2"/>
@@ -203,16 +244,24 @@ estimates. Activation supports a choice; a is not a storage probability.
     <rect x="300" y="130" width="130" height="140" fill="#0028a5"/>
     <text x="365" y="212" font-size="34" text-anchor="middle" font-style="italic" fill="white">a</text>
   </g>
+  <g>
+    <path d="M 802 205 H 933 Q 945 205 945 217 V 253 Q 945 265 933 265 H 820 L 780 290 L 800 265 Q 790 263 790 253 V 217 Q 790 205 802 205 Z" fill="white" stroke="#7f7f7f" stroke-width="2" stroke-linejoin="round"/>
+    <text x="867.5" y="235" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">baseline</text>
+  </g>
+  <g>
+    <path d="M 452 75 H 651 Q 663 75 663 87 V 123 Q 663 135 651 135 H 470 L 430 170 L 450 135 Q 440 133 440 123 V 87 Q 440 75 452 75 Z" fill="white" stroke="#0028a5" stroke-width="2" stroke-linejoin="round"/>
+    <text x="551.5" y="105" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#0028a5">item memory</text>
+  </g>
   <g text-anchor="middle">
     <text x="365" y="375" font-size="42">🪑</text><text x="715" y="375" font-size="42">🚲</text>
     <text x="365" y="420" font-size="28" fill="#4a5568">Old object</text><text x="715" y="420" font-size="28" fill="#4a5568">New object</text>
   </g>
-</svg>
+</svg></div>
 ```
 
 :::
 
-::: {.column .m3-choice-formulas width="55%"}
+::: {.m3-binding-formula}
 
 ::: {.fragment fragment-index=0}
 
@@ -223,35 +272,18 @@ $$
 
 :::
 
-::: {.fragment fragment-index=1}
-
-$$
-P(\mathrm{new})=
-\frac{b}{(b+a)+b}
-$$
-
-:::
-
 :::
 
 ::::
 
-::: {.notes}
-Reference: Oberauer & Lewandowsky (2019), Eq. 2, applied to this teaching
-recognition example. Normalize the activation values directly: old receives
-b+a, new receives b. Point to each contribution in the shared denominator.
-This rule uses nonnegative activation values with a positive total; a fixed
-positive baseline sets their scale. The original paper fixed b at 0.1.
-:::
+## Concept: softmax choice rule {#softmax-choice-rule .m3-binding-slide}
 
-## Choice probabilities: Softmax {#softmax-choice-rule auto-animate=true}
+:::: {.m3-binding-layout}
 
-:::: {.columns .m3-choice-layout}
-
-::: {.column width="45%"}
+::: {.m3-binding-diagram}
 
 ```{=html}
-<svg data-id="m3-activation-plot" viewBox="0 0 1000 440" width="100%" height="440" role="img" aria-labelledby="m3-softmax-activation-title m3-softmax-activation-desc">
+<div class="m3-activation-figure" data-id="m3-activation-plot"><svg viewBox="0 0 1000 440" width="100%" role="img" aria-labelledby="m3-softmax-activation-title m3-softmax-activation-desc">
   <title id="m3-softmax-activation-title">Baseline and memory activation for old and new objects</title>
   <desc id="m3-softmax-activation-desc">Old has baseline b plus memory activation a; new has baseline b. Bar heights are illustrative.</desc>
   <line x1="150" y1="320" x2="880" y2="320" stroke="#4a5568" stroke-width="2"/>
@@ -266,16 +298,24 @@ positive baseline sets their scale. The original paper fixed b at 0.1.
     <rect x="300" y="130" width="130" height="140" fill="#0028a5"/>
     <text x="365" y="212" font-size="34" text-anchor="middle" font-style="italic" fill="white">a</text>
   </g>
+  <g>
+    <path d="M 802 205 H 933 Q 945 205 945 217 V 253 Q 945 265 933 265 H 820 L 780 290 L 800 265 Q 790 263 790 253 V 217 Q 790 205 802 205 Z" fill="white" stroke="#7f7f7f" stroke-width="2" stroke-linejoin="round"/>
+    <text x="867.5" y="235" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">baseline</text>
+  </g>
+  <g>
+    <path d="M 452 75 H 651 Q 663 75 663 87 V 123 Q 663 135 651 135 H 470 L 430 170 L 450 135 Q 440 133 440 123 V 87 Q 440 75 452 75 Z" fill="white" stroke="#0028a5" stroke-width="2" stroke-linejoin="round"/>
+    <text x="551.5" y="105" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#0028a5">item memory</text>
+  </g>
   <g text-anchor="middle">
     <text x="365" y="375" font-size="42">🪑</text><text x="715" y="375" font-size="42">🚲</text>
     <text x="365" y="420" font-size="28" fill="#4a5568">Old object</text><text x="715" y="420" font-size="28" fill="#4a5568">New object</text>
   </g>
-</svg>
+</svg></div>
 ```
 
 :::
 
-::: {.column .m3-choice-formulas width="55%"}
+::: {.m3-binding-formula}
 
 ::: {.fragment fragment-index=0}
 
@@ -286,88 +326,56 @@ $$
 
 :::
 
-::: {.fragment fragment-index=1}
-
-$$
-P(\mathrm{new})=
-\frac{\exp(b)}{\exp(b+a)+\exp(b)}
-$$
-
-:::
-
 :::
 
 ::::
 
-::: {.notes}
-Choice-rule reference: Oberauer (2023), Eq. 4.
-Now transform the same activations with exp before normalizing. These are
-alternative choice rules with different parameter scales, not equivalent
-rewritings of one model. Use softmax in all subsequent examples.
-Point from each numerator to the corresponding image on the preceding slide.
-Both options compete in the same choice and share a denominator. Their
-probabilities sum to one. A common b cancels from softmax; keep it visible
-to explain activation sources rather than estimating it independently.
-:::
-
-## Memory activation and choice probabilities {#stronger-item-memory-favors-the-old-image .m3-figure}
+## Concept: item activation and choice {#stronger-item-memory-favors-the-old-image .m3-figure}
 
 ```{r}
 #| label: recognition-demo
 #| echo: false
 #| fig-height: 4
-#| fig-alt: "Illustrative softmax probabilities: old and new are equally likely when memory activation is zero; greater memory activation favors old."
-recognition_demo <- expand_grid(a = c(0, 1, 2), option = c("Old", "New")) |>
+#| fig-alt: "Illustrative softmax probabilities as lines over memory activation a from 0 to 2: old and new are equally likely at a = 0; as a increases, the old line rises and the new line falls."
+recognition_demo <- expand_grid(a = seq(0, 2, by = 0.02), option = c("Old", "New")) |>
   mutate(b = 1, activation = b + if_else(option == "Old", a, 0),
          weight = exp(activation)) |>
   mutate(probability = weight / sum(weight), .by = a)
 recognition_demo |>
-  ggplot(aes(option, probability, fill = option)) +
-  geom_col(width = 0.6) +
-  geom_text(aes(label = sprintf("%.2f", probability)), vjust = -0.4, size = 6) +
-  facet_wrap(~a, labeller = label_both) +
-  scale_x_discrete(limits = c("Old", "New")) +
-  scale_fill_manual(values = c(New = wk_colors[["grey"]], Old = wk_colors[["blue"]]), guide = "none") +
+  ggplot(aes(a, probability, color = option)) +
+  geom_line(linewidth = 1.5) +
+  scale_color_manual(values = c(Old = wk_colors[["blue"]], New = wk_colors[["grey"]]),
+                     breaks = c("Old", "New")) +
   scale_y_continuous(limits = c(0, 1)) +
-  labs(x = NULL, y = "Choice probability") + theme_workshop() +
-  theme(strip.text = element_text(size = 20))
+  labs(x = expression("Memory activation" ~ italic(a)), y = "Choice probability", color = NULL) +
+  theme_workshop()
 ```
 
-## Two dimensions of memory strength {.section-divider}
+## Concept: two dimensions of memory strength {.section-divider}
 
 **Item memory** and **binding memory** as sources of activation.
 
-## Example of a location memory task {#location-memory-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: location memory {#location-memory-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
-<div class="m3-task"><div class="m3-screen" aria-label="Empty screen before the location memory sequence."></div></div>
+<div class="m3-task"><div class="m3-screen" aria-label="Instructions before the location memory sequence."><p class="m3-screen-instruction">Remember the objects and their locations.</p></div></div>
 ```
 
-::: {.notes}
-Press next to start the automatic picture sequence.
-:::
-
-## Example of a location memory task {#now-remember-the-locations .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
+## Task: location memory {#now-remember-the-locations .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task">
-  <div class="m3-screen m3-stage m3-spatial" aria-label="Sequential presentation: apple at left, chair at center, car at right.">
-    <span class="m3-stim m3-left fragment fade-out" data-fragment-index="0" role="img" aria-label="apple at left">🍎</span>
-    <span class="m3-stim fragment current-visible" data-fragment-index="0" role="img" aria-label="chair at center">🪑</span>
-    <span class="m3-stim m3-right fragment fade-in" data-fragment-index="1" role="img" aria-label="car at right">🚗</span>
+  <div class="m3-screen m3-spatial-test" aria-label="Sequential presentation in three location frames: apple at left, chair at center, car at right.">
+    <div class="m3-cue-row">
+      <span class="m3-location"><span class="m3-stim fragment fade-out" data-fragment-index="0" role="img" aria-label="apple at left">🍎</span></span>
+      <span class="m3-location"><span class="m3-stim fragment current-visible" data-fragment-index="0" role="img" aria-label="chair at center">🪑</span></span>
+      <span class="m3-location"><span class="m3-stim fragment fade-in" data-fragment-index="1" role="img" aria-label="car at right">🚗</span></span>
+    </div>
   </div>
 </div>
 ```
 
-::: {.notes}
-The key change is the instruction to remember image–location associations.
-As in recognition, each picture appears for one second: apple at left,
-chair at center, car at right. The pictures disappear as the next appears. Change only the
-spatial association and the retrieval instruction, not the basic presentation
-logic. These intervals are for the teaching demonstration.
-:::
-
-## Example of a location memory task {#which-image-was-in-the-center data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: location memory {#which-image-was-in-the-center data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-response m3-spatial-test" aria-label="The center location cue and all three response options are shown simultaneously.">
@@ -383,13 +391,7 @@ logic. These intervals are for the teaching demonstration.
 </div></div>
 ```
 
-::: {.notes}
-Keep the location cue visible above the response options throughout the test.
-Ask for a choice before labeling response categories. The test contains one
-correct image, one other studied image, and one new image.
-:::
-
-## Item and binding activation {#three-options-reveal-two-memory-sources .m3-binding-slide auto-animate=true}
+## Concept: item and binding activation {#three-options-reveal-two-memory-sources .m3-binding-slide data-autoslide="0" auto-animate=true}
 
 :::: {.m3-binding-layout}
 
@@ -404,7 +406,7 @@ correct image, one other studied image, and one new image.
   <text x="95" y="185" transform="rotate(-90 95 185)" text-anchor="middle" font-size="28" fill="#4a5568">Activation</text>
   <g>
   <g fill="#7f7f7f">
-    <rect data-fragment-index="0" class="fragment m3-grow-bar" x="245" y="290" width="110" height="50"/>
+    <rect data-fragment-index="0" data-autoslide="550" class="fragment m3-grow-bar" x="245" y="290" width="110" height="50"/>
     <rect data-fragment-index="0" class="fragment m3-grow-bar" x="490" y="290" width="110" height="50"/>
     <rect data-fragment-index="0" class="fragment m3-grow-bar" x="735" y="290" width="110" height="50"/>
   </g>
@@ -413,15 +415,27 @@ correct image, one other studied image, and one new image.
   </g>
   </g>
   <g>
-    <rect data-fragment-index="1" class="fragment m3-grow-bar" x="245" y="150" width="110" height="140" fill="#0028a5"/>
-    <rect data-fragment-index="1" class="fragment m3-grow-bar" x="490" y="150" width="110" height="140" fill="#0028a5"/>
+    <rect data-fragment-index="2" data-autoslide="550" class="fragment m3-grow-bar" x="245" y="150" width="110" height="140" fill="#0028a5"/>
+    <rect data-fragment-index="2" class="fragment m3-grow-bar" x="490" y="150" width="110" height="140" fill="#0028a5"/>
     <g fill="white" font-size="34" font-style="italic" text-anchor="middle">
-      <text data-fragment-index="1" class="fragment fade-in" x="300" y="232">a</text><text data-fragment-index="1" class="fragment fade-in" x="545" y="232">a</text>
+      <text data-fragment-index="2" class="fragment fade-in" x="300" y="232">a</text><text data-fragment-index="2" class="fragment fade-in" x="545" y="232">a</text>
     </g>
   </g>
   <g>
-    <rect data-fragment-index="2" class="fragment m3-grow-bar" x="245" y="-40" width="110" height="190" fill="#dc6800"/>
-    <text data-fragment-index="2" class="fragment fade-in" x="300" y="67" font-size="34" font-style="italic" text-anchor="middle" fill="white">c</text>
+    <rect data-fragment-index="4" data-autoslide="550" class="fragment m3-grow-bar" x="245" y="-40" width="110" height="190" fill="#dc6800"/>
+    <text data-fragment-index="4" class="fragment fade-in" x="300" y="67" font-size="34" font-style="italic" text-anchor="middle" fill="white">c</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="1" data-autoslide="0">
+    <path d="M 852 225 H 983 Q 995 225 995 237 V 263 Q 995 275 983 275 H 875 L 845 290 L 860 275 H 852 Q 840 275 840 263 V 237 Q 840 225 852 225 Z" fill="white" stroke="#7f7f7f" stroke-width="2" stroke-linejoin="round"/>
+    <text x="917.5" y="250" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">baseline</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="3" data-autoslide="0">
+    <path d="M 622 75 H 821 Q 833 75 833 87 V 123 Q 833 135 821 135 H 630 L 600 150 L 615 135 Q 610 133 610 123 V 87 Q 610 75 622 75 Z" fill="white" stroke="#0028a5" stroke-width="2" stroke-linejoin="round"/>
+    <text x="721.5" y="105" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">item memory</text>
+  </g>
+  <g class="fragment fade-in" data-fragment-index="5" data-autoslide="0">
+    <path d="M 377 -60 H 617 Q 629 -60 629 -48 V -12 Q 629 0 617 0 H 385 L 355 15 L 370 0 Q 365 -2 365 -12 V -48 Q 365 -60 377 -60 Z" fill="white" stroke="#dc6800" stroke-width="2" stroke-linejoin="round"/>
+    <text x="497" y="-30" text-anchor="middle" dominant-baseline="middle" font-size="32.1" fill="#4a5568">binding memory</text>
   </g>
   <g text-anchor="middle">
     <text x="300" y="397" font-size="42">🪑</text><text x="545" y="397" font-size="42">🍎</text><text x="790" y="397" font-size="42">🚲</text>
@@ -432,7 +446,7 @@ correct image, one other studied image, and one new image.
 
 :::
 
-::: {.m3-binding-formula .fragment fragment-index=3}
+::: {.m3-binding-formula .fragment fragment-index=6}
 
 $$
 \begin{aligned}
@@ -446,118 +460,116 @@ $$
 
 ::::
 
-::: {.notes}
-Start with axes and options only. The first click shows the three grey
-baseline bars and b labels; the second adds item activation a to both studied
-images; the third adds orange binding c only
-to the cued image. Do not add total labels above the bars. The sources follow
-Oberauer & Lewandowsky (2019), Eq. 1; this task is a teaching example.
-
-:::
-
-## Memory activation and choice probabilities {#what-does-binding-add .m3-figure}
+## Concept: binding activation and choice {#what-does-binding-add .m3-figure}
 
 ```{r}
 #| label: binding-demo
 #| echo: false
 #| fig-height: 4
-#| fig-alt: "Illustrative predictions holding item activation fixed: correct and other are equally likely without binding; adding binding increases correct choices."
-binding_demo <- expand_grid(c = c(0, 1, 2), option = c("Correct", "Others", "New")) |>
-  mutate(option = factor(option, levels = c("Correct", "Others", "New")),
-         b = 1, a = 1,
+#| fig-alt: "Illustrative softmax probabilities as lines over binding activation c from 0 to 2, holding item activation fixed: correct and other are equally likely at c = 0; as c increases, the correct line rises while the other and new lines fall."
+binding_demo <- expand_grid(c = seq(0, 2, by = 0.02), option = c("Correct", "Others", "New")) |>
+  mutate(b = 1, a = 1,
          activation = b + if_else(option == "New", 0, a) + if_else(option == "Correct", c, 0),
          weight = exp(activation)) |>
   mutate(probability = weight / sum(weight), .by = c)
 binding_demo |>
-  ggplot(aes(option, probability, fill = option)) +
-  geom_col(width = 0.6) +
-  facet_wrap(~c, labeller = label_both) +
-  scale_fill_manual(values = unname(wk_colors[c("blue", "orange", "grey")]), guide = "none") +
+  ggplot(aes(c, probability, color = option)) +
+  geom_line(linewidth = 1.5) +
+  scale_color_manual(values = c(Correct = wk_colors[["orange"]], Others = wk_colors[["blue"]], New = wk_colors[["grey"]]),
+                     breaks = c("Correct", "Others", "New")) +
   scale_y_continuous(limits = c(0, 1)) +
-  labs(x = NULL, y = "Choice probability") + theme_workshop() +
-  theme(strip.text = element_text(size = 20))
+  labs(x = expression("Binding activation" ~ italic(c)), y = "Choice probability", color = NULL) +
+  theme_workshop()
 ```
 
-::: {.notes}
-These are illustrative predictions with fixed a. Without binding, correct
-and other have equal activation; increasing c favors correct.
-:::
-
-## Applying M3 to simple span {.section-divider}
+## Task: simple span and M3 {.section-divider}
 
 Estimating item and binding memory with bmm.
 
-## Example of a simple-span task {#simple-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: simple span {#simple-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
 ```
 
-## Example of a simple-span task {#simple-span .m3-timed data-autoslide="900" data-transition="none" .m3-task-slide}
+## Task: simple span {#simple-span .m3-timed data-autoslide="900" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" aria-label="Study HAUS, HUND, TISCH, BAUM, HUT, BUCH sequentially from left to right.">
 <div class="m3-real-frames" style="--set-size: 6;"><span><span class="fragment fade-out" data-fragment-index="0">HAUS</span></span><span><span class="fragment current-visible" data-fragment-index="1" data-autoslide="900">HUND</span></span><span><span class="fragment current-visible" data-fragment-index="3" data-autoslide="900">TISCH</span></span><span><span class="fragment current-visible" data-fragment-index="5" data-autoslide="900">BAUM</span></span><span><span class="fragment current-visible" data-fragment-index="7" data-autoslide="900">HUT</span></span><span><span class="fragment current-visible" data-fragment-index="9" data-autoslide="900">BUCH</span></span></div><span class="fragment current-visible m3-study-interval" data-fragment-index="0" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="2" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="4" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="6" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="8" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="10" data-autoslide="1100" aria-hidden="true"></span></div></div>
 ```
 
-## Example of a simple-span task {#which-item-was-in-the-middle data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
+## Task: simple span {#which-item-was-in-the-middle data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames with the second position cued and ten word response options."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span>?</span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span>HAUS</span><span>TISCH</span><span>ZUG</span><span>BAUM</span><span>HUT</span><span>BUCH</span><span>BROT</span><span>BILD</span><span>HUND</span><span>GLAS</span></div></div></div>
 ```
 
-## Response categories and counts {#response-categories .m3-task-slide auto-animate=true}
+## Data: response categories and counts {#response-categories .m3-task-slide auto-animate=true}
 
 ```{=html}
-<div class="m3-category-layout">
-<div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames with the second position cued and ten word response options."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span>?</span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span>HAUS</span><span>TISCH</span><span>ZUG</span><span>BAUM</span><span>HUT</span><span>BUCH</span><span>BROT</span><span>BILD</span><span>HUND</span><span>GLAS</span></div></div></div>
-<div class="m3-category-stages"><div class="fragment fade-out" data-fragment-index="3"><div class="m3-response-categories"><div class="fragment m3-test-correct" data-fragment-index="0"><span class="m3-category-label">Correct (1):</span><span class="m3-category-items">HUND</span></div><div class="fragment m3-test-other" data-fragment-index="1"><span class="m3-category-label">Others (5):</span><span class="m3-category-items">HAUS, TISCH, BAUM, HUT, BUCH</span></div><div class="fragment m3-test-npl" data-fragment-index="2"><span class="m3-category-label">NPL (4):</span><span class="m3-category-items">ZUG, BROT, BILD, GLAS</span></div></div></div>
+<div class="m3-category-layout m3-simple-categories">
+<div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames with the second position cued and ten word response options."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span>?</span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span class="m3-test-other">HAUS</span><span class="m3-test-other">TISCH</span><span class="m3-test-npl">ZUG</span><span class="m3-test-other">BAUM</span><span class="m3-test-other">HUT</span><span class="m3-test-other">BUCH</span><span class="m3-test-npl">BROT</span><span class="m3-test-npl">BILD</span><span class="m3-test-correct">HUND</span><span class="m3-test-npl">GLAS</span></div></div></div>
+<div class="m3-category-stages"><div class="fragment fade-out" data-fragment-index="4"><div class="m3-response-categories"><div class="fragment m3-test-correct" data-fragment-index="0"><span class="m3-category-label">Correct (1):</span><span class="m3-category-items">HUND</span></div><div class="fragment m3-test-other" data-fragment-index="1"><span class="m3-category-label">Others (5):</span><span class="m3-category-items">HAUS, TISCH, BAUM, HUT, BUCH</span></div><div class="fragment m3-test-npl" data-fragment-index="2" data-autoslide="550"><span class="m3-category-label">NPL (4):<span class="m3-speech-bubble fragment" data-fragment-index="3" data-autoslide="0">Not-presented lure</span></span><span class="m3-category-items">ZUG, BROT, BILD, GLAS</span></div></div></div>
+<div class="fragment fade-out" data-fragment-index="5">
 ```
 
-::: {.m3-binding-formula .fragment fragment-index=3}
+::: {.m3-binding-formula .fragment fragment-index=4}
 
 $$
 \begin{aligned}
-A(\mathrm{Correct}) &= (b + a + c) \times 1 \\
-A(\mathrm{Others}) &= (b + a) \times 5 \\
-A(\mathrm{NPL}) &= b \times 4
+A(\mathrm{Correct}) &= b + a + c && \times 1 \\
+A(\mathrm{Others}) &= b + a && \times 5 \\
+A(\mathrm{NPL}) &= b && \times 4
 \end{aligned}
 $$
 
 :::
 
 ```{=html}
-</div></div>
-```
-
-## From responses to data {#test-option-composition .m3-design-slide}
-
-```{=html}
-<div class="m3-response-set-workflow"><div class="m3-real-tests"><div class="m3-real-test-example"><p>Set size 2</p><div class="m3-real-test-screen" aria-label="Test display for set size 2 with 4 response options."><div class="m3-real-frames" style="--set-size: 2;"><span></span><span>?</span></div><div class="m3-real-options"><span class="m3-test-other">HUT</span><span class="m3-test-correct">HUND</span><span class="m3-test-npl">ZUG</span><span class="m3-test-npl">BILD</span></div></div></div><div class="m3-real-test-example"><p>Set size 4</p><div class="m3-real-test-screen" aria-label="Test display for set size 4 with 8 response options."><div class="m3-real-frames" style="--set-size: 4;"><span></span><span>?</span><span></span><span></span></div><div class="m3-real-options"><span class="m3-test-other">HUT</span><span class="m3-test-correct">HUND</span><span class="m3-test-npl">ZUG</span><span class="m3-test-other">BAUM</span><span class="m3-test-npl">BROT</span><span class="m3-test-other">HAUS</span><span class="m3-test-npl">BILD</span><span class="m3-test-npl">GLAS</span></div></div></div><div class="m3-real-test-example"><p>Set size 6</p><div class="m3-real-test-screen" aria-label="Test display for set size 6 with 10 response options."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span>?</span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span class="m3-test-other">HAUS</span><span class="m3-test-other">TISCH</span><span class="m3-test-npl">ZUG</span><span class="m3-test-other">BAUM</span><span class="m3-test-other">HUT</span><span class="m3-test-other">BUCH</span><span class="m3-test-npl">BROT</span><span class="m3-test-npl">BILD</span><span class="m3-test-correct">HUND</span><span class="m3-test-npl">GLAS</span></div></div></div><div class="m3-real-test-example"><p>Set size 8</p><div class="m3-real-test-screen" aria-label="Test display for set size 8 with 12 response options."><div class="m3-real-frames" style="--set-size: 8;"><span></span><span>?</span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span class="m3-test-other">BAUM</span><span class="m3-test-other">BUCH</span><span class="m3-test-npl">ZUG</span><span class="m3-test-npl">GLAS</span><span class="m3-test-npl">BILD</span><span class="m3-test-other">HAUS</span><span class="m3-test-other">BOOT</span><span class="m3-test-other">TISCH</span><span class="m3-test-other">HUT</span><span class="m3-test-npl">BROT</span><span class="m3-test-other">STUHL</span><span class="m3-test-correct">HUND</span></div></div></div></div>
-<div class="m3-response-set-details"><div class="m3-response-set-combinations fragment current-visible" data-fragment-index="0"><ul class="m3-test-combinations"><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">0 Others</span> + <span class="m3-test-npl">1 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">2 NPL</span></li></ul><ul class="m3-test-combinations"><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">0 Others</span> + <span class="m3-test-npl">1 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">2 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">4 NPL</span></li></ul><ul class="m3-test-combinations"><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">0 Others</span> + <span class="m3-test-npl">1 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">2 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">4 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">4 NPL</span></li></ul><ul class="m3-test-combinations"><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">0 Others</span> + <span class="m3-test-npl">1 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">2 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">4 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">4 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">7 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">7 Others</span> + <span class="m3-test-npl">4 NPL</span></li></ul></div>
-<div class="m3-data-example fragment" data-fragment-index="1" aria-label="A real aggregated row for participant 20, set size 6, with 23 responses and ten available options per trial.">
-<div class="m3-data-card"><p>Subject ID</p><div class="m3-data-values m3-data-id"><div><code>id</code><strong>20</strong></div></div></div>
-<div class="m3-data-card"><p>Experiment &amp; set size</p><div class="m3-data-values m3-data-conditions"><div><code>exp</code><strong class="m3-exp-value">openset</strong></div><div><code>setsize</code><strong>6</strong></div></div></div>
-<div class="m3-data-card"><p>Response counts</p><div class="m3-data-values"><div class="m3-test-correct"><code>corr</code><strong>21</strong></div><div class="m3-test-other"><code>other</code><strong>1</strong></div><div class="m3-test-npl"><code>npl</code><strong>1</strong></div></div></div>
-<div class="m3-data-card"><p>Option counts</p><div class="m3-data-values"><div class="m3-test-correct"><code>n_corr</code><strong>1</strong></div><div class="m3-test-other"><code>n_other</code><strong>5</strong></div><div class="m3-test-npl"><code>n_npl</code><strong>4</strong></div></div></div>
+</div><div class="fragment" data-fragment-index="5"><ul class="m3-test-combinations"><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">0 Others</span> + <span class="m3-test-npl">1 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">1 Others</span> + <span class="m3-test-npl">2 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">3 Others</span> + <span class="m3-test-npl">4 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">0 NPL</span></li><li><span class="m3-test-correct">1 Correct</span> + <span class="m3-test-other">5 Others</span> + <span class="m3-test-npl">4 NPL</span></li></ul></div></div>
+<div class="m3-data-example fragment" data-fragment-index="6" aria-label="A real aggregated row for participant 20, set size 6, with 23 responses and ten available options per trial.">
+<div class="m3-data-card fragment" data-fragment-index="6"><p>Subject ID</p><div class="m3-data-values m3-data-id"><div><code>id</code><strong>20</strong></div></div></div>
+<div class="m3-data-card fragment" data-fragment-index="6"><p>Trial properties</p><div class="m3-data-values m3-data-conditions"><div><code>exp</code><strong class="m3-exp-value">openset</strong></div><div><code>setsize</code><strong>6</strong></div></div></div>
+<div class="m3-data-card fragment" data-fragment-index="7"><p>Response counts</p><div class="m3-data-values"><div class="m3-test-correct"><code>corr</code><strong>21</strong></div><div class="m3-test-other"><code>other</code><strong>1</strong></div><div class="m3-test-npl"><code>npl</code><strong>1</strong></div></div></div>
+<div class="m3-data-card fragment" data-fragment-index="8"><p>Option counts</p><div class="m3-data-values"><div class="m3-test-correct"><code>n_corr</code><strong>1</strong></div><div class="m3-test-other"><code>n_other</code><strong>5</strong></div><div class="m3-test-npl"><code>n_npl</code><strong>4</strong></div></div></div>
 </div>
-</div></div>
+</div>
 ```
 
-## Specifying the simple-span model {#specify-categories-and-their-option-counts .smaller .m3-model-slide}
-[[specify]{.on} · fit · evaluate]{.track}
+## Data: aggregating trial responses {#preparing-simple-span-data .m3-model-slide}
+
+::: {.m3-preparation-content}
+
+```{.r}
+simple_span <- trials |>
+  summarise(corr = sum(response_type == "correct"),
+            other = sum(response_type == "other"),
+            npl = sum(response_type == "npl"),
+            .by = c(id, exp, setsize, n_corr, n_other, n_npl))
+```
+
+```{.text}
+          id     exp setsize n_corr n_other n_npl corr other npl
+1 10_openset openset       2      1       0     1   23     0   0
+2 10_openset openset       2      1       1     0   23     0   0
+3 10_openset openset       2      1       1     2   23     0   0
+```
+
+:::
+
+## Specify: the simple-span model {#specify-categories-and-their-option-counts .smaller .m3-model-slide auto-animate=true}
 
 ::::: {.m3-model-content}
 
 ```{r}
 #| label: model-simple
-#| code-line-numbers: "1-7|2|3|4|5|6"
+#| code-line-numbers: "1-6|2|3|4|5"
 model_simple <- m3(
   resp_cats = c("corr", "other", "npl"),
   num_options = c("n_corr", "n_other", "n_npl"),
   version = "ss",
-  choice_rule = "softmax",
-  links = list(a = "identity", c = "identity")
+  choice_rule = "softmax"
 )
 ```
 
@@ -582,118 +594,23 @@ document.querySelector('#specify-categories-and-their-option-counts .sourceCode 
 
 :::
 
-::: {.fragment .current-visible fragment-index=3}
+::: {.m3-choice-stage .fragment .current-visible fragment-index=3}
 `choice_rule`: `"simple"` = Luce’s choice rule · `"softmax"` = exponential choice weights.
 
-:::
-
-::: {.fragment fragment-index=4}
-::::: {.fragment .fade-out fragment-index=7}
-`links`: map regression predictors to parameter values.
-
-:::: {.columns}
-::: {.column .fragment width="33%" fragment-index=4}
-
-### identity
-
-```{r}
-#| label: link-identity
-#| echo: false
-#| fig-width: 4
-#| fig-height: 2.5
-#| out-width: "100%"
-#| fig-alt: "Identity inverse link: parameter value equals the regression predictor, including negative values."
-link_predictors <- tibble(eta = seq(-3, 3, length.out = 201))
-ggplot(link_predictors, aes(eta, eta)) +
-  geom_line(color = wk_colors[["blue"]], linewidth = 1) +
-  labs(x = "Link scale", y = "Original scale") + theme_workshop()
-```
-
-:::
-::: {.column .fragment width="33%" fragment-index=5}
-
-### log
-
-```{r}
-#| label: link-log
-#| echo: false
-#| fig-width: 4
-#| fig-height: 2.5
-#| out-width: "100%"
-#| fig-alt: "Log inverse link: exponentiating the regression predictor produces positive parameter values."
-ggplot(link_predictors, aes(eta, exp(eta))) +
-  geom_hline(yintercept = 0, color = wk_colors[["grey"]], linetype = "dashed") +
-  geom_line(color = wk_colors[["blue"]], linewidth = 1) +
-  scale_y_continuous(limits = c(0, 21)) +
-  labs(x = "Link scale", y = "Original scale") + theme_workshop()
-```
-
-:::
-::: {.column .fragment width="33%" fragment-index=6}
-
-### logit
-
-```{r}
-#| label: link-logit
-#| echo: false
-#| fig-width: 4
-#| fig-height: 2.5
-#| out-width: "100%"
-#| fig-alt: "Logit inverse link: a logistic curve maps the regression predictor to parameter values between zero and one."
-ggplot(link_predictors, aes(eta, plogis(eta))) +
-  geom_hline(yintercept = c(0, 1), color = wk_colors[["grey"]], linetype = "dashed") +
-  geom_line(color = wk_colors[["blue"]], linewidth = 1) +
-  scale_y_continuous(limits = c(0, 1)) +
-  labs(x = "Link scale", y = "Original scale") + theme_workshop()
-```
-
-:::
-::::
-:::::
-:::
-
-::: {.fragment fragment-index=7}
-
 :::: {.columns .m3-choice-comparison}
-::: {.column .m3-choice-panel width="100%"}
-
-### simple
-
+::: {.column .m3-choice-panel}
 ::: {.m3-choice-equation}
-
 $$
 P(k)=\frac{n_k A_k}{\sum_j n_j A_j}
 $$
-
-```{=html}
-<div class="m3-formula-callout fragment" data-fragment-index="8" role="note">
-  <svg aria-hidden="true"><path></path></svg>
-  <div class="m3-callout-label"><span class="m3-callout-emphasis">Cannot</span> be negative</div>
-</div>
-```
-
 :::
-
 :::
-::: {.column .m3-choice-panel width="100%"}
-
-### softmax
-
+::: {.column .m3-choice-panel}
 ::: {.m3-choice-equation}
-
 $$
 P(k)=\frac{n_k\exp(A_k)}{\sum_j n_j\exp(A_j)}
 $$
-
-```{=html}
-<div class="m3-formula-callout fragment" data-fragment-index="8" role="note">
-  <svg aria-hidden="true"><path></path></svg>
-  <div class="m3-callout-label">Can be negative</div>
-</div>
-```
-
 :::
-
 :::
 ::::
 
@@ -703,19 +620,7 @@ $$
 
 :::::
 
-::: {.notes}
-Initially show the complete code without dimmed lines or explanations.
-Each click highlights the next parameter and shows its explanation together:
-resp_cats, num_options, version, then choice_rule. Valid options were checked against
-the installed bmm 1.3.1 m3 constructor. The native Quarto line-highlight
-plugin uses the code's initial fragment index to align its cloned steps.
-The conceptual b remains in teaching formulas. The implementation fixes the
-common baseline for identification; it cancels from softmax. Only a and c
-need regression formulas. Do not present b as a third estimable parameter.
-:::
-
-## Specifying parameter formulas {#specify-how-do-a-and-c-vary .smaller}
-[[specify]{.on} · fit · evaluate]{.track}
+## Specify: parameter formulas {#specify-how-do-a-and-c-vary .smaller}
 
 ```{r}
 #| label: formula-simple
@@ -731,114 +636,29 @@ formula_simple <- bmf(
 - `(0 + ss_fac | id)`: correlated participant deviations at each set size.
 :::
 
-::: {.notes}
-ss_fac treats set size as categorical. Both fixed and participant effects
-use one coefficient per set size, without a separate intercept. The fit uses
-only open-set data. The vertical bar retains correlations between each
-participant's deviations at different set sizes.
-:::
-
-## Setting priors: simple {#setting-priors-simple .smaller}
-[[specify]{.on} · fit · evaluate]{.track}
-
-**Log link:** priors on the log-activation scale.
-
-```{r}
-#| eval: false
-coefs <- paste0("ss_fac", c(2, 4, 6, 8))
-priors_simple_rule <- c(
-  set_prior("normal(1, 0.5)", nlpar = "a", coef = coefs),
-  set_prior("normal(1.5, 0.5)", nlpar = "c", coef = coefs)
-)
-```
-
-These priors apply to the set-size means of log activation.
-The log link keeps $a$ and $c$ positive.
-
-```{r}
-#| label: prior-simple-density
-#| echo: false
-#| fig-width: 11.5
-#| fig-height: 2.5
-#| out-width: "100%"
-#| fig-alt: "Priors for a and c: normal densities on the link scale and their lognormal densities on the original scale, shown in blue and orange."
-prior_simple_density <- bind_rows(
-  expand_grid(parameter = c("a", "c"), value = seq(-1, 3.5, length.out = 401)) |>
-    mutate(scale = "Link scale",
-           density = dnorm(value, mean = if_else(parameter == "a", 1, 1.5), sd = 0.5)),
-  expand_grid(parameter = c("a", "c"), value = seq(0, qlnorm(0.995, 1.5, 0.5), length.out = 401)) |>
-    mutate(scale = "Original scale",
-           density = dlnorm(value, meanlog = if_else(parameter == "a", 1, 1.5), sdlog = 0.5))
-) |>
-  mutate(scale = factor(scale, levels = c("Link scale", "Original scale")))
-ggplot(prior_simple_density, aes(value, density, color = parameter, linetype = parameter)) +
-  geom_line(linewidth = 1) +
-  facet_wrap(~scale, nrow = 1, scales = "free") +
-  scale_color_manual(values = c(a = wk_colors[["blue"]], c = wk_colors[["orange"]])) +
-  scale_linetype_manual(values = c(a = "solid", c = "dashed")) +
-  labs(x = NULL, y = "Density", color = NULL, linetype = NULL) +
-  theme_workshop() + theme(legend.position = "right")
-```
-
-## Setting priors: softmax {#setting-priors-softmax .smaller}
-[[specify]{.on} · fit · evaluate]{.track}
-
-**Identity link:** priors on the activation scale.
-
-```{r}
-#| eval: false
-coefs <- paste0("ss_fac", c(2, 4, 6, 8))
-priors_softmax <- c(
-  set_prior("normal(3, 1)", nlpar = "a", coef = coefs),
-  set_prior("normal(3, 1)", nlpar = "c", coef = coefs)
-)
-```
-
-These priors apply to the set-size means of activation.
-They are the priors used in this workshop fit.
-
-```{r}
-#| label: prior-softmax-density
-#| echo: false
-#| fig-width: 11.5
-#| fig-height: 2.5
-#| out-width: "100%"
-#| fig-alt: "Priors for a and c are both Normal(3, 1); link-scale and original-scale densities are identical under the identity link. The blue solid and orange dashed curves coincide."
-prior_softmax_density <- expand_grid(
-  parameter = c("a", "c"), scale = c("Link scale", "Original scale"),
-  value = seq(-1, 7, length.out = 401)
-) |>
-  mutate(scale = factor(scale, levels = c("Link scale", "Original scale")),
-         density = dnorm(value, mean = 3, sd = 1))
-ggplot(prior_softmax_density, aes(value, density, color = parameter, linetype = parameter)) +
-  geom_line(linewidth = 1) +
-  facet_wrap(~scale, nrow = 1, scales = "free") +
-  scale_color_manual(values = c(a = wk_colors[["blue"]], c = wk_colors[["orange"]])) +
-  scale_linetype_manual(values = c(a = "solid", c = "dashed")) +
-  labs(x = NULL, y = "Density", color = NULL, linetype = NULL) +
-  theme_workshop() + theme(legend.position = "right")
-```
-
-## Fitting M3 with bmm {#fit-once-load-the-result-for-the-workshop .smaller .m3-model-slide}
-[specify · [fit]{.on} · evaluate]{.track}
+## Fit: the simple-span model {#fit-once-load-the-result-for-the-workshop .smaller .m3-model-slide}
 
 ::::: {.m3-model-content}
 
 ```{r}
 #| label: fit-simple-settings
 #| eval: false
-#| code-line-numbers: true
+#| code-line-numbers: "2-5"
 fit_simple <- bmm(
   formula = formula_simple,
   model = model_simple,
   data = dat_simple,
-  prior = priors_softmax,
-  chains = 4, cores = 4,
-  iter = 5000, warmup = 2000,
+  prior = priors_simple,
+  chains = 4,
+  cores = 4,
+  iter = 5000,
+  warmup = 2000,
   control = list(adapt_delta = 0.95),
   sample_prior = "yes",
   backend = "cmdstanr",
-  seed = 2026
+  seed = 2026,
+  file = here("models", "m3_simple"),
+  file_refit = "on_change"
 )
 ```
 
@@ -846,10 +666,9 @@ The sampling arguments work the same way as in the SDT model.
 
 :::::
 
-## Model fit: Observed and predicted responses {#evaluate-does-m3-reproduce-the-responses .smaller .m3-figure}
-[specify · fit · [evaluate]{.on}]{.track}
+## Evaluate: observed and predicted responses {#evaluate-does-m3-reproduce-the-responses .smaller .m3-figure}
 
-`posterior_epred(fit_simple)` predicts counts in **all three categories**.
+`posterior_epred(fit_simple)` predicts counts in **all three categories**. Predictions match the observed proportions for correct responses and both error types.
 
 ```{r}
 #| label: predictive-check
@@ -859,41 +678,32 @@ The sampling arguments work the same way as in the SDT model.
 knitr::include_graphics(here::here("data", "figures", "m3_simple_predictive.png"))
 ```
 
-::: {.notes}
-Compare observed and predicted means, including both error categories.
-Error bars are ±1 participant-level SE, not posterior predictive intervals.
-Close mean curves do not establish that every aspect of fit is adequate.
-:::
-
-## Parameter estimates: Item and binding memory {#interpret-item-memory-and-binding-memory .smaller .m3-figure}
-[specify · fit · [evaluate]{.on}]{.track}
+## Evaluate: item and binding estimates {#interpret-item-memory-and-binding-memory .smaller .m3-figure}
 
 ```{r}
 #| label: posterior-plot
 #| echo: false
-#| out-width: "100%"
+#| out-width: "90%"
 #| fig-alt: "Open-set item and binding memory medians and 95 percent credible intervals across set sizes, in blue and orange facets on a 0 to 6 activation scale."
 knitr::include_graphics(here::here("data", "figures", "m3_simple_parameters.png"))
 ```
 
-::: {.small}
-Posterior medians and 95% credible intervals; parameters are on the activation scale.
-:::
+- Item memory tends to decline with set size, but the estimates are uncertain.
+- Binding memory declines clearly with set size.
 
-::: {.notes}
-Binding estimates have lower posterior medians at larger set sizes in the open set.
-Describe item-memory patterns separately rather than treating accuracy as a
-single memory parameter. These are model-based estimates under the chosen
-activation and choice rules.
-:::
-
-## Extending M3 to complex span {.section-divider}
+## Extension: M3 for complex span {.section-divider}
 
 How does M3 account for distractor activation?
 
+::: {.m3-slide-link}
+```{=html}
+<a href="#/resources-further-reading-and-advanced-use" aria-label="Further reading"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M3 5 L12 12 L3 19 Z M11 5 L20 12 L11 19 Z"/><rect x="20" y="5" width="2.5" height="14" rx="1"/></svg></a>
+```
+:::
+
 <!-- FLEX: this chapter can be cut without breaking the simple-span story. -->
 
-## Example of a complex-span task {#complex-span-instructions .m3-task-slide}
+## Task: complex span {#complex-span-instructions .m3-task-slide}
 
 ```{=html}
 <div class="m3-category-layout">
@@ -911,7 +721,7 @@ How does M3 account for distractor activation?
 </div>
 ```
 
-## Example of a complex-span task {#complex-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: complex span {#complex-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <link rel="preload" as="image" href="images/complex-span/image1-green.svg">
@@ -935,18 +745,7 @@ How does M3 account for distractor activation?
 <div class="m3-task"><div class="m3-screen m3-complex-screen" aria-label="Empty screen before the simplified complex-span example."></div></div>
 ```
 
-::: {.notes}
-Simplified complex-span demonstration based on Li, Frischkorn, and Oberauer
-(2026), Experiment 1.
-Press next to begin. The published arrow cue is replaced by a circular
-outline here as a simplified teaching display. The white ring appears with the pair and selects the memorandum during
-processing. It has a white outline and no fill.
-Both objects share a context color; processing requires selecting the larger
-object in real life. The target is designated before the size judgment.
-This example and the fitted application both use the pre-cue condition.
-:::
-
-## Example of a complex-span task {#targets-and-distractors .m3-timed data-autoslide="0" data-transition="none" .m3-task-slide}
+## Task: complex span {#targets-and-distractors .m3-timed data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-complex-screen m3-stage" aria-label="Three ring-cued pairs sharing green, purple, and orange context colors.">
@@ -964,24 +763,7 @@ document.querySelectorAll('#targets-and-distractors [data-processing-choice]').f
 </script>
 ```
 
-::: {.notes}
-This simplified display is presenter-paced. The white ring and the two
-objects appear simultaneously. Press next (or click an object) to show the
-following pair directly. After the last pair, press next to open the test.
-No blank stages or automatic timers remain.
-The original experiment allowed up to 2500 ms for processing and a
-1500-ms post-processing interval; this demonstration does not reproduce
-those durations, record responses, or score choices. Each target/distractor pair differs by
-at least two levels in the authors' size ratings: image5/image1 = 4/2,
-image8/image2 = 4/2, and image24/image4 = 6/2.
-The targets are avocado, flamingo, croissant. The first and third targets
-are the smaller objects; the second is the larger object. The size-judgment
-question still asks for the larger object in every pair. Three context colors follow the
-published hue spacing. Original silhouettes are from the public OSF materials.
-The stimuli are a teaching selection, not the particular trial in Figure 1.
-:::
-
-## Example of a complex-span task {#five-response-categories data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
+## Task: complex span {#five-response-categories data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-complex-screen m3-complex-test" data-id="complex-test-screen" aria-label="Purple color cue with twelve white object choices.">
@@ -990,19 +772,7 @@ The stimuli are a teaching selection, not the particular trial in Figure 1.
 </div></div>
 ```
 
-::: {.notes}
-The color cue probes flamingo, not a spatial location or pair index. The
-12 choices are 1 correct, 1 same-color distractor, 2 other targets,
-2 other distractors, and 6 NPLs. The response categories are introduced on the following slide after the
-audience has selected a response. In the experiment each of the three colors was
-probed in randomized order with a 10-second response deadline; the slide
-shows one test and remains until the presenter advances. White silhouettes,
-context cue and two simultaneous objects match the published design; this
-is a reconstruction using original assets, not an archived screenshot.
-Source: Li et al. (2026), Experiment 1, Figure 1; doi:10.1037/xlm0001585.
-:::
-
-## Response categories and counts {#complex-response-categories .m3-complex-category-slide auto-animate=true}
+## Data: response categories and counts {#complex-response-categories .m3-complex-category-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-category-layout">
@@ -1016,15 +786,7 @@ Source: Li et al. (2026), Experiment 1, Figure 1; doi:10.1037/xlm0001585.
 </div>
 ```
 
-::: {.notes}
-The preceding test screen shrinks to the left; the five response categories
-appear on successive keypresses on the right. The purple context probes
-flamingo. Counts are 1 correct, 1 paired distractor (banana), 2 other targets
-(avocado, croissant), 2 other distractors (crocodile, octopus), and 6 NPLs.
-The screen retains the same option identities, ordering, and color cue.
-:::
-
-## Distractor activation and filtering {#filtering .m3-binding-slide}
+## Concept: distractor activation and filtering {#filtering .m3-binding-slide}
 
 :::: {.m3-binding-layout}
 
@@ -1044,7 +806,7 @@ The screen retains the same option identities, ordering, and color cue.
 <image href="images/complex-span/image8-black.svg" x="222.5" y="355" width="60" height="60" aria-label="flamingo"/>
 <rect class="fragment m3-grow-bar" data-fragment-index="0" x="365" y="290" width="105" height="50" fill="#7f7f7f"/>
 <text class="fragment fade-in" data-fragment-index="0" x="417.5" y="327" text-anchor="middle" font-size="32" font-style="italic" fill="white">b</text>
-<g class="fragment fade-out m3-filter-source" data-fragment-index="3"><rect class="fragment m3-grow-bar" data-fragment-index="1" x="365" y="150" width="105" height="140" fill="#0028a5"/>
+<g class="fragment fade-out m3-filter-source" data-fragment-index="3" data-autoslide="550"><rect class="fragment m3-grow-bar" data-fragment-index="1" x="365" y="150" width="105" height="140" fill="#0028a5"/>
 <text class="fragment fade-in" data-fragment-index="1" x="417.5" y="232" text-anchor="middle" font-size="32" font-style="italic" fill="white">a</text></g>
 <g class="fragment fade-out m3-filter-source" data-fragment-index="3"><rect class="fragment m3-grow-bar" data-fragment-index="2" x="365" y="-40" width="105" height="190" fill="#dc6800"/>
 <text class="fragment fade-in" data-fragment-index="2" x="417.5" y="67" text-anchor="middle" font-size="32" font-style="italic" fill="white">c</text></g>
@@ -1070,12 +832,13 @@ The screen retains the same option identities, ordering, and color cue.
 <g class="fragment fade-in m3-filter-result" data-fragment-index="3"><text x="417.5" y="258" text-anchor="middle" font-size="30" font-style="italic" fill="white">fa</text><rect x="365" class="m3-removed-activation" y="150" width="105" height="70" fill="#0028a5" fill-opacity="0.2" stroke="#0028a5" stroke-width="2" stroke-dasharray="7 5"/></g>
 <g class="fragment fade-in m3-filter-result" data-fragment-index="3"><text x="747.5" y="258" text-anchor="middle" font-size="30" font-style="italic" fill="white">fa</text><rect x="695" class="m3-removed-activation" y="150" width="105" height="70" fill="#0028a5" fill-opacity="0.2" stroke="#0028a5" stroke-width="2" stroke-dasharray="7 5"/></g>
 <g class="fragment fade-in m3-filter-result" data-fragment-index="3"><text x="417.5" y="113" text-anchor="middle" font-size="30" font-style="italic" fill="white">fc</text><rect x="365" class="m3-removed-activation" y="-40" width="105" height="95" fill="#dc6800" fill-opacity="0.2" stroke="#dc6800" stroke-width="2" stroke-dasharray="7 5"/></g>
+<g class="fragment fade-in" data-fragment-index="4" data-autoslide="0"><path d="M 492 -20 H 775 Q 787 -20 787 -8 V 28 Q 787 40 775 40 H 500 L 470 55 L 485 40 Q 480 38 480 28 V -8 Q 480 -20 492 -20 Z" fill="white" stroke="#28a745" stroke-width="2" stroke-linejoin="round"/><text x="633.5" y="10" text-anchor="middle" dominant-baseline="middle" font-size="33.7" fill="#4a5568">Filtering / Removal</text></g>
 </svg>
 ```
 
 :::
 
-::: {.m3-binding-formula .m3-category-activations .fragment fragment-index=4}
+::: {.m3-binding-formula .m3-category-activations .fragment fragment-index=5}
 
 $$
 \begin{aligned}
@@ -1091,27 +854,7 @@ $$
 
 ::::
 
-::: {.notes}
-The bars show one representative option per category. Start with axes and
-options only. First show baseline b, then item activation a, then binding activation c
-on three separate clicks. The fourth click illustrates filtering with f=0.5. Baseline is unchanged. Both distractor
-item and binding contributions are retained at 50% in the standard
-cs model. Original bar heights are preserved: removed portions are outlined
-with dashed borders and 20% fill opacity; solid portions show fa and fc.
-Filtering reduces each solid segment from its top down over 0.5 seconds,
-while the removed portion expands down from its original top.
-This shared multiplier is a model assumption, not a universal
-claim about filtering. f=0 leaves baseline alone. Bar heights and f=0.5
-are teaching values, not fitted results. A larger c in the illustration is
-not an invariant property. See tutorial pp. 20–22 for the activation formulas.
-Show the activation decomposition for each response category on the final
-click. Each formula is activation per option, not a category probability.
-The same f scales item and binding activation for distractors in the standard
-bmm complex-span model.
-:::
-
-## Specifying the complex-span model {#extend-the-model-keep-the-workflow .smaller}
-[[specify]{.on} · fit · evaluate]{.track}
+## Specify: the complex-span model {#extend-the-model-keep-the-workflow .smaller}
 
 ```{r}
 #| eval: false
@@ -1128,8 +871,10 @@ formula_complex <- bmf(
 )
 ```
 
-## Model fit: Observed and predicted responses {#evaluate-complex-span-fit .smaller .m3-figure}
-[specify · fit · [evaluate]{.on}]{.track}
+## Evaluate: observed and predicted responses {#evaluate-complex-span-fit .smaller .m3-figure}
+
+:::: {.m3-annotated-figure}
+::: {.m3-figure-anchor style="--figure-width: 95%;"}
 
 ```{r}
 #| label: complex-predictive-check
@@ -1139,36 +884,34 @@ formula_complex <- bmf(
 knitr::include_graphics(here::here("data", "figures", "m3_complex_predictive.png"))
 ```
 
-::: {.notes}
-Error bars are ±1 participant-level SE. Correct uses a 0.5–0.9 scale;
-Errors uses 0–0.20. The model underpredicts other-distractor responses.
-Acknowledge this discrepancy before interpreting the filtering parameter.
-:::
+```{=html}
+<svg class="m3-figure-overlay" viewBox="0 0 2520 864" aria-hidden="true"><g class="fragment m3-hand-circle" data-fragment-index="0"><path pathLength="1" d="M1658 573 L1665 569 L1671 564 L1677 559 L1683 553 L1688 546 L1693 539 L1697 531 L1700 523 L1703 514 L1705 505 L1706 496 L1707 487 L1706 477 L1705 468 L1703 458 L1699 449 L1695 441 L1690 432 L1685 425 L1679 418 L1672 411 L1664 406 L1656 401 L1648 398 L1640 395 L1631 394 L1623 393 L1614 393 L1606 395 L1598 397 L1590 399 L1582 403 L1575 407 L1568 412 L1562 418 L1556 424 L1551 431 L1546 438 L1542 446 L1538 454 L1535 463 L1533 471 L1531 480 L1530 490 L1530 499 L1531 508 L1532 518 L1534 527 L1537 536 L1541 545 L1546 554 L1551 562 L1557 569 L1564 576 L1572 582 L1580 587 L1588 591 L1597 594 L1606 596 L1615 597 L1624 597 L1633 596 L1642 594 L1650 591 L1658 586 L1666 582 L1673 576 L1679 569 L1685 562 L1690 555 L1695 547 L1698 538"/></g></svg>
+```
 
-## Parameter estimates: Item, binding, and filtering {#interpret-the-extension-alongside-model-fit .smaller .m3-figure}
-[specify · fit · [evaluate]{.on}]{.track}
+:::
+::::
+
+## Evaluate: item, binding, and filtering estimates {#interpret-the-extension-alongside-model-fit .smaller .m3-figure}
+
+:::: {.m3-annotated-figure}
+::: {.m3-figure-anchor style="--figure-width: 59%; --bubble-overhang: 220px;"}
 
 ```{r}
 #| label: complex-parameter-plot
 #| echo: false
-#| out-width: "70%"
+#| out-width: "100%"
 #| fig-alt: "Pre-cue parameter medians and 95 percent credible intervals: a and c on a 0 to 6 activation scale, f on a 0 to 1 scale, colored blue, orange, and green."
 knitr::include_graphics(here::here("data", "figures", "m3_complex_parameters.png"))
 ```
 
-::: {.small}
-Medians and 95% credible intervals. Filtering is shown on the 0–1 scale.
-:::
+```{=html}
+<span class="m3-speech-bubble m3-speech-bubble-up m3-speech-bubble-wrap m3-speech-bubble-f" style="--tip-x: 87.7%; --tip-y: 27.6%;">About a third of a distractor's activation is filtered out</span>
+```
 
-::: {.notes}
-This fit uses only pre-cue responses. a and c describe item activation and
-context binding; f scales distractor activation relative to targets.
-The same f scales distractor item and binding contributions in the standard
-complex-span model. Interpret these estimates alongside the predictive check,
-which shows systematic underprediction of other-distractor responses.
 :::
+::::
 
-## Further reading and advanced use {.m3-reading-slide}
+## Resources: further reading and advanced use {.m3-reading-slide}
 
 :::: {.columns}
 ::: {.column width="65%"}
@@ -1208,4 +951,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script type="module" src="formula-callouts.js"></script>
+<script type="module" src="fragment-autoslide.js"></script>
 ```
