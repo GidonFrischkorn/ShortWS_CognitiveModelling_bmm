@@ -46,6 +46,35 @@ Timing rule: the schedule has **no buffer**, so the *Extension* section is
 your designated flex material — plan your talk so it can be cut live without
 breaking the storyline if the session runs long.
 
+## Workflow markers {.smaller}
+[[specify]{.on} · fit · evaluate]{.track}
+
+Every slide of the three bmm steps carries this **track** above its title:
+the active step in blue, the others grey. It replaces a "Specify:" prefix in
+the title. One line right after the heading, nothing else to set up:
+
+```markdown
+## Choose the model {.smaller}
+[[specify]{.on} · fit · evaluate]{.track}
+
+## Load the cached fit {.smaller}
+[specify · [fit]{.on} · evaluate]{.track}
+
+## Testing differences is one line {.smaller}
+[specify · fit · [evaluate]{.on}]{.track}
+
+## Ratings: more criteria, same axis {.smaller}
+[[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
+```
+
+- Any number of steps can be `.on`: an *Extension* slide that repeats the
+  whole workflow lights all three
+- On a `{.section-divider}` or `{.question-slide}` the track turns white
+  automatically
+- Slides outside the three steps (intuition, data, take-home) carry no track
+- Styling lives in `custom.scss` under "Workflow track"; do not copy it into
+  your deck
+
 ## Section dividers {.section-divider}
 
 A `{.section-divider}` slide starts each major part of your talk.
@@ -96,10 +125,11 @@ highlights on click:
 library(bmm)
 library(here)
 
-model <- sdt(resp ~ 1 + (1 | id),
-             data = dat)
+model <- sdt_yn(response = "n_old", stimulus = "is_old",
+                n_trials = "n_trials")
 
-fit <- bmm(model, data = dat, cores = 4)
+fit <- bmm(bmf(d ~ 1 + (1 | id), criterion ~ 1 + (1 | id)),
+           data = dat, model = model, cores = 4)
 ```
 
 Illustrative syntax only (`eval: false`) — real fits are cached, see next slide.
@@ -114,7 +144,7 @@ time, where you can fix it):
 
 ```{r}
 #| eval: false
-fit <- readRDS(here::here("models", "sdt_binary.rds"))
+fit <- readRDS(here::here("models", "sdt_yn.rds"))
 summary(fit)
 ```
 
@@ -125,7 +155,8 @@ this chunk executes at render time.)
 Workflow: fit in your examples/ notebook or a scratch script, saveRDS() to
 models/ under the name contracted in models/README.md, record the bmm/brms
 versions in that README's table, and commit the .rds together with your
-deck and _freeze/ update. Fits must be made with CRAN versions of bmm/brms.
+deck and _freeze/ update. Fits must be made with CRAN versions of bmm/brms
+(bmm >= 1.4.1, which carries the SDT models).
 :::
 
 ## Posterior visualization
@@ -136,7 +167,7 @@ With a cached fit loaded, plot posteriors with `tidybayes` / `bayesplot`:
 #| eval: false
 library(tidybayes)
 fit |>
-  gather_draws(b_dprime_Intercept, b_c_Intercept) |>
+  gather_draws(b_d_Intercept, b_criterion_Intercept) |>
   ggplot(aes(x = .value, y = .variable)) +
   stat_halfeye()
 ```
