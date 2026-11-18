@@ -583,7 +583,8 @@
   transition: stroke-dashoffset 0.9s ease-in-out;
 }
 
-.m3-hand-circle.visible path {
+.m3-hand-circle.visible path,
+.current-fragment .m3-hand-circle path {
   stroke-dashoffset: 0;
 }
 
@@ -636,13 +637,44 @@
   margin: 0;
 }
 
-.m3-category-stages {
+.m3-category-stages,
+.m3-overlay-stages {
   display: grid;
   align-items: center;
 }
 
-.m3-category-stages > * {
+.m3-category-stages > *,
+.m3-overlay-stages > * {
   grid-area: 1 / 1;
+}
+
+.reveal .slides .m3-overlay-stages > .fragment {
+  align-self: start;
+  transition: none;
+}
+
+.m3-code-output > .cell {
+  display: grid;
+  gap: 0.65em;
+}
+
+.m3-code-output {
+  position: relative;
+}
+
+.m3-evidence-circle {
+  // Match the monospaced output's character grid.
+  font: 0.85em $font-family-monospace;
+  position: absolute;
+  inset-inline-start: calc(2.75em + 62.65ch);
+  inset-block-end: 0.2em;
+  width: 12.65ch;
+  height: 3.3em;
+  pointer-events: none;
+}
+
+.m3-evidence-circle path {
+  stroke-width: 3.5;
 }
 
 .m3-activation-figure {
