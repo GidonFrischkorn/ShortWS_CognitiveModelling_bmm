@@ -37,7 +37,7 @@ fit_simple <- readRDS(here::here("models", "m3_simple.rds"))
 
 
 
-## Concept: the memory measurement model (M3) {#m3-applications .no-title}
+## The memory measurement model (M3) {#m3-applications .no-title}
 
 ```{=html}
 <svg viewBox="0 0 1000 470" width="100%" role="img" aria-labelledby="m3-tasks-title m3-tasks-desc">
@@ -97,7 +97,7 @@ In this session, we will:
 :::
 ::::
 
-## Concept: memory activation and choice {.section-divider}
+## Memory activation and choice {#concept-memory-activation-and-choice .section-divider}
 
 <!-- Draft: the object emoji are schematic picture stimuli, not experimental assets.
 The first two tasks are teaching examples, animated with native Reveal
@@ -112,13 +112,13 @@ Suggested pacing: logic 10–12 min; application 10–12 min; extension 3–4 mi
 
 How does memory activation determine choice probabilities?
 
-## Task: recognition memory {#recognition-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Recognition memory {#recognition-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen" aria-label="Instructions before the object sequence."><p class="m3-screen-instruction">Remember the objects for the test.</p></div></div>
 ```
 
-## Task: recognition memory {#remember-three-pictures .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
+## Recognition memory {#remember-three-pictures .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <style>
@@ -158,7 +158,7 @@ How does memory activation determine choice probabilities?
 </div>
 ```
 
-## Task: recognition memory {#which-picture-did-you-see data-autoslide="0" data-transition="none" .m3-task-slide}
+## Recognition memory {#which-picture-did-you-see data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-response" aria-label="Two response options: a studied chair and a new bicycle.">
@@ -168,7 +168,7 @@ How does memory activation determine choice probabilities?
 </div></div>
 ```
 
-## Concept: baseline and memory activation {#each-option-receives-activation .m3-binding-slide data-autoslide="0" auto-animate=true}
+## Baseline and memory activation {#each-option-receives-activation .m3-binding-slide data-autoslide="0" auto-animate=true}
 
 :::: {.m3-binding-layout}
 
@@ -222,7 +222,7 @@ $$
 
 ::::
 
-## Concept: Luce’s choice rule {#simple-choice-rule .m3-binding-slide}
+## Luce’s choice rule {#simple-choice-rule .m3-binding-slide}
 
 :::: {.m3-binding-layout}
 
@@ -276,7 +276,7 @@ $$
 
 ::::
 
-## Concept: softmax choice rule {#softmax-choice-rule .m3-binding-slide}
+## Softmax choice rule {#softmax-choice-rule .m3-binding-slide}
 
 :::: {.m3-binding-layout}
 
@@ -330,7 +330,7 @@ $$
 
 ::::
 
-## Concept: item activation and choice {#stronger-item-memory-favors-the-old-image .m3-figure}
+## Item activation and choice {#stronger-item-memory-favors-the-old-image .m3-figure}
 
 ```{r}
 #| label: recognition-demo
@@ -351,17 +351,17 @@ recognition_demo |>
   theme_workshop()
 ```
 
-## Concept: two dimensions of memory strength {.section-divider}
+## Two dimensions of memory strength {#concept-two-dimensions-of-memory-strength .section-divider}
 
 **Item memory** and **binding memory** as sources of activation.
 
-## Task: location memory {#location-memory-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Location memory {#location-memory-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen" aria-label="Instructions before the location memory sequence."><p class="m3-screen-instruction">Remember the objects and their locations.</p></div></div>
 ```
 
-## Task: location memory {#now-remember-the-locations .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
+## Location memory {#now-remember-the-locations .m3-timed data-autoslide="1000" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task">
@@ -375,7 +375,7 @@ recognition_demo |>
 </div>
 ```
 
-## Task: location memory {#which-image-was-in-the-center data-autoslide="0" data-transition="none" .m3-task-slide}
+## Location memory {#which-image-was-in-the-center data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-response m3-spatial-test" aria-label="The center location cue and all three response options are shown simultaneously.">
@@ -391,7 +391,7 @@ recognition_demo |>
 </div></div>
 ```
 
-## Concept: item and binding activation {#three-options-reveal-two-memory-sources .m3-binding-slide data-autoslide="0" auto-animate=true}
+## Item and binding activation {#three-options-reveal-two-memory-sources .m3-binding-slide data-autoslide="0" auto-animate=true}
 
 :::: {.m3-binding-layout}
 
@@ -460,7 +460,7 @@ $$
 
 ::::
 
-## Concept: binding activation and choice {#what-does-binding-add .m3-figure}
+## Binding activation and choice {#what-does-binding-add .m3-figure}
 
 ```{r}
 #| label: binding-demo
@@ -482,30 +482,30 @@ binding_demo |>
   theme_workshop()
 ```
 
-## Task: simple span and M3 {.section-divider}
+## Simple span and M3 {#task-simple-span-and-m3 .section-divider}
 
 Estimating item and binding memory with bmm.
 
-## Task: simple span {#simple-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Simple span {#simple-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
 ```
 
-## Task: simple span {#simple-span .m3-timed data-autoslide="900" data-transition="none" .m3-task-slide}
+## Simple span {#simple-span .m3-timed data-autoslide="900" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" aria-label="Study HAUS, HUND, TISCH, BAUM, HUT, BUCH sequentially from left to right.">
 <div class="m3-real-frames" style="--set-size: 6;"><span><span class="fragment fade-out" data-fragment-index="0">HAUS</span></span><span><span class="fragment current-visible" data-fragment-index="1" data-autoslide="900">HUND</span></span><span><span class="fragment current-visible" data-fragment-index="3" data-autoslide="900">TISCH</span></span><span><span class="fragment current-visible" data-fragment-index="5" data-autoslide="900">BAUM</span></span><span><span class="fragment current-visible" data-fragment-index="7" data-autoslide="900">HUT</span></span><span><span class="fragment current-visible" data-fragment-index="9" data-autoslide="900">BUCH</span></span></div><span class="fragment current-visible m3-study-interval" data-fragment-index="0" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="2" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="4" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="6" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="8" data-autoslide="100" aria-hidden="true"></span><span class="fragment current-visible m3-study-interval" data-fragment-index="10" data-autoslide="1100" aria-hidden="true"></span></div></div>
 ```
 
-## Task: simple span {#which-item-was-in-the-middle data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
+## Simple span {#which-item-was-in-the-middle data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-real-test-screen" data-id="simple-test-screen" aria-label="Six position frames with the second position cued and ten word response options."><div class="m3-real-frames" style="--set-size: 6;"><span></span><span>?</span><span></span><span></span><span></span><span></span></div><div class="m3-real-options"><span>HAUS</span><span>TISCH</span><span>ZUG</span><span>BAUM</span><span>HUT</span><span>BUCH</span><span>BROT</span><span>BILD</span><span>HUND</span><span>GLAS</span></div></div></div>
 ```
 
-## Data: response categories and counts {#response-categories .m3-task-slide auto-animate=true}
+## Response categories and counts {#response-categories .m3-task-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-category-layout m3-simple-categories">
@@ -537,7 +537,7 @@ $$
 </div>
 ```
 
-## Data: aggregating trial responses {#preparing-simple-span-data .m3-model-slide}
+## Aggregating trial responses {#preparing-simple-span-data .m3-model-slide}
 
 ::: {.m3-preparation-content}
 
@@ -562,7 +562,8 @@ dat_simple <- trials_simple |>
 
 :::
 
-## Specify: the simple-span model {#specify-categories-and-their-option-counts .smaller .m3-model-slide auto-animate=true}
+## The simple-span model {#specify-categories-and-their-option-counts .smaller .m3-model-slide auto-animate=true}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ::::: {.m3-model-content}
 
@@ -624,7 +625,8 @@ $$
 
 :::::
 
-## Specify: parameter formulas {#specify-how-do-a-and-c-vary .smaller}
+## Parameter formulas {#specify-how-do-a-and-c-vary .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ```{r}
 #| label: formula-simple
@@ -640,7 +642,8 @@ formula_simple <- bmf(
 - `(0 + ss_fac | id)`: correlated participant deviations at each set size.
 :::
 
-## Fit: the simple-span model {#fit-once-load-the-result-for-the-workshop .smaller .m3-model-slide}
+## Fitting the simple-span model {#fit-once-load-the-result-for-the-workshop .smaller .m3-model-slide}
+[specify · [fit]{.on} · evaluate]{.track}
 
 ::::: {.m3-model-content}
 
@@ -670,7 +673,8 @@ The sampling arguments work the same way as in the SDT model.
 
 :::::
 
-## Evaluate: observed and predicted responses {#evaluate-does-m3-reproduce-the-responses .smaller .m3-figure}
+## Observed and predicted responses {#evaluate-does-m3-reproduce-the-responses .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 `posterior_epred(fit_simple)` predicts counts in **all three categories**. Predictions match the observed proportions for correct responses and both error types.
 
@@ -682,18 +686,47 @@ The sampling arguments work the same way as in the SDT model.
 knitr::include_graphics(here::here("data", "figures", "m3_simple_predictive.png"))
 ```
 
-## Evaluate: item and binding estimates {#interpret-item-memory-and-binding-memory .smaller .m3-figure}
+## Item and binding estimates {#interpret-item-memory-and-binding-memory .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 ```{r}
 #| label: posterior-plot
 #| echo: false
-#| out-width: "90%"
+#| out-width: "70%"
 #| fig-alt: "Open-set item and binding memory medians and 95 percent credible intervals across set sizes, in blue and orange facets on a 0 to 6 activation scale."
 knitr::include_graphics(here::here("data", "figures", "m3_simple_parameters.png"))
 ```
 
+:::: {.m3-overlay-stages}
+::: {.fragment .current-visible .m3-code-output}
+```{r}
+#| include: false
+set.seed(2026)
+item_contrast_options <- options(width = 110, brms.short_summary = TRUE)
+```
+
+```{r}
+#| label: item-contrast
+#| comment: ""
+#| class-output: m3-evidence-output
+hypothesis(fit_simple, "a_ss_fac8 = a_ss_fac2")
+```
+
+```{r}
+#| include: false
+options(item_contrast_options)
+```
+
+```{=html}
+<svg class="m3-hand-circle m3-evidence-circle" viewBox="0 0 150 76" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M125 9C104 2 56 1 27 7 10 11 4 21 4 35 3 53 12 65 37 69 62 74 117 75 137 61 146 54 147 38 145 25 143 13 132 7 117 6"/></svg>
+```
+:::
+
+::: {.fragment}
 - Item memory tends to decline with set size, but the estimates are uncertain.
 - Binding memory declines clearly with set size.
+:::
+::::
 
 ## Extension: M3 for complex span {.section-divider}
 
@@ -707,7 +740,7 @@ How does M3 account for distractor activation?
 
 <!-- FLEX: this chapter can be cut without breaking the simple-span story. -->
 
-## Task: complex span {#complex-span-instructions .m3-task-slide}
+## Complex span {#complex-span-instructions .m3-task-slide}
 
 ```{=html}
 <div class="m3-category-layout">
@@ -725,7 +758,7 @@ How does M3 account for distractor activation?
 </div>
 ```
 
-## Task: complex span {#complex-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
+## Complex span {#complex-span-ready data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <link rel="preload" as="image" href="images/complex-span/image1-green.svg">
@@ -749,7 +782,7 @@ How does M3 account for distractor activation?
 <div class="m3-task"><div class="m3-screen m3-complex-screen" aria-label="Empty screen before the simplified complex-span example."></div></div>
 ```
 
-## Task: complex span {#targets-and-distractors .m3-timed data-autoslide="0" data-transition="none" .m3-task-slide}
+## Complex span {#targets-and-distractors .m3-timed data-autoslide="0" data-transition="none" .m3-task-slide}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-complex-screen m3-stage" aria-label="Three ring-cued pairs sharing green, purple, and orange context colors.">
@@ -767,7 +800,7 @@ document.querySelectorAll('#targets-and-distractors [data-processing-choice]').f
 </script>
 ```
 
-## Task: complex span {#five-response-categories data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
+## Complex span {#five-response-categories data-autoslide="0" data-transition="none" .m3-task-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-task"><div class="m3-screen m3-complex-screen m3-complex-test" data-id="complex-test-screen" aria-label="Purple color cue with twelve white object choices.">
@@ -776,7 +809,7 @@ document.querySelectorAll('#targets-and-distractors [data-processing-choice]').f
 </div></div>
 ```
 
-## Data: response categories and counts {#complex-response-categories .m3-complex-category-slide auto-animate=true}
+## Response categories and counts {#complex-response-categories .m3-complex-category-slide auto-animate=true}
 
 ```{=html}
 <div class="m3-category-layout">
@@ -790,7 +823,7 @@ document.querySelectorAll('#targets-and-distractors [data-processing-choice]').f
 </div>
 ```
 
-## Concept: distractor activation and filtering {#filtering .m3-binding-slide}
+## Distractor activation and filtering {#filtering .m3-binding-slide}
 
 :::: {.m3-binding-layout}
 
@@ -858,7 +891,8 @@ $$
 
 ::::
 
-## Specify: the complex-span model {#extend-the-model-keep-the-workflow .smaller}
+## The complex-span model {#extend-the-model-keep-the-workflow .smaller}
+[[specify]{.on} · fit · evaluate]{.track}
 
 ```{r}
 #| eval: false
@@ -875,7 +909,8 @@ formula_complex <- bmf(
 )
 ```
 
-## Evaluate: observed and predicted responses {#evaluate-complex-span-fit .smaller .m3-figure}
+## Observed and predicted responses {#evaluate-complex-span-fit .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 :::: {.m3-annotated-figure}
 ::: {.m3-figure-anchor style="--figure-width: 95%;"}
@@ -889,13 +924,18 @@ knitr::include_graphics(here::here("data", "figures", "m3_complex_predictive.png
 ```
 
 ```{=html}
-<svg class="m3-figure-overlay" viewBox="0 0 2520 864" aria-hidden="true"><g class="fragment m3-hand-circle" data-fragment-index="0"><path pathLength="1" d="M1658 573 L1665 569 L1671 564 L1677 559 L1683 553 L1688 546 L1693 539 L1697 531 L1700 523 L1703 514 L1705 505 L1706 496 L1707 487 L1706 477 L1705 468 L1703 458 L1699 449 L1695 441 L1690 432 L1685 425 L1679 418 L1672 411 L1664 406 L1656 401 L1648 398 L1640 395 L1631 394 L1623 393 L1614 393 L1606 395 L1598 397 L1590 399 L1582 403 L1575 407 L1568 412 L1562 418 L1556 424 L1551 431 L1546 438 L1542 446 L1538 454 L1535 463 L1533 471 L1531 480 L1530 490 L1530 499 L1531 508 L1532 518 L1534 527 L1537 536 L1541 545 L1546 554 L1551 562 L1557 569 L1564 576 L1572 582 L1580 587 L1588 591 L1597 594 L1606 596 L1615 597 L1624 597 L1633 596 L1642 594 L1650 591 L1658 586 L1666 582 L1673 576 L1679 569 L1685 562 L1690 555 L1695 547 L1698 538"/></g></svg>
+<svg class="m3-figure-overlay" viewBox="0 0 2520 864" aria-hidden="true"><g class="fragment m3-hand-circle" data-fragment-index="0" data-autoslide="950"><path pathLength="1" d="M1658 573 L1665 569 L1671 564 L1677 559 L1683 553 L1688 546 L1693 539 L1697 531 L1700 523 L1703 514 L1705 505 L1706 496 L1707 487 L1706 477 L1705 468 L1703 458 L1699 449 L1695 441 L1690 432 L1685 425 L1679 418 L1672 411 L1664 406 L1656 401 L1648 398 L1640 395 L1631 394 L1623 393 L1614 393 L1606 395 L1598 397 L1590 399 L1582 403 L1575 407 L1568 412 L1562 418 L1556 424 L1551 431 L1546 438 L1542 446 L1538 454 L1535 463 L1533 471 L1531 480 L1530 490 L1530 499 L1531 508 L1532 518 L1534 527 L1537 536 L1541 545 L1546 554 L1551 562 L1557 569 L1564 576 L1572 582 L1580 587 L1588 591 L1597 594 L1606 596 L1615 597 L1624 597 L1633 596 L1642 594 L1650 591 L1658 586 L1666 582 L1673 576 L1679 569 L1685 562 L1690 555 L1695 547 L1698 538"/></g></svg>
+```
+
+```{=html}
+<span class="fragment m3-speech-bubble m3-speech-bubble-up" data-fragment-index="1" data-autoslide="0" style="--tip-x: 66%; --tip-y: 47%;">Model underpredicts</span>
 ```
 
 :::
 ::::
 
-## Evaluate: item, binding, and filtering estimates {#interpret-the-extension-alongside-model-fit .smaller .m3-figure}
+## Item, binding, and filtering estimates {#interpret-the-extension-alongside-model-fit .smaller .m3-figure}
+[specify · fit · [evaluate]{.on}]{.track}
 
 :::: {.m3-annotated-figure}
 ::: {.m3-figure-anchor style="--figure-width: 59%; --bubble-overhang: 220px;"}
@@ -930,17 +970,7 @@ Continue with the tutorial to:
 - Assess **parameter recovery** to guide model validation and experimental design.
 :::
 ::: {.column width="35%"}
-<!-- Replace the placeholder with a QR code for the online tutorial paper. -->
-```{=html}
-<svg viewBox="0 0 300 300" width="80%" role="img" aria-label="Placeholder for the tutorial paper QR code; online link to be added.">
-  <rect x="10" y="10" width="280" height="280" rx="8" fill="none" stroke="#a3adb7" stroke-width="2" stroke-dasharray="8 6"/>
-  <g text-anchor="middle" fill="#4a5568" font-family="sans-serif" font-size="22">
-    <text x="150" y="125">Tutorial paper</text>
-    <text x="150" y="160">QR code</text>
-    <text x="150" y="200" font-size="18">Link coming soon</text>
-  </g>
-</svg>
-```
+[![](images/qr_m3_tutorial.png){fig-alt="QR code for the M3 tutorial preprint on OSF" width="80%"}](https://osf.io/tcuzx)
 :::
 ::::
 

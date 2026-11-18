@@ -119,6 +119,8 @@ rating_counts <- my_trials |>
 
 Dropping that `complete()` line is a silent error: the model fits, and the estimates are wrong, because a participant who never used "sure new" looks like a participant who was never offered it.
 
+For M3, see the [worked example](02_m3.qmd#data) for counting responses by participant, set size, and option combination, and recording how many options were available in each category.
+
 ## Step 3: Writing the formula for *your* design
 
 The workshop example has one between-subjects factor. Yours probably does not. The good news is that this is ordinary R formula syntax on the left-hand side of a parameter name — everything you know from `lm()` and `lmer()` transfers directly.
