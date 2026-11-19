@@ -59,6 +59,27 @@ jobs:
       - name: Render site
         run: quarto render
 
+      - name: Publish the slides as PDF only
+        # The decks are still rendered (presenters need the HTML locally, and the
+        # PDFs in handouts/ are exported from it), but the site serves only the
+        # PDFs. Drop the HTML decks and remove them from the search index and
+        # the sitemap, so that neither points to a page that is not there.
+        run: |
+          rm -rf _output/slides
+          python3 - <<'EOF'
+          import json, pathlib, re
+          index = pathlib.Path("_output/search.json")
+          entries = json.loads(index.read_text())
+          index.write_text(json.dumps([e for e in entries if not e["href"].startswith("slides/")]))
+          sitemap = pathlib.Path("_output/sitemap.xml")
+          sitemap.write_text(re.sub(r"\s*<url>\s*<loc>[^<]*/slides/[^<]*</loc>.*?</url>", "",
+                                    sitemap.read_text(), flags=re.S))
+          EOF
+          if grep -rl 'href="[^"]*slides/' _output --include='*.html'; then
+            echo "::error::A published page still links to the removed HTML decks."
+            exit 1
+          fi
+
       - name: Add .nojekyll
         # Without it, GitHub's Jekyll pass drops every directory whose name
         # starts with an underscore — including site_libs — and each page

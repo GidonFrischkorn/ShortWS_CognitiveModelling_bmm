@@ -187,9 +187,12 @@ press `e` for print view and use the browser's "Save as PDF".
 
 ## Publishing (GitHub Pages)
 
-The rendered site — `index.qmd` landing page, all decks, all notebooks — is
-published to GitHub Pages so attendees can follow along and revisit the
-materials without installing anything. **Publishing is automatic:** push to
+The rendered site — `index.qmd` landing page, the slides as PDFs, all
+notebooks — is published to GitHub Pages so attendees can revisit the
+materials without installing anything. The HTML decks are rendered but not
+published: the workflow drops them before deploying, and the site links the
+one-page-per-slide PDFs in `handouts/` instead. After changing a deck,
+re-export its PDF (section above) and commit it, or the site keeps the old one. **Publishing is automatic:** push to
 `main` and `.github/workflows/publish.yml` renders the site and deploys it.
 Nobody has to run a publish command, and nobody needs R installed to publish.
 
