@@ -4,6 +4,7 @@ subtitle: "Part 3: The EZ-Drift Diffusion Model"
 author: "Adriana F. Chávez De la Peña"
 institute: "University of California, Irvine | Now at Stanford University"
 date: "November 2026"
+date-format: "MMMM YYYY"
 format:
   revealjs:
     theme: [ezddm.scss]
@@ -313,7 +314,7 @@ If time is short, end here. The next section is the cut.
 ## Trial-level DDM {.trial-space}
 [[specify]{.on} · [fit]{.on} · [evaluate]{.on}]{.track}
 
-`ddm()` reads one row per trial: (N = 7,373 trials).
+`ddm()` reads one row per trial: (N = 7,369 trials).
 
 ```{r}
 #| label: compare-fits

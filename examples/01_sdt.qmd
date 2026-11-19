@@ -13,15 +13,13 @@ execute:
 
 ## Setup
 
-The SDT models are new in bmm and are not in the CRAN version yet, so this notebook needs the development version — install once with:
+The SDT models arrived in bmm 1.4.1 (on CRAN since October 2026). If `library(bmm)` works but `sdt_yn()` or `parameter_info()` gives you `could not find function`, your bmm is older than that; update it once with:
 
 ```{r}
 #| label: install
 #| eval: false
-remotes::install_github("popov-lab/bmm@develop")
+install.packages("bmm")   # the workshop needs version 1.4.1 or newer
 ```
-
-If `library(bmm)` works but `sdt_yn()` or `parameter_info()` gives you `could not find function`, you are on the CRAN version (or an older development build) and this install step is the fix.
 
 ```{r}
 #| label: setup
@@ -65,7 +63,7 @@ dat |>
 
 ## Specify: the model and its formula
 
-Yes/no SDT describes each old/new decision with two parameters: the distance between the noise and signal evidence distributions (sensitivity $d'$) and the location of the decision boundary (criterion $c$; 0 = unbiased, positive = conservative).
+Yes/no SDT describes each old/new decision with two parameters: the distance between the noise and signal evidence distributions (sensitivity $d'$) and the location of the decision boundary (criterion $c$, measured from the mean of the noise distribution: $c = d'/2$ is the unbiased midpoint, higher is more conservative).
 
 `sdt_yn()` expects one row per participant × stimulus class, with the count of "old" responses and the number of trials. **This data shape is a contract** — getting it wrong is the first error most people hit, so check it against `head()` before fitting:
 
@@ -111,10 +109,24 @@ With treatment coding (`full_attention` is the reference level), the four popula
 | --- | --- |
 | `d_Intercept` | $d'$, full-attention condition |
 | `d_conditionimmediate` | **difference in $d'$**, immediate − full attention |
-| `criterion_Intercept` | criterion $c$, full-attention condition |
+| `criterion_Intercept` | criterion $c$, full-attention condition (from the noise mean) |
 | `criterion_conditionimmediate` | **difference in $c$**, immediate − full attention |
 
 Everything you know about R's linear formulas transfers: interactions, multiple predictors, and `(1 | pid)` for hierarchical participant-level parameters — but the "outcome" of each formula is a *cognitive model parameter*, not a raw response.
+
+bmm offers a second name for the same boundary: `bias`, measured from the midpoint between the two distributions (0 = neutral, positive = conservative; `bias = criterion - d/2` under equal variance). Write `criterion` *or* `bias` in the formula, never both. `criterion` is the one the false-alarm rate depends on alone, which is why this notebook uses it.
+
+Before anything compiles, let bmm check formula and data together. `bmm_data_check()` runs the checks `bmm()` would run and reports how the model reads the response and the predictors; a formula that names a parameter the model does not have fails the hard checks here, with the valid names in the message:
+
+```{r}
+#| label: data-check
+bmm_data_check(
+  bmf(d ~ 1 + condition + (1 | pid), criterion ~ 1 + condition + (1 | pid)),
+  data = binary_counts, model = sdt_model
+)
+```
+
+Read the findings for what they are. `condition` is a character column, so bmm codes it as a factor in alphabetical order, which makes `full_attention` the reference level. The 96 empty cells are the design: each participant took part in one condition only. The trial counts come from `n_trials`, here 154 to 300 per participant. The line that matters is the last one: the hard checks passed.
 
 ## Fit: load the cached model
 

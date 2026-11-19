@@ -17,15 +17,6 @@
   color: $uzh-white;
 }
 
-// Same rule as in custom.scss on the Part 1 branch; drop this copy once
-// that branch is merged.
-.reveal .slide.section-divider.take-home code {
-  color: $uzh-blue;
-  background-color: $uzh-white;
-  padding: 0.08em 0.35em;
-  border-radius: 4px;
-}
-
 .reveal .slide.choice-open .fragment {
   margin-top: 1.6em;
 }

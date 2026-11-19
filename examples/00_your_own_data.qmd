@@ -119,6 +119,8 @@ rating_counts <- my_trials |>
 
 Dropping that `complete()` line is a silent error: the model fits, and the estimates are wrong, because a participant who never used "sure new" looks like a participant who was never offered it.
 
+For M3, see the [worked example](02_m3.qmd#data) for counting responses by participant, set size, and option combination, and recording how many options were available in each category.
+
 ## Step 3: Writing the formula for *your* design
 
 The workshop example has one between-subjects factor. Yours probably does not. The good news is that this is ordinary R formula syntax on the left-hand side of a parameter name — everything you know from `lm()` and `lmer()` transfers directly.
@@ -150,7 +152,7 @@ bmf(d ~ 1 + condition + (1 + condition | pid),
 Three things worth internalising:
 
 - **You write one formula per parameter, and you choose which.** Any parameter you do not name gets an intercept only. Deciding that memory varies with your manipulation but bias does not — or vice versa — *is* your hypothesis, expressed in code.
-- **The left-hand side must be a parameter name, not a column in your data.** The error names the legal ones, and `parameter_info(model)` describes them.
+- **The left-hand side must be a parameter name, not a column in your data.** The error names the legal ones, and `parameter_info(model)` describes them. `bmm_data_check(formula, data, model)` runs that check, and bmm's data checks, before anything compiles: make it the first call on your own data.
 - **`(1 | pid)` is not optional in practice.** Without it, every participant is assumed to have the same parameter value, and the uncertainty you report will be far too small.
 
 ### A worked translation
@@ -209,7 +211,15 @@ cmdstanr::install_cmdstan()
 options(brms.backend = "cmdstanr", mc.cores = 4)
 ```
 
-**What success looks like.** Step 3 prints `The C++ toolchain required for CmdStan is setup properly`. Step 4 ends with `CmdStan path set to:` and a directory. If you got both of those lines, you are done — the following will fit in well under a minute and is the smallest possible end-to-end test:
+**What success looks like.** Step 3 prints `The C++ toolchain required for CmdStan is setup properly`. Step 4 ends with `CmdStan path set to:` and a directory. Since bmm 1.4.1, one call runs all of these checks and compiles and samples a small test model, with one fix suggested for every check that fails:
+
+```{r}
+#| label: bmm-setup
+#| eval: false
+bmm::bmm_setup()
+```
+
+If you got both of those lines, or `bmm_setup()` reports no failed check, you are done — the following will fit in well under a minute and is the smallest possible end-to-end test:
 
 ```{r}
 #| label: smoke-test
@@ -225,16 +235,16 @@ If `brm()` on `mtcars` works, your toolchain is fine and any later problem is ab
 
 ## Step 5: What breaks first
 
-Real error messages, in roughly the order people meet them.
+Real error messages, in roughly the order people meet them. `bmm_data_check(formula, data, model)` reports the second, third and fourth of these before anything compiles, so run it first.
 
 ### `could not find function "sdt_yn"`
 
-You are on the CRAN version of bmm, which does not yet include the SDT models. Install the development version:
+Your bmm is older than 1.4.1, the release that added the SDT models (CRAN, October 2026). Update it:
 
 ```{r}
 #| label: fix-install
 #| eval: false
-remotes::install_github("popov-lab/bmm@develop")
+install.packages("bmm")
 ```
 
 The same message for any other model name means the same thing: check `supported_models()` against `packageVersion("bmm")`.
@@ -250,7 +260,6 @@ parameter_info(sdt_yn(response = "n_old", stimulus = "is_old",
                        n_trials = "n_trials"))
 ```
 
-(Older development builds called this `parameters()`. tidybayes exports a function of that name too, so if you are on such a build, write `bmm::parameters()`.)
 
 ### `Stimulus variable 'is_old_' missing in the data`
 

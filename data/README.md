@@ -19,8 +19,13 @@ put it here — link to its repository instead.
 | --- | --- | --- |
 | `sdt_recognition.csv` | Koen et al. (2013), via the `roc6` dataset in [MPTinR](https://cran.r-project.org/package=MPTinR) | MPTinR is GPL-2 \| GPL-3; cite Koen et al. (2013) and Klauer & Kellen (2015) |
 | `m3_simple_span.csv` | Oberauer (2019), <https://doi.org/10.5334/joc.86>, via the M3 tutorial supplement (Frischkorn & Li, 2026), <https://osf.io/yb7wm/> | OSF project is **CC BY-NC 4.0** (checked 2026-08-19); cite Oberauer (2019) and the tutorial |
+| `m3_simple_trials.csv` | Oberauer (2019), trial-level source of `m3_simple_span.csv` | as above |
 | `m3_complex_span.csv` | Li, Frischkorn, & Oberauer (2026), Exp. 1, <https://doi.org/10.1037/xlm0001585>, via the same supplement | as above |
 | `ezddm_perceptual.csv` | Ratcliff & Rouder (1998), Experiment 1, participant N.H., as used in Chávez De la Peña & Vandekerckhove (2025), <https://doi.org/10.3758/s13423-025-02729-y>; source file `nh.tsv` from <https://github.com/Adrifelcha/EZ-project/> | OSF supplement <https://osf.io/bzkpn/> is **CC BY 4.0** (checked 2026-08-19); cite Ratcliff & Rouder (1998) and the PB&R paper |
+
+`data/figures/` holds figures and summary tables generated from the cached
+fits. They are outputs, not datasets, and are not covered by the licensing
+table above. Regenerate the M3 files with `Rscript data/plot_m3.R`.
 
 ## Naming contract
 
@@ -28,6 +33,7 @@ put it here — link to its repository instead.
 | --- | --- | --- | --- |
 | `sdt_recognition.csv` | Recognition memory (binary + rating SDT) | Gidon | done |
 | `m3_simple_span.csv` | Simple span (M3) | Chenyu | done |
+| `m3_simple_trials.csv` | Simple span (M3), trial level | Chenyu | done |
 | `m3_complex_span.csv` | Complex span (M3 extension) | Chenyu | done |
 | `ezddm_perceptual.csv` | Perceptual decision making (EZ-DDM / DDM) | Adriana | done |
 
@@ -88,8 +94,10 @@ preparation: `data/prepare_m3.R`; the workshop uses only the open-set subset
 of the tutorial's aggregated data.
 
 Participants studied words in boxes and then selected the word associated
-with a probed position. The workshop retains the 20 participants who studied
-new words on every trial (`openset`); the closed-set experiment is omitted. Set size and the
+with a probed position. The workshop retains the 20 participants of the
+open-set experiment (`openset`): list words were drawn without replacement
+from a pool of 1,198 nouns, so a word recurred only after the whole pool had
+been used. The closed-set experiment is omitted. Set size and the
 composition of the test options varied within participants.
 
 One row contains response counts for one participant at one set size and
@@ -110,6 +118,22 @@ give the number of available options in each category on each trial.
 | `n_corr` | int | 1 | Available correct options |
 | `n_other` | int | 0, 1, 3, 5, 7 | Available other-list options |
 | `n_npl` | int | 0, 1, 2, 4 | Available non-presented lure options |
+
+### m3_simple_trials.csv
+
+The open-set choice trials from which `m3_simple_span.csv` is aggregated
+(same participants and design; see above). Reproducible preparation:
+`data/prepare_m3.R`, which drops the recall trials (typed answers, no
+response options). One row per trial: 20 participants × 552 trials = 11,040
+rows.
+
+| Column | Type | Values | Description |
+| --- | --- | --- | --- |
+| `id` | chr | 20 unique IDs ending `_openset` | Participant ID, as in `m3_simple_span.csv` |
+| `setsize` | int | 2, 4, 6, 8 | Number of studied word–box pairs |
+| `rsizeList` | int | 1, 2, 4, 6, 8 | Studied items among the test options, including the correct one |
+| `rsizeNPL` | int | 0, 1, 2, 4 | Not-presented lures among the test options |
+| `rcat` | int | 1, 2, 3 | Response category: 1 = correct, 2 = other studied item, 3 = not-presented lure |
 
 ### m3_complex_span.csv
 
@@ -161,7 +185,7 @@ The participant decided whether the overall brightness of a pixel array was high
 - **Instruction:** accuracy or speed.
 - **Stimulus configuration:** the black-to-white proportion, changed in graded steps. Within each instruction there are 16 steps with more black pixels than white, then 16 steps with more white pixels than black. The judgment is harder when the mix is closer to half and half, and easier as the proportion moves away from an even mix.
 
-The source file also contains two 50/50 cells (`cond` 17 and 50), where the display is half black and half white and accuracy is undefined. The prepare script drops those cells, and drops trials with `rt_ms` above 3000 (too slow). The CSV has the remaining 7,373 trials in 64 cells. One row per trial.
+The source file also contains two 50/50 cells (`cond` 17 and 50), where the display is half black and half white and accuracy is undefined. The prepare script drops those cells, drops trials with `rt_ms` below 200 (too fast), and drops trials with `rt_ms` above 3000 (too slow). The CSV has the remaining 7,369 trials in 64 cells. One row per trial.
 
 - `cond` 1–16: more black than white, accuracy instructions.
 - `cond` 18–33: more white than black, accuracy instructions.
@@ -175,4 +199,4 @@ Response `1` is correct on mostly-black displays and response `2` is correct on 
 | `index` | int | 1 | Present on every row. This file is participant N.H. only. |
 | `cond` | int | 1–16, 18–33, 34–49, 51–66 | Stimulus and instruction cell (see above). |
 | `response` | int | 1, 2 | Brightness judgment: 1 = low, 2 = high. |
-| `rt_ms` | int | 173–2981 | Response time in milliseconds. |
+| `rt_ms` | int | 202–2981 | Response time in milliseconds. |

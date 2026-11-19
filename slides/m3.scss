@@ -35,7 +35,9 @@
   justify-content: center;
 }
 
-.reveal .slide.section-divider.present {
+// Keep the flex layout while a slide fades out, not only while it is present;
+// Reveal hides undisplayed slides with an inline display: none.
+.reveal .slide.section-divider:not([style*="display: none"]) {
   display: flex !important;
 }
 
@@ -59,7 +61,7 @@
   box-sizing: border-box;
   flex-direction: column;
 
-  &.present {
+  &:not([style*="display: none"]) {
     display: flex !important;
   }
 
@@ -76,54 +78,21 @@
   }
 }
 
-.m3-response-set-workflow {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 16px;
-}
-
-.m3-real-tests {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  align-items: start;
-}
-
-.m3-real-test-example > p {
-  margin: 0 0 10px;
-  text-align: center;
-  font-size: 26px;
-}
-
-.m3-response-set-details {
-  display: grid;
-  align-items: center;
-}
-
-.m3-response-set-details > * {
-  grid-area: 1 / 1;
-}
-
-.m3-response-set-combinations {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  align-items: start;
+.reveal .slide.m3-figure > p {
+  line-height: 1.5;
 }
 
 .reveal .m3-test-combinations {
   display: block;
   list-style: none;
-  margin: 8px 0;
+  margin: 0;
   padding: 0;
-  font-size: 16px;
-  line-height: 22px;
+  font-size: 26px;
+  line-height: 1.5;
   text-align: center;
 }
 
-.m3-real-tests .m3-real-test-screen {
+.m3-real-test-screen {
   height: 245px;
 }
 
@@ -242,6 +211,7 @@
 
 .m3-model-explanations {
   display: grid;
+  flex: 1;
   min-height: 130px;
   margin-top: 24px;
 }
@@ -254,6 +224,13 @@
   justify-content: flex-start;
 }
 
+.m3-preparation-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
 .m3-model-explanations > .fragment {
   grid-area: 1 / 1;
   min-height: 0;
@@ -263,19 +240,41 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.m3-choice-stage {
+  display: flex;
+  flex-direction: column;
+}
+
+.m3-choice-comparison::before {
+  content: "";
+  grid-area: 1 / 1 / 2 / 3;
+  justify-self: center;
+  align-self: center;
+  height: 50%;
+  border-left: 1px solid $uzh-gray;
+  pointer-events: none;
 }
 
 .reveal .m3-choice-comparison > .m3-choice-panel {
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr;
+  grid-row: 1;
+  width: 100%;
   min-width: 0;
   padding: 0;
 }
 
-.m3-choice-panel + .m3-choice-panel > .m3-choice-equation {
-  border-inline-start: 1px solid $uzh-gray;
+.m3-choice-panel:first-child {
+  grid-column: 1;
+}
+
+.m3-choice-panel:last-child {
+  grid-column: 2;
 }
 
 .reveal .m3-choice-panel > h3 {
@@ -469,7 +468,124 @@
 }
 
 .m3-category-label {
+  position: relative;
   min-width: 0;
+}
+
+// HTML speech bubble below its anchor; tail geometry matches the SVG callouts
+// (base 15, depth 15, tip offset 15 from the base).
+@mixin m3-bubble-tail($color) {
+  $hex: str-slice("#{$color}", 2);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='18'%3E%3Cpath d='M32 18 L1 2 L15 18 Z' fill='white'/%3E%3Cpath d='M31 17 L1 2 L16 17' fill='none' stroke='%23#{$hex}' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat;
+}
+
+.m3-speech-bubble {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 14px);
+  padding: 4px 14px;
+  border: 2px solid $uzh-gray-dark;
+  border-radius: 12px;
+  background: white;
+  color: $uzh-gray-dark;
+  font-size: 24px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.m3-speech-bubble::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: -16px;
+  width: 32px;
+  height: 18px;
+  @include m3-bubble-tail($uzh-gray-dark);
+}
+
+// Bubble above and to the right of a point; the tail tip sits at
+// (--tip-x, --tip-y) within the positioned parent.
+.m3-speech-bubble.m3-speech-bubble-up {
+  left: calc(var(--tip-x) - 13px);
+  top: auto;
+  bottom: calc(100% - var(--tip-y) + 14px);
+}
+
+.m3-speech-bubble.m3-speech-bubble-up::before {
+  top: auto;
+  bottom: -16px;
+  transform: scaleY(-1);
+}
+
+.m3-speech-bubble.m3-speech-bubble-wrap {
+  width: max-content;
+  max-width: 12.25em;
+  white-space: normal;
+}
+
+.m3-speech-bubble.m3-speech-bubble-f {
+  border-color: $uzh-accent-green;
+}
+
+.m3-speech-bubble.m3-speech-bubble-f::before {
+  @include m3-bubble-tail($uzh-accent-green);
+}
+
+// Figure placed on the left with a bubble anchored to image coordinates.
+.reveal .slide.m3-figure > .m3-annotated-figure {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// --bubble-overhang: how far the bubble extends past the figure's right edge,
+// so figure and bubble are centred together.
+.m3-annotated-figure > .m3-figure-anchor {
+  position: relative;
+  width: var(--figure-width, 100%);
+  margin-right: var(--bubble-overhang, 0px);
+
+  figure,
+  figure > p {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+  }
+}
+
+// Overlay in image pixel coordinates (viewBox = PNG size).
+.m3-figure-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+// Hand-drawn emphasis loop that draws itself when its fragment appears.
+.m3-hand-circle path {
+  fill: none;
+  stroke: $uzh-accent-red;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s ease-in-out;
+}
+
+.m3-hand-circle.visible path,
+.current-fragment .m3-hand-circle path {
+  stroke-dashoffset: 0;
 }
 
 .m3-response-categories .m3-category-items {
@@ -491,6 +607,23 @@
   align-items: center;
 }
 
+.m3-simple-categories {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.m3-simple-categories .m3-data-example {
+  grid-column: 1 / -1;
+}
+
+.m3-simple-categories .m3-real-options span {
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.m3-simple-categories:has(.m3-response-categories .m3-test-correct.visible) .m3-real-options .m3-test-correct { color: $uzh-blue; }
+.m3-simple-categories:has(.m3-response-categories .m3-test-other.visible) .m3-real-options .m3-test-other { color: $uzh-accent-orange; }
+.m3-simple-categories:has(.m3-response-categories .m3-test-npl.visible) .m3-real-options .m3-test-npl { color: $uzh-gray-dark; }
+
 .m3-category-layout > .m3-task {
   margin: 0;
 }
@@ -504,13 +637,55 @@
   margin: 0;
 }
 
-.m3-category-stages {
+.m3-category-stages,
+.m3-overlay-stages {
   display: grid;
   align-items: center;
 }
 
-.m3-category-stages > * {
+.m3-category-stages > *,
+.m3-overlay-stages > * {
   grid-area: 1 / 1;
+}
+
+.reveal .slides .m3-overlay-stages > .fragment {
+  align-self: start;
+  transition: none;
+}
+
+.m3-code-output > .cell {
+  display: grid;
+  gap: 0.65em;
+}
+
+.m3-code-output {
+  position: relative;
+}
+
+.m3-evidence-circle {
+  // Match the monospaced output's character grid.
+  font: 0.85em $font-family-monospace;
+  position: absolute;
+  inset-inline-start: calc(2.75em + 62.65ch);
+  inset-block-end: 0.2em;
+  width: 12.65ch;
+  height: 3.3em;
+  pointer-events: none;
+}
+
+.m3-evidence-circle path {
+  stroke-width: 3.5;
+}
+
+.m3-activation-figure {
+  width: 100%;
+  aspect-ratio: 1000 / 440;
+}
+
+.m3-activation-figure > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .m3-category-layout .m3-screen {
@@ -616,4 +791,39 @@
   margin: 0;
   max-width: 90%;
   text-align: center;
+}
+
+// Formulas revealed one at a time within a formula block.
+.reveal .m3-binding-formula > .fragment > p {
+  margin: 0;
+}
+
+.reveal .m3-binding-formula > .fragment + .fragment {
+  margin-top: 32px;
+}
+
+// Jump link to another slide, at the bottom right, outside the slide's layout.
+.reveal .m3-slide-link {
+  position: absolute;
+  right: 0;
+  bottom: 1em;
+  margin: 0;
+}
+
+.reveal .m3-slide-link a {
+  display: inline-block;
+  padding: 0.2em 0.4em;
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.reveal .m3-slide-link svg {
+  display: block;
+}
+
+// The shared theme shows code on .smaller slides at 0.85em. At that size the
+// 16-line bmm() call on the fit slide is a few pixels taller than the
+// code-block height limit, and its closing line was cut off.
+.reveal #fit-once-load-the-result-for-the-workshop pre code {
+  max-height: none;
 }
