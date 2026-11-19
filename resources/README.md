@@ -30,9 +30,7 @@ to nor restrict them.
   — **PDF in `01_sdt/`** (open access)
 - Etz, A., & Vandekerckhove, J. (2018). Introduction to Bayesian inference
   for psychology. *Psychonomic Bulletin & Review*, 25, 5–34.
-  <https://doi.org/10.3758/s13423-017-1262-3>
-  — **PDF in `01_sdt/`** — ⚠️ redistribution terms unverified, check before
-  the repo goes public
+  <https://doi.org/10.3758/s13423-017-1262-3> — link only
 
 ## Part 1: Signal Detection Theory (`01_sdt/`)
 
@@ -50,8 +48,7 @@ to nor restrict them.
   <https://osf.io/tcuzx> — **PDF in `02_m3/`** (preprint)
 - Oberauer, K., & Lewandowsky, S. (2019). Simple measurement models for
   complex working-memory tasks. *Psychological Review*, 126(6), 880–932.
-  <https://doi.org/10.1037/rev0000159> — **PDF in `02_m3/`** — ⚠️ APA
-  copyright; replace with the author-posted version or drop to link-only
+  <https://doi.org/10.1037/rev0000159> — link only
 
 ## Part 3: Diffusion Decision Models (`03_ezddm/`)
 
@@ -66,5 +63,4 @@ to nor restrict them.
 - Voss, A., Nagler, M., & Lerche, V. (2013). Diffusion models in
   experimental psychology: A practical introduction. *Experimental
   Psychology*, 60(6), 385–402. <https://doi.org/10.1027/1618-3169/a000218>
-  — **PDF in `03_ezddm/`** — ⚠️ Hogrefe copyright; check redistribution or
-  drop to link-only
+  — link only
