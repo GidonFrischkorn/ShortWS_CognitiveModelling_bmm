@@ -5,6 +5,9 @@ project:
     - "index.qmd"
     - "slides/*.qmd"
     - "examples/*.qmd"
+  # PDF versions of the decks (one page per slide), linked from index.qmd.
+  resources:
+    - "handouts/*_slides.pdf"
 
 # The site is a reading companion, not a replacement for the talk: the
 # sidebar gives attendees a way to navigate and search the notebooks after

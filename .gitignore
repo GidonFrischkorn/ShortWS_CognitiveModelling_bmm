@@ -13,6 +13,10 @@
 *_files/
 *.quarto_ipynb
 
+# PDF handouts: only the one-page-per-slide versions are published. The
+# one-page-per-step versions are the presenters' offline fallback and stay local.
+/handouts/*_steps.pdf
+
 # Never track: workshop proposal, private notes, AI context
 local/
 CLAUDE.md
