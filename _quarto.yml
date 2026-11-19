@@ -36,14 +36,14 @@ website:
             href: examples/02_m3.qmd
           - text: "Part 3 — EZ-Drift Diffusion Model"
             href: examples/03_ezddm.qmd
-      - section: "Slides"
+      - section: "Slides (PDF)"
         contents:
           - text: "Part 1 — bmm workflow & SDT"
-            href: slides/01_Intro_bmm_SDT.html
+            href: handouts/01_Intro_bmm_SDT_slides.pdf
           - text: "Part 2 — M3"
-            href: slides/02_M3.html
+            href: handouts/02_M3_slides.pdf
           - text: "Part 3 — EZ-DDM"
-            href: slides/03_EZDDM.html
+            href: handouts/03_EZDDM_slides.pdf
 
 execute:
   freeze: auto
